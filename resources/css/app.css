@@ -159,7 +159,7 @@ a:hover {
 :where(a.btn-primary) {
     background: var(--color-primary);
     color: var(--color-primary-content);
-    border: none;
+    border: none
 }
 
 :where(.btn-primary:hover),
