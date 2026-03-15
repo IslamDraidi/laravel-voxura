@@ -1,0 +1,235 @@
+/* ═══════════════════════════════
+   CONTACT SECTION
+═══════════════════════════════ */
+
+.contact-section {
+    min-height: 100svh;
+    background: #000;
+    color: #fff;
+    padding: 5rem 1.5rem;
+}
+
+.contact-container {
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+
+/* ── العنوان ── */
+.contact-header {
+    text-align: center;
+    margin-bottom: 4rem;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.contact-header.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.contact-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 700 !important;
+    color: #fff;
+    margin-bottom: 1.5rem;
+    line-height: 1.1;
+}
+
+.contact-title span {
+    color: #ea580c;
+}
+
+.contact-subtitle {
+    font-size: 1.1rem;
+    color: #9ca3af;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.7;
+}
+
+
+/* ── الغريد ── */
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+}
+
+@media (min-width: 1024px) {
+    .contact-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+
+/* ── الفورم ── */
+.contact-form-wrap {
+    opacity: 0;
+    transform: translateX(-50px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.contact-form-wrap.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.contact-form {
+    background: #111827;
+    border: 1px solid #1f2937;
+    border-radius: 1rem;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #fff;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: #000;
+    border: 1px solid #374151;
+    border-radius: 0.5rem;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: #6b7280;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: #ea580c;
+}
+
+.form-group textarea {
+    resize: none;
+}
+
+.btn-contact {
+    width: 100%;
+    background: #ea580c;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 500;
+    padding: 1rem;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.3s;
+}
+
+.btn-contact:hover {
+    background: #c2410c;
+    transform: scale(1.05);
+}
+
+
+/* ── معلومات التواصل ── */
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    opacity: 0;
+    transform: translateX(50px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.contact-info.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.contact-info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.contact-info-item:nth-child(1) { transition-delay: 0.0s; }
+.contact-info-item:nth-child(2) { transition-delay: 0.1s; }
+.contact-info-item:nth-child(3) { transition-delay: 0.2s; }
+
+.contact-info-item.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.contact-info-icon {
+    width: 56px;
+    height: 56px;
+    background: #ea580c;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #fff;
+}
+
+.contact-info-item h3 {
+    font-size: 1.1rem;
+    font-weight: 600 !important;
+    color: #fff;
+    margin-bottom: 0.25rem;
+}
+
+.contact-info-item p {
+    color: #9ca3af;
+    font-size: 0.95rem;
+}
+
+
+/* ── Social Media ── */
+.contact-social p {
+    color: #9ca3af;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+.social-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-social {
+    padding: 0.5rem 1.25rem;
+    border: 1px solid #374151;
+    border-radius: 0.5rem;
+    color: #fff !important;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: border-color 0.3s, color 0.3s;
+}
+
+.btn-social:hover {
+    border-color: #ea580c;
+    color: #ea580c !important;
+}
