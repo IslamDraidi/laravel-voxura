@@ -1,5 +1,5 @@
-<x-layout>
-    <x-slot:title>Welcome</x-slot:title>
+<x-layout mainClass="full-width">
+
 
     <div class="max-w-2xl mx-auto">
         <div class="card bg-base-100 shadow mt-8">
@@ -11,3 +11,24 @@
     </div>
 </x-layout>
 
+
+    {{-- Hero --}}
+    <x-hero />
+
+    {{-- Featured Products --}}
+    <div style="background:#fff">
+        @foreach($featuredProducts as $index => $product)
+            <x-featured-product :product="$product" :index="$index" />
+        @endforeach
+    </div>
+
+    {{-- Product Grid --}}
+    <x-product-grid :products="$products" />
+
+    {{-- About --}}
+    <x-about />
+
+    {{-- Contact --}}
+    <x-contact />
+
+</x-layout>
