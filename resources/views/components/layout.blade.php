@@ -14,7 +14,7 @@
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
 
-    <!-- Fonts — same as signup page -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
@@ -22,10 +22,22 @@
 
     <style>
         /* ── Reset ── */
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        html { scroll-behavior: smooth; }
+        *, *::before, *::after { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0;
+        }
 
-        /* ── Design tokens — matching signup page ── */
+        html { 
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        body {
+            overflow-x: hidden;
+        }
+
+        /* ── Design tokens ── */
         :root {
             --orange:         #ea580c;
             --orange-dark:    #c2410c;
@@ -57,7 +69,7 @@
             flex-direction: column;
         }
 
-        /* Ambient background blobs — same as signup */
+        /* Ambient blobs */
         body::before,
         body::after {
             content: '';
@@ -84,11 +96,12 @@
         @keyframes blob1 { to { transform: translate(45px, 35px) scale(1.07); } }
         @keyframes blob2 { to { transform: translate(-35px, -25px) scale(1.06); } }
 
-        /* ─── NAV ─────────────────────────────────── */
+        /* ── NAV ── */
         nav {
             position: sticky;
             top: 0;
             z-index: 50;
+            width: 100%;
             background: rgba(255, 247, 237, 0.75);
             backdrop-filter: blur(18px) saturate(160%);
             -webkit-backdrop-filter: blur(18px) saturate(160%);
@@ -106,7 +119,6 @@
             gap: 1rem;
         }
 
-        /* Wordmark — Playfair Display to match signup heading */
         .nav-logo {
             font-family: 'Playfair Display', serif;
             font-weight: 800;
@@ -131,14 +143,12 @@
         }
 
         .nav-logo .logo-icon svg { width: 15px; height: 15px; }
-
-        /* Orange accent on VOX, matching signup "Join VOX URA" */
         .nav-logo .accent { color: var(--orange); }
 
         .nav-end {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
         }
 
         .nav-user {
@@ -146,6 +156,24 @@
             font-weight: 500;
             color: var(--gray-500);
             padding: 0 0.6rem;
+        }
+
+        /* ── Nav Icons ── */
+        .nav-icon-btn {
+            color: var(--gray-600);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            transition: color 0.2s, background 0.2s;
+            text-decoration: none;
+        }
+
+        .nav-icon-btn:hover {
+            color: var(--orange);
+            background: rgba(234, 88, 12, 0.08);
         }
 
         /* ── Buttons ── */
@@ -166,7 +194,6 @@
         }
         .btn:active { transform: scale(0.97); }
 
-        /* Ghost — thin orange border */
         .btn-ghost {
             background: transparent;
             color: var(--gray-600);
@@ -178,7 +205,6 @@
             background: rgba(234, 88, 12, 0.05);
         }
 
-        /* Primary — solid orange, same as signup submit */
         .btn-primary {
             background: var(--orange);
             color: var(--white);
@@ -189,7 +215,7 @@
             box-shadow: 0 4px 18px rgba(234, 88, 12, 0.32);
         }
 
-        /* ─── TOAST ──────────────────────────────── */
+        /* ── TOAST ── */
         .toast-wrap {
             position: fixed;
             top: 74px;
@@ -223,7 +249,7 @@
             100% { opacity: 0; transform: translateY(-6px); pointer-events: none; }
         }
 
-        /* ─── MAIN ───────────────────────────────── */
+        /* ── MAIN ── */
         main {
             position: relative;
             z-index: 1;
@@ -234,7 +260,13 @@
             padding: 2.5rem 1.5rem;
         }
 
-        /* ─── FOOTER ─────────────────────────────── */
+        /* Home page — full width */
+        main.full-width {
+            max-width: 100% !important;
+            padding: 0 !important;
+        }
+
+        /* ── FOOTER ── */
         footer {
             position: relative;
             z-index: 1;
@@ -248,7 +280,6 @@
             margin: 0 auto;
         }
 
-        /* 4-column grid: brand | Shop | Support | Company */
         .footer-grid {
             display: grid !important;
             grid-template-columns: 1.6fr 1fr 1fr 1fr;
@@ -256,7 +287,6 @@
             padding-bottom: 3rem;
         }
 
-        /* ── Brand column ── */
         .footer-brand .footer-wordmark {
             font-family: 'Playfair Display', serif !important;
             font-weight: 800 !important;
@@ -281,8 +311,6 @@
             font-weight: 400 !important;
         }
 
-        /* ── Link columns ── */
-        /* Override app.css h1-h6 { font-weight: 400 !important } */
         footer .footer-col h4 {
             font-family: 'DM Sans', sans-serif !important;
             font-size: 0.875rem !important;
@@ -301,7 +329,6 @@
             gap: 0.65rem !important;
         }
 
-        /* Override app.css global `a { color: var(--link) }` */
         footer .footer-col ul li a {
             font-size: 0.875rem !important;
             color: rgba(255,255,255,0.45) !important;
@@ -313,7 +340,6 @@
             color: #ffffff !important;
         }
 
-        /* ── Divider ── */
         .footer-rule {
             border: none !important;
             border-top: 1px solid rgba(255,255,255,0.08) !important;
@@ -322,7 +348,6 @@
             height: 0 !important;
         }
 
-        /* ── Copyright bar ── */
         .footer-copy {
             text-align: center !important;
             font-size: 0.8rem !important;
@@ -370,14 +395,33 @@
             </a>
 
             <div class="nav-end">
+                  {{-- Wishlist --}}
+                    <a href="/wishlist" class="nav-icon-btn" title="Wishlist">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
+                             viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z"/>
+                        </svg>
+                    </a>
+
+                    {{-- Cart --}}
+                    <a href="/cart" class="nav-icon-btn" title="Cart">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
+                             viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                    </a> 
                 @auth
+                 
+
                     <span class="nav-user">{{ auth()->user()->name }}</span>
                     <form method="POST" action="/logout" style="display:inline">
                         @csrf
                         <button type="submit" class="btn btn-ghost">Logout</button>
                     </form>
                 @else
-                    <a href="/login"    class="btn btn-ghost">Sign In</a>
+                    <a href="/login" class="btn btn-ghost">Sign In</a>
                     <a href="{{ route('register') }}" class="btn btn-primary">Sign Up</a>
                 @endauth
             </div>
@@ -398,7 +442,7 @@
     @endif
 
     {{-- ── Page Content ── --}}
-    <main>
+    <main {{ isset($mainClass) ? "class=$mainClass" : '' }}>
         {{ $slot }}
     </main>
 
@@ -408,13 +452,13 @@
 
             <div class="footer-grid">
 
-                {{-- Brand column --}}
+                {{-- Brand --}}
                 <div class="footer-brand">
                     <a href="/" class="footer-wordmark"><span>VOX</span>URA</a>
                     <p class="footer-tagline">Elevating your tech experience with premium products</p>
                 </div>
 
-                {{-- Shop column --}}
+                {{-- Shop --}}
                 <div class="footer-col">
                     <h4>Shop</h4>
                     <ul>
@@ -425,7 +469,7 @@
                     </ul>
                 </div>
 
-                {{-- Support column --}}
+                {{-- Support --}}
                 <div class="footer-col">
                     <h4>Support</h4>
                     <ul>
@@ -436,7 +480,7 @@
                     </ul>
                 </div>
 
-                {{-- Company column --}}
+                {{-- Company --}}
                 <div class="footer-col">
                     <h4>Company</h4>
                     <ul>
