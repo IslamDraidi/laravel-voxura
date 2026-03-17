@@ -1,4 +1,9 @@
 @import 'tailwindcss';
+@import './hero.css';
+@import './featured-product.css';
+@import './product-grid.css';
+@import './about.css';
+@import './contact.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -159,7 +164,7 @@ a:hover {
 :where(a.btn-primary) {
     background: var(--color-primary);
     color: var(--color-primary-content);
-    border: none;
+
 }
 
 :where(.btn-primary:hover),
