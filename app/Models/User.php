@@ -33,7 +33,7 @@ class User extends Authenticatable
 
     public function isAdmin(): bool
     {
-        return $this->role === 'admin';
+        return (bool) $this->is_admin;
     }
 
     public function isBuyer(): bool
