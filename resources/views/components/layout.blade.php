@@ -22,13 +22,13 @@
 
     <style>
         /* ── Reset ── */
-        *, *::before, *::after { 
-            box-sizing: border-box; 
-            margin: 0; 
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
             padding: 0;
         }
 
-        html { 
+        html {
             scroll-behavior: smooth;
             overflow-x: hidden;
         }
@@ -98,83 +98,110 @@
 
         /* ── NAV ── */
         nav {
-            position: sticky;
+            position: fixed;
             top: 0;
+            left: 0;
+            right: 0;
             z-index: 50;
             width: 100%;
-            background: rgba(255, 247, 237, 0.75);
-            backdrop-filter: blur(18px) saturate(160%);
-            -webkit-backdrop-filter: blur(18px) saturate(160%);
-            border-bottom: 1px solid rgba(234, 88, 12, 0.12);
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+
+        nav.nav-top {
+            background: transparent;
+        }
+
+        nav.nav-scrolled {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
         }
 
         .nav-inner {
-            max-width: 1100px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 0 1.5rem;
-            height: 62px;
+            height: 64px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 1rem;
+            position: relative;
         }
 
         .nav-logo {
             font-family: 'Playfair Display', serif;
             font-weight: 800;
             font-size: 1.5rem;
-            color: var(--gray-900);
             text-decoration: none;
             letter-spacing: -0.02em;
-            display: flex;
-            align-items: center;
-            gap: 0.45rem;
+            transition: color 0.3s;
         }
 
-        .nav-logo .logo-icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 30px; height: 30px;
-            background: var(--orange);
-            border-radius: 8px;
-            color: var(--white);
-            flex-shrink: 0;
-        }
-
-        .nav-logo .logo-icon svg { width: 15px; height: 15px; }
+        nav.nav-top .nav-logo { color: #fff; }
+        nav.nav-scrolled .nav-logo { color: var(--gray-900); }
         .nav-logo .accent { color: var(--orange); }
 
+        /* ── Nav Links ── */
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .nav-links a {
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        nav.nav-top .nav-links a { color: #fff; }
+        nav.nav-top .nav-links a:hover { color: #fb923c; }
+        nav.nav-scrolled .nav-links a { color: var(--gray-600); }
+        nav.nav-scrolled .nav-links a:hover { color: var(--orange); }
+
+        /* ── Nav End ── */
         .nav-end {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.5rem;
         }
 
         .nav-user {
             font-size: 0.82rem;
             font-weight: 500;
-            color: var(--gray-500);
-            padding: 0 0.6rem;
+            padding: 0 0.3rem;
+            transition: color 0.3s;
         }
+
+        nav.nav-top .nav-user { color: #fff; }
+        nav.nav-scrolled .nav-user { color: var(--gray-600); }
 
         /* ── Nav Icons ── */
         .nav-icon-btn {
-            color: var(--gray-600);
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
-            transition: color 0.2s, background 0.2s;
             text-decoration: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.3s, background 0.3s;
         }
 
-        .nav-icon-btn:hover {
-            color: var(--orange);
-            background: rgba(234, 88, 12, 0.08);
-        }
+        nav.nav-top .nav-icon-btn { color: #fff; }
+        nav.nav-top .nav-icon-btn:hover { color: #fb923c; }
+        nav.nav-scrolled .nav-icon-btn { color: var(--gray-600); }
+        nav.nav-scrolled .nav-icon-btn:hover { color: var(--orange); background: rgba(234,88,12,0.08); }
 
         /* ── Buttons ── */
         .btn {
@@ -205,6 +232,16 @@
             background: rgba(234, 88, 12, 0.05);
         }
 
+        nav.nav-top .btn-ghost {
+            color: #fff;
+            border-color: rgba(255,255,255,0.4);
+        }
+        nav.nav-top .btn-ghost:hover {
+            color: #fff;
+            border-color: #fff;
+            background: rgba(255,255,255,0.1);
+        }
+
         .btn-primary {
             background: var(--orange);
             color: var(--white);
@@ -213,6 +250,54 @@
         .btn-primary:hover {
             background: var(--orange-dark);
             box-shadow: 0 4px 18px rgba(234, 88, 12, 0.32);
+        }
+
+        /* ── Hamburger ── */
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.4rem;
+            transition: color 0.3s;
+        }
+
+        nav.nav-top .hamburger { color: #fff; }
+        nav.nav-scrolled .hamburger { color: var(--gray-900); }
+
+        /* ── Mobile Menu ── */
+        .mobile-menu {
+            display: none;
+            background: #fff;
+            border-top: 1px solid var(--gray-200);
+            padding: 1.5rem;
+        }
+
+        .mobile-menu.open { display: block; }
+
+        .mobile-menu a,
+        .mobile-menu button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 0.65rem 0;
+            color: var(--gray-700);
+            font-weight: 500;
+            text-decoration: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-family: 'DM Sans', sans-serif;
+            transition: color 0.2s;
+        }
+
+        .mobile-menu a:hover,
+        .mobile-menu button:hover { color: var(--orange); }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hamburger { display: flex; }
         }
 
         /* ── TOAST ── */
@@ -260,116 +345,9 @@
             padding: 2.5rem 1.5rem;
         }
 
-        /* Home page — full width */
         main.full-width {
             max-width: 100% !important;
             padding: 0 !important;
-        }
-
-        /* ── FOOTER ── */
-        footer {
-            position: relative;
-            z-index: 1;
-            margin-top: auto;
-            background: #0a0a0a !important;
-            padding: 3.5rem 1.5rem 0 !important;
-        }
-
-        .footer-inner {
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-
-        .footer-grid {
-            display: grid !important;
-            grid-template-columns: 1.6fr 1fr 1fr 1fr;
-            gap: 2rem;
-            padding-bottom: 3rem;
-        }
-
-        .footer-brand .footer-wordmark {
-            font-family: 'Playfair Display', serif !important;
-            font-weight: 800 !important;
-            font-size: 1.55rem !important;
-            letter-spacing: -0.02em !important;
-            color: #ffffff !important;
-            line-height: 1 !important;
-            text-decoration: none !important;
-            display: inline-block !important;
-            margin-bottom: 1rem !important;
-        }
-
-        .footer-brand .footer-wordmark span {
-            color: var(--orange) !important;
-        }
-
-        .footer-tagline {
-            font-size: 0.875rem !important;
-            color: rgba(255,255,255,0.45) !important;
-            line-height: 1.6 !important;
-            max-width: 220px;
-            font-weight: 400 !important;
-        }
-
-        footer .footer-col h4 {
-            font-family: 'DM Sans', sans-serif !important;
-            font-size: 0.875rem !important;
-            font-weight: 600 !important;
-            color: #ffffff !important;
-            margin-bottom: 1.1rem !important;
-            letter-spacing: 0.01em !important;
-        }
-
-        footer .footer-col ul {
-            list-style: none !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            display: flex !important;
-            flex-direction: column !important;
-            gap: 0.65rem !important;
-        }
-
-        footer .footer-col ul li a {
-            font-size: 0.875rem !important;
-            color: rgba(255,255,255,0.45) !important;
-            text-decoration: none !important;
-            transition: color 0.15s !important;
-        }
-
-        footer .footer-col ul li a:hover {
-            color: #ffffff !important;
-        }
-
-        .footer-rule {
-            border: none !important;
-            border-top: 1px solid rgba(255,255,255,0.08) !important;
-            margin: 0 !important;
-            background: none !important;
-            height: 0 !important;
-        }
-
-        .footer-copy {
-            text-align: center !important;
-            font-size: 0.8rem !important;
-            color: rgba(255,255,255,0.3) !important;
-            padding: 1.4rem 0 !important;
-            font-weight: 400 !important;
-        }
-
-        /* ── Responsive ── */
-        @media (max-width: 768px) {
-            .footer-grid {
-                grid-template-columns: 1fr 1fr !important;
-            }
-            .footer-brand {
-                grid-column: 1 / -1 !important;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .footer-grid {
-                grid-template-columns: 1fr !important;
-            }
         }
     </style>
 </head>
@@ -377,25 +355,30 @@
 <body>
 
     {{-- ── Navbar ── --}}
-    <nav>
+    <nav id="navbar" class="nav-top">
         <div class="nav-inner">
+
+            {{-- Logo --}}
             <a href="/" class="nav-logo">
-                <span class="logo-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
-                         stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M2 10v4"/>
-                        <path d="M6 6v12"/>
-                        <path d="M10 3v18"/>
-                        <path d="M14 6v12"/>
-                        <path d="M18 10v4"/>
-                        <path d="M22 12h0"/>
-                    </svg>
-                </span>
                 <span class="accent">VOX</span>URA
             </a>
 
+            {{-- Center Links --}}
+            <div class="nav-links">
+                <a href="/#products">Products</a>
+                <a href="/#about">About</a>
+                <a href="/#contact">Contact</a>
+                @auth
+                    @if(auth()->user()->isAdmin())
+                        <a href="/admin">Admin</a>
+                    @endif
+                @endauth
+            </div>
+
+            {{-- Right Side --}}
             <div class="nav-end">
-                  {{-- Wishlist --}}
+                @auth
+                    {{-- Wishlist --}}
                     <a href="/wishlist" class="nav-icon-btn" title="Wishlist">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
                              viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -411,20 +394,65 @@
                             <path stroke-linecap="round" stroke-linejoin="round"
                                   d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                         </svg>
-                    </a> 
-                @auth
-                 
+                    </a>
 
                     <span class="nav-user">{{ auth()->user()->name }}</span>
+
                     <form method="POST" action="/logout" style="display:inline">
                         @csrf
-                        <button type="submit" class="btn btn-ghost">Logout</button>
+                        <button type="submit" class="nav-icon-btn" title="Logout">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
+                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                            </svg>
+                        </button>
                     </form>
                 @else
                     <a href="/login" class="btn btn-ghost">Sign In</a>
                     <a href="{{ route('register') }}" class="btn btn-primary">Sign Up</a>
                 @endauth
+
+                {{-- Hamburger --}}
+                <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+                    <svg id="icon-menu" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                    <svg id="icon-close" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="display:none;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
             </div>
+        </div>
+
+        {{-- Mobile Menu --}}
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="/#products">Products</a>
+            <a href="/#about">About</a>
+            <a href="/#contact">Contact</a>
+            <a href="/wishlist">Wishlist</a>
+            <a href="/cart">Cart</a>
+            @auth
+                @if(auth()->user()->isAdmin())
+                    <a href="/admin">Admin</a>
+                @endif
+                <div style="border-top:1px solid #e5e7eb; margin-top:1rem; padding-top:1rem;">
+                    <div style="font-size:0.85rem; font-weight:600; color:#111; margin-bottom:0.5rem;">
+                        {{ auth()->user()->name }}
+                    </div>
+                    <form method="POST" action="/logout">
+                        @csrf
+                        <button type="submit" style="color:#ef4444 !important;">Sign Out</button>
+                    </form>
+                </div>
+            @else
+                <div style="border-top:1px solid #e5e7eb; margin-top:1rem; padding-top:1rem;">
+                    <a href="/login">Sign In</a>
+                    <a href="{{ route('register') }}" style="color:#ea580c;">Sign Up</a>
+                </div>
+            @endauth
         </div>
     </nav>
 
@@ -447,57 +475,78 @@
     </main>
 
     {{-- ── Footer ── --}}
-    <footer>
-        <div class="footer-inner">
+    <footer style="background:#000;color:#fff;padding:4rem 0;">
+        <div style="max-width:1280px;margin:0 auto;padding:0 1.5rem;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:2rem;margin-bottom:2rem;">
 
-            <div class="footer-grid">
-
-                {{-- Brand --}}
-                <div class="footer-brand">
-                    <a href="/" class="footer-wordmark"><span>VOX</span>URA</a>
-                    <p class="footer-tagline">Elevating your tech experience with premium products</p>
+                <div>
+                    <h3 style="font-size:1.5rem;font-weight:700;margin:0 0 1rem;">
+                        <span style="color:#ea580c;">VOX</span>URA
+                    </h3>
+                    <p style="color:#9ca3af;margin:0;font-size:14px;line-height:1.6;">
+                        Elevating your tech experience with premium products
+                    </p>
                 </div>
 
-                {{-- Shop --}}
-                <div class="footer-col">
-                    <h4>Shop</h4>
-                    <ul>
-                        <li><a href="#">All Products</a></li>
-                        <li><a href="#">New Arrivals</a></li>
-                        <li><a href="#">Best Sellers</a></li>
-                        <li><a href="#">Sale</a></li>
+                <div>
+                    <h4 style="font-weight:600;margin:0 0 1rem;font-size:15px;">Shop</h4>
+                    <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;">
+                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">All Products</a></li>
+                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">New Arrivals</a></li>
+                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">Best Sellers</a></li>
+                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">Sale</a></li>
                     </ul>
                 </div>
 
-                {{-- Support --}}
-                <div class="footer-col">
-                    <h4>Support</h4>
-                    <ul>
-                        <li><a href="#">Contact Us</a></li>
-                        <li><a href="#">Shipping Info</a></li>
-                        <li><a href="#">Returns</a></li>
-                        <li><a href="#">FAQ</a></li>
+                <div>
+                    <h4 style="font-weight:600;margin:0 0 1rem;font-size:15px;">Support</h4>
+                    <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;">
+                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">Contact Us</a></li>
+                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">Shipping Info</a></li>
+                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">Returns</a></li>
+                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">FAQ</a></li>
                     </ul>
                 </div>
 
-                {{-- Company --}}
-                <div class="footer-col">
-                    <h4>Company</h4>
-                    <ul>
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">Careers</a></li>
-                        <li><a href="#">Press</a></li>
-                        <li><a href="#">Privacy</a></li>
+                <div>
+                    <h4 style="font-weight:600;margin:0 0 1rem;font-size:15px;">Company</h4>
+                    <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;">
+                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">About Us</a></li>
+                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">Careers</a></li>
+                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">Press</a></li>
+                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">Privacy</a></li>
                     </ul>
                 </div>
 
             </div>
 
-            <hr class="footer-rule">
-            <p class="footer-copy">© {{ date('Y') }} Voxura. All rights reserved.</p>
-
+            <div style="border-top:1px solid #1f2937;padding-top:2rem;text-align:center;">
+                <p style="color:#9ca3af;margin:0;font-size:14px;">&copy; {{ date('Y') }} Voxura. All rights reserved.</p>
+            </div>
         </div>
     </footer>
+
+    <script>
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.remove('nav-top');
+                navbar.classList.add('nav-scrolled');
+            } else {
+                navbar.classList.remove('nav-scrolled');
+                navbar.classList.add('nav-top');
+            }
+        });
+
+        function toggleMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const iconMenu = document.getElementById('icon-menu');
+            const iconClose = document.getElementById('icon-close');
+            menu.classList.toggle('open');
+            iconMenu.style.display = menu.classList.contains('open') ? 'none' : 'block';
+            iconClose.style.display = menu.classList.contains('open') ? 'block' : 'none';
+        }
+    </script>
 
 </body>
 </html>
