@@ -11,6 +11,8 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\ProfileController;
 
 Route::get("/", [UserController::class, "index"]);
 Route::get("/product/{product}", [ProductController::class, "show"])->name("products.show");
@@ -38,6 +40,15 @@ Route::middleware("auth")->group(function () {
     Route::post("/checkout",      [OrderController::class, "place"])->name("checkout.place");
     Route::get("/orders",         [OrderController::class, "index"])->name("orders.index");
     Route::get("/orders/{order}", [OrderController::class, "show"])->name("orders.show");
+
+    // Profile
+    Route::get("/profile",          [ProfileController::class, "edit"])->name("profile.edit");
+    Route::patch("/profile/info",   [ProfileController::class, "updateInfo"])->name("profile.info");
+    Route::patch("/profile/password",[ProfileController::class, "updatePassword"])->name("profile.password");
+
+    // Reviews
+    Route::post("/products/{product}/reviews", [FeedbackController::class, "store"])->name("reviews.store");
+    Route::delete("/reviews/{feedback}",       [FeedbackController::class, "destroy"])->name("reviews.destroy");
 });
 
 Route::middleware(["auth", "admin"])->prefix("admin")->group(function () {
@@ -54,4 +65,6 @@ Route::middleware(["auth", "admin"])->prefix("admin")->group(function () {
     Route::post("/categories",                  [CategoryController::class, "store"])->name("admin.categories.store");
     Route::put("/categories/{category}",        [CategoryController::class, "update"])->name("admin.categories.update");
     Route::delete("/categories/{category}",     [CategoryController::class, "destroy"])->name("admin.categories.destroy");
+    Route::get("/orders",                       [AdminController::class, "orders"])->name("admin.orders.index");
+    Route::patch("/orders/{order}/status",      [AdminController::class, "updateOrderStatus"])->name("admin.orders.status");
 });
