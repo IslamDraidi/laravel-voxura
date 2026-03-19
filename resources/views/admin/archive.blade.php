@@ -1,68 +1,246 @@
-<x-layout>
-    <x-slot name="title">Archive</x-slot>
+<x-layout title="Archive">
+<style>
+.admin-page { padding-top: 90px; padding-bottom: 4rem; }
 
-    
-        <div style="max-width:1100px; margin:0 auto;">
+.admin-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
 
-            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:2rem;">
-                <h1 style="font-family:'Playfair Display',serif; font-size:3rem; font-weight:700;">
-                    
-                    
-                    <span >Archive</span>
-                </h1
-                <a href="/admin"
-                   style="background:#ea580c; color:#fff; padding:0.75rem 1.5rem; border-radius:999px; text-decoration:none; font-weight:600;">
-                    ← Back to Admin
-                </a>
-            </div>
+.admin-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--gray-900);
+    letter-spacing: -0.03em;
+}
 
-            @if(session('success'))
-                <div style="background:#dcfce7; color:#16a34a; padding:1rem; border-radius:0.5rem; margin-bottom:1.5rem;">
-                    {{ session('success') }}
-                </div>
-            @endif
+.admin-title span { color: var(--orange); }
 
-            @if($products->isEmpty())
-                
-                    <p style="color:#6b7280; font-size:1.1rem; text-align:center;">No archived products</p>
-                </div>
-            @else
-                <div style="display:flex; flex-direction:column; gap:1rem;">
-                    @foreach($products as $product)
-                    <div style="background:#fff; border-radius:0.75rem; padding:1.5rem; box-shadow:0 4px 16px rgba(0,0,0,0.08); display:flex; align-items:center; gap:1.5rem; opacity:0.8;">
+.btn-admin {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--orange);
+    color: #fff;
+    padding: 0.55rem 1.1rem;
+    border-radius: 999px;
+    text-decoration: none;
+    font-size: 0.83rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-family: 'DM Sans', sans-serif;
+}
 
-                        <img src="{{ asset('images/' . $product->image) }}"
-                             alt="{{ $product->name }}"
-                             style="width:96px; height:96px; object-fit:cover; border-radius:0.5rem; filter:grayscale(50%);">
+.btn-admin:hover { background: var(--orange-dark); }
 
-                        <div style="flex:1;">
-                            <h3 style="font-size:1.25rem; font-weight:700; color:#000;">{{ $product->name }}</h3>
-                            <p style="color:#6b7280;">{{ $product->category->name }}</p>
-                            <div style="display:flex; gap:1rem; margin-top:0.5rem; font-size:0.9rem;">
-                                <span style="font-weight:600;">${{ $product->price }}</span>
-                                <span style="color:#ef4444;">Deleted: {{ $product->deleted_at->format('M d, Y') }}</span>
-                            </div>
-                        </div>
+.btn-admin-ghost {
+    background: transparent;
+    color: var(--gray-600);
+    border: 1.5px solid var(--gray-300);
+}
 
-                        <div style="display:flex; gap:0.5rem;">
-                            <form method="POST" action="/admin/products/{{ $product->id }}/restore">
-                                @csrf
-                                <button type="submit"
-                                        style="background:#ea580c; color:#fff; padding:0.5rem 1rem; border-radius:0.5rem; border:none; cursor:pointer; font-weight:600;">
-                                    ↩️ Restore
-                                </button>
-                            </form>
-                            <a href="/admin/products/{{ $product->id }}/edit?from=archive"
-                               style="background:#ea580c; color:#fff; padding:0.5rem 1rem; border-radius:0.5rem; text-decoration:none; font-weight:600;">
-                                ✏️ Edit
-                            </a>
-                        </div>
+.btn-admin-ghost:hover {
+    color: var(--orange);
+    border-color: var(--orange);
+    background: rgba(234,88,12,0.05);
+}
 
-                    </div>
-                    @endforeach
-                </div>
-            @endif
+.alert-success {
+    background: #dcfce7;
+    color: #16a34a;
+    padding: 0.85rem 1.25rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.25rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
 
-        </div>
+.archive-rows { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.archive-row {
+    background: #fff;
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    opacity: 0.82;
+    transition: opacity 0.2s, box-shadow 0.2s;
+}
+
+.archive-row:hover { opacity: 1; box-shadow: var(--shadow-md); }
+
+.archive-row img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    flex-shrink: 0;
+    filter: grayscale(40%);
+}
+
+.archive-row-info { flex: 1; min-width: 0; }
+
+.archive-row-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--gray-900);
+}
+
+.archive-row-meta {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.3rem;
+    font-size: 0.82rem;
+    color: var(--gray-400);
+    flex-wrap: wrap;
+}
+
+.deleted-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+.archive-row-actions { display: flex; gap: 0.5rem; flex-shrink: 0; flex-wrap: wrap; }
+
+.btn-restore {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1.5px solid #bbf7d0;
+    color: #16a34a;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    transition: background 0.15s;
+}
+
+.btn-restore:hover { background: #dcfce7; }
+
+.btn-edit-arch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1.5px solid var(--gray-200);
+    color: var(--gray-600);
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    transition: color 0.15s, border-color 0.15s;
+}
+
+.btn-edit-arch:hover { color: var(--orange); border-color: var(--orange); }
+
+.btn-perm-delete {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1.5px solid #fecaca;
+    color: #ef4444;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    transition: background 0.15s;
+}
+
+.btn-perm-delete:hover { background: #fee2e2; }
+
+.archive-empty {
+    text-align: center;
+    padding: 4rem 1rem;
+    color: var(--gray-400);
+    font-size: 0.95rem;
+}
+
+@media (max-width: 640px) {
+    .archive-row { flex-wrap: wrap; }
+    .archive-row-actions { width: 100%; justify-content: flex-end; }
+}
+</style>
+
+<div class="admin-page">
+
+    <div class="admin-header">
+        <h1 class="admin-title">📦 <span>Archive</span></h1>
+        <a href="/admin" class="btn-admin btn-admin-ghost">← Back to Admin</a>
     </div>
+
+    @if(session('success'))
+        <div class="alert-success">✓ {{ session('success') }}</div>
+    @endif
+
+    @if($products->isEmpty())
+        <div class="archive-empty">
+            <p style="font-size:2rem;margin-bottom:0.5rem;">📭</p>
+            <p>No archived products — everything is live!</p>
+        </div>
+    @else
+        <div class="archive-rows">
+            @foreach($products as $product)
+            <div class="archive-row">
+
+                <img src="{{ asset('images/' . $product->image) }}" alt="{{ $product->name }}">
+
+                <div class="archive-row-info">
+                    <p class="archive-row-name">{{ $product->name }}</p>
+                    <div class="archive-row-meta">
+                        <span>{{ $product->category->name }}</span>
+                        <span style="font-weight:700;color:var(--gray-900);">${{ number_format($product->price) }}</span>
+                        <span class="deleted-badge">Deleted {{ $product->deleted_at->format('M d, Y') }}</span>
+                    </div>
+                </div>
+
+                <div class="archive-row-actions">
+
+                    {{-- Restore --}}
+                    <form method="POST" action="/admin/products/{{ $product->id }}/restore">
+                        @csrf
+                        <button type="submit" class="btn-restore">↩️ Restore</button>
+                    </form>
+
+                    {{-- Edit --}}
+                    <a href="/admin/products/{{ $product->id }}/edit?from=archive"
+                       class="btn-edit-arch">✏️ Edit</a>
+
+                    {{-- Permanent Delete --}}
+                    <form method="POST" action="/admin/products/{{ $product->id }}/force-delete">
+                        @csrf @method('DELETE')
+                        <button type="submit" class="btn-perm-delete"
+                                onclick="return confirm('Permanently delete \"{{ $product->name }}\"? This cannot be undone!')">
+                            🗑️ Delete Forever
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+            @endforeach
+        </div>
+    @endif
+
+</div>
 </x-layout>
