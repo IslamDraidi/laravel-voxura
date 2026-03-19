@@ -5,9 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\User;
-use App\Models\ShoppingCart;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
@@ -15,40 +16,33 @@ class AdminController extends Controller
     {
         $query = Product::with('category');
 
-        // Search
         if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
         }
-
-        // Filter by category
         if ($request->filled('category')) {
             $query->where('category_id', $request->category);
         }
-
-        // Filter by stock
         if ($request->filled('stock')) {
-            if ($request->stock === 'low') {
-                $query->where('stock', '<=', 10);
-            } elseif ($request->stock === 'out') {
-                $query->where('stock', 0);
-            }
+            if ($request->stock === 'low')  $query->where('stock', '<=', 10)->where('stock', '>', 0);
+            if ($request->stock === 'out')  $query->where('stock', 0);
         }
 
         $products   = $query->get();
         $categories = Category::all();
 
-        // Stats
         $stats = [
-            'total'     => Product::count(),
-            'low_stock' => Product::where('stock', '<=', 10)->where('stock', '>', 0)->count(),
-            'out'       => Product::where('stock', 0)->count(),
-            'archived'  => Product::onlyTrashed()->count(),
-            'users'     => User::count(),
-            'revenue'   => Product::sum(\DB::raw('price * (100 - stock)')), // rough estimate
+            'total'          => Product::count(),
+            'low_stock'      => Product::where('stock', '<=', 10)->where('stock', '>', 0)->count(),
+            'out'            => Product::where('stock', 0)->count(),
+            'archived'       => Product::onlyTrashed()->count(),
+            'users'          => User::count(),
+            'pending_orders' => Order::where('status', 'pending')->count(),
         ];
 
         return view('admin.dashboard', compact('products', 'categories', 'stats'));
     }
+
+    // ── Products ──
 
     public function create()
     {
@@ -107,7 +101,7 @@ class AdminController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $imageName    = time() . '.' . $request->image->extension();
+            $imageName      = time() . '.' . $request->image->extension();
             $request->image->move(public_path('images'), $imageName);
             $product->image = $imageName;
         }
@@ -146,15 +140,52 @@ class AdminController extends Controller
 
     public function forceDelete($id)
     {
-        $product = Product::withTrashed()->findOrFail($id);
-
-        // Delete image file if it exists
+        $product   = Product::withTrashed()->findOrFail($id);
         $imagePath = public_path('images/' . $product->image);
-        if ($product->image && file_exists($imagePath)) {
-            unlink($imagePath);
-        }
-
+        if ($product->image && file_exists($imagePath)) unlink($imagePath);
         $product->forceDelete();
         return redirect('/admin/archive')->with('success', 'Product permanently deleted.');
+    }
+
+    // ── Orders ──
+
+    public function orders(Request $request)
+    {
+        $query = Order::with('user', 'items.product')->latest();
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('search')) {
+            $query->whereHas('user', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('email', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        $orders = $query->get();
+
+        $statusCounts = [
+            'all'        => Order::count(),
+            'pending'    => Order::where('status', 'pending')->count(),
+            'processing' => Order::where('status', 'processing')->count(),
+            'shipped'    => Order::where('status', 'shipped')->count(),
+            'delivered'  => Order::where('status', 'delivered')->count(),
+            'cancelled'  => Order::where('status', 'cancelled')->count(),
+        ];
+
+        return view('admin.orders.index', compact('orders', 'statusCounts'));
+    }
+
+    public function updateOrderStatus(Request $request, Order $order)
+    {
+        $request->validate([
+            'status' => 'required|in:pending,processing,shipped,delivered,cancelled',
+        ]);
+
+        $order->update(['status' => $request->status]);
+
+        return back()->with('success', "Order #{$order->id} status updated to " . ucfirst($request->status) . '.');
     }
 }

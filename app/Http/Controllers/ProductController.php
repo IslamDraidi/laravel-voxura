@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Feedback;
 
 class ProductController extends Controller
 {
@@ -10,6 +11,16 @@ class ProductController extends Controller
     {
         $product->load('category');
 
-        return view('products.show', compact('product'));
+        $reviews = Feedback::where('product_id', $product->id)
+                           ->with('user')
+                           ->latest()
+                           ->get();
+
+        $avgRating   = $reviews->avg('rating');
+        $userReview  = auth()->check()
+            ? $reviews->firstWhere('user_id', auth()->id())
+            : null;
+
+        return view('products.show', compact('product', 'reviews', 'avgRating', 'userReview'));
     }
 }
