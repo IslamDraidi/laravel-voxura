@@ -10,55 +10,39 @@
     <meta property="og:description" content="A social platform built with Laravel." />
     <meta property="og:url" content="https://voxura.laravel.cloud" />
 
-    <!-- Favicons -->
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
 
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
-        /* ── Reset ── */
-        *, *::before, *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; overflow-x: hidden; }
+        body { overflow-x: hidden; }
 
-        html {
-            scroll-behavior: smooth;
-            overflow-x: hidden;
-        }
-
-        body {
-            overflow-x: hidden;
-        }
-
-        /* ── Design tokens ── */
         :root {
-            --orange:         #ea580c;
-            --orange-dark:    #c2410c;
-            --orange-light:   #fff7ed;
-            --orange-muted:   #fed7aa;
-            --gray-50:        #f9fafb;
-            --gray-100:       #f3f4f6;
-            --gray-200:       #e5e7eb;
-            --gray-300:       #d1d5db;
-            --gray-400:       #9ca3af;
-            --gray-500:       #6b7280;
-            --gray-600:       #4b5563;
-            --gray-900:       #111827;
-            --white:          #ffffff;
-            --shadow-sm:      0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
-            --shadow-md:      0 4px 16px rgba(0,0,0,0.08);
-            --shadow-card:    0 25px 50px -12px rgba(0,0,0,0.12);
-            --radius:         0.75rem;
+            --orange:       #ea580c;
+            --orange-dark:  #c2410c;
+            --orange-light: #fff7ed;
+            --orange-muted: #fed7aa;
+            --gray-50:      #f9fafb;
+            --gray-100:     #f3f4f6;
+            --gray-200:     #e5e7eb;
+            --gray-300:     #d1d5db;
+            --gray-400:     #9ca3af;
+            --gray-500:     #6b7280;
+            --gray-600:     #4b5563;
+            --gray-900:     #111827;
+            --white:        #ffffff;
+            --shadow-sm:    0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md:    0 4px 16px rgba(0,0,0,0.08);
+            --shadow-card:  0 25px 50px -12px rgba(0,0,0,0.12);
+            --radius:       0.75rem;
         }
 
-        /* ── Base ── */
         body {
             background: linear-gradient(135deg, var(--orange-light) 0%, var(--white) 50%, var(--gray-50) 100%);
             color: var(--gray-900);
@@ -69,9 +53,7 @@
             flex-direction: column;
         }
 
-        /* Ambient blobs */
-        body::before,
-        body::after {
+        body::before, body::after {
             content: '';
             position: fixed;
             border-radius: 50%;
@@ -98,19 +80,11 @@
 
         /* ── NAV ── */
         nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 50;
-            width: 100%;
+            position: fixed; top: 0; left: 0; right: 0;
+            z-index: 50; width: 100%;
             transition: background 0.3s, box-shadow 0.3s;
         }
-
-        nav.nav-top {
-            background: transparent;
-        }
-
+        nav.nav-top     { background: transparent; }
         nav.nav-scrolled {
             background: rgba(255,255,255,0.95);
             backdrop-filter: blur(10px);
@@ -119,212 +93,163 @@
         }
 
         .nav-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-            height: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            position: relative;
+            max-width: 1200px; margin: 0 auto; padding: 0 1.5rem;
+            height: 64px; display: flex; align-items: center;
+            justify-content: space-between; gap: 1rem; position: relative;
         }
 
         .nav-logo {
             font-family: 'Playfair Display', serif;
-            font-weight: 800;
-            font-size: 1.5rem;
-            text-decoration: none;
-            letter-spacing: -0.02em;
+            font-weight: 800; font-size: 1.5rem;
+            text-decoration: none; letter-spacing: -0.02em;
             transition: color 0.3s;
         }
-
-        nav.nav-top .nav-logo { color: #fff; }
+        nav.nav-top .nav-logo      { color: #fff; }
         nav.nav-scrolled .nav-logo { color: var(--gray-900); }
-        .nav-logo .accent { color: var(--orange); }
+        .nav-logo .accent          { color: var(--orange); }
 
-        /* ── Nav Links ── */
         .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
+            display: flex; align-items: center; gap: 2rem;
+            position: absolute; left: 50%; transform: translateX(-50%);
         }
-
         .nav-links a {
-            font-size: 0.9rem;
-            font-weight: 500;
-            text-decoration: none;
-            transition: color 0.3s;
+            font-size: 0.9rem; font-weight: 500;
+            text-decoration: none; transition: color 0.3s;
         }
-
-        nav.nav-top .nav-links a { color: #fff; }
+        nav.nav-top .nav-links a      { color: #fff; }
         nav.nav-top .nav-links a:hover { color: #fb923c; }
-        nav.nav-scrolled .nav-links a { color: var(--gray-600); }
+        nav.nav-scrolled .nav-links a  { color: var(--gray-600); }
         nav.nav-scrolled .nav-links a:hover { color: var(--orange); }
 
-        /* ── Nav End ── */
-        .nav-end {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
+        .nav-end { display: flex; align-items: center; gap: 0.5rem; }
 
         .nav-user {
-            font-size: 0.82rem;
-            font-weight: 500;
-            padding: 0 0.3rem;
-            transition: color 0.3s;
+            font-size: 0.82rem; font-weight: 500;
+            padding: 0 0.3rem; transition: color 0.3s;
         }
-
-        nav.nav-top .nav-user { color: #fff; }
+        nav.nav-top .nav-user      { color: #fff; }
         nav.nav-scrolled .nav-user { color: var(--gray-600); }
 
-        /* ── Nav Icons ── */
+        /* ── Nav Icon Button ── */
         .nav-icon-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            text-decoration: none;
-            background: none;
-            border: none;
-            cursor: pointer;
-            position: relative;
+            display: flex; align-items: center; justify-content: center;
+            width: 38px; height: 38px; border-radius: 50%;
+            text-decoration: none; background: none; border: none;
+            cursor: pointer; position: relative;
             transition: color 0.3s, background 0.3s;
         }
-
-        nav.nav-top .nav-icon-btn { color: #fff; }
+        nav.nav-top .nav-icon-btn       { color: #fff; }
         nav.nav-top .nav-icon-btn:hover { color: #fb923c; }
-        nav.nav-scrolled .nav-icon-btn { color: var(--gray-600); }
-        nav.nav-scrolled .nav-icon-btn:hover { color: var(--orange); background: rgba(234,88,12,0.08); }
+        nav.nav-scrolled .nav-icon-btn  { color: var(--gray-600); }
+        nav.nav-scrolled .nav-icon-btn:hover {
+            color: var(--orange);
+            background: rgba(234,88,12,0.08);
+        }
+
+        /* ── Badge ── */
+        .nav-badge {
+            position: absolute;
+            top: 2px; right: 2px;
+            min-width: 17px; height: 17px;
+            background: var(--orange);
+            color: #fff;
+            font-size: 0.62rem;
+            font-weight: 800;
+            font-family: 'DM Sans', sans-serif;
+            border-radius: 999px;
+            display: flex; align-items: center; justify-content: center;
+            padding: 0 4px;
+            border: 2px solid transparent;
+            line-height: 1;
+            pointer-events: none;
+        }
+
+        nav.nav-top .nav-badge {
+            border-color: rgba(255,255,255,0.2);
+        }
+        nav.nav-scrolled .nav-badge {
+            border-color: #fff;
+        }
 
         /* ── Buttons ── */
         .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 0.83rem;
-            font-weight: 600;
-            padding: 0.45rem 1.15rem;
-            border-radius: 999px;
-            border: none;
-            cursor: pointer;
-            text-decoration: none;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-family: 'DM Sans', sans-serif; font-size: 0.83rem; font-weight: 600;
+            padding: 0.45rem 1.15rem; border-radius: 999px; border: none;
+            cursor: pointer; text-decoration: none;
             transition: background 0.18s, color 0.18s, box-shadow 0.18s, transform 0.1s;
             white-space: nowrap;
         }
         .btn:active { transform: scale(0.97); }
 
         .btn-ghost {
-            background: transparent;
-            color: var(--gray-600);
+            background: transparent; color: var(--gray-600);
             border: 1.5px solid var(--gray-300);
         }
         .btn-ghost:hover {
-            color: var(--orange);
-            border-color: var(--orange);
-            background: rgba(234, 88, 12, 0.05);
+            color: var(--orange); border-color: var(--orange);
+            background: rgba(234,88,12,0.05);
         }
-
         nav.nav-top .btn-ghost {
-            color: #fff;
-            border-color: rgba(255,255,255,0.4);
+            color: #fff; border-color: rgba(255,255,255,0.4);
         }
         nav.nav-top .btn-ghost:hover {
-            color: #fff;
-            border-color: #fff;
-            background: rgba(255,255,255,0.1);
+            color: #fff; border-color: #fff; background: rgba(255,255,255,0.1);
         }
 
         .btn-primary {
-            background: var(--orange);
-            color: var(--white);
-            box-shadow: 0 2px 10px rgba(234, 88, 12, 0.22);
+            background: var(--orange); color: var(--white);
+            box-shadow: 0 2px 10px rgba(234,88,12,0.22);
         }
         .btn-primary:hover {
             background: var(--orange-dark);
-            box-shadow: 0 4px 18px rgba(234, 88, 12, 0.32);
+            box-shadow: 0 4px 18px rgba(234,88,12,0.32);
         }
 
         /* ── Hamburger ── */
         .hamburger {
-            display: none;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0.4rem;
-            transition: color 0.3s;
+            display: none; background: none; border: none;
+            cursor: pointer; padding: 0.4rem; transition: color 0.3s;
         }
-
-        nav.nav-top .hamburger { color: #fff; }
+        nav.nav-top .hamburger      { color: #fff; }
         nav.nav-scrolled .hamburger { color: var(--gray-900); }
 
         /* ── Mobile Menu ── */
         .mobile-menu {
-            display: none;
-            background: #fff;
-            border-top: 1px solid var(--gray-200);
-            padding: 1.5rem;
+            display: none; background: #fff;
+            border-top: 1px solid var(--gray-200); padding: 1.5rem;
         }
-
         .mobile-menu.open { display: block; }
 
-        .mobile-menu a,
-        .mobile-menu button {
-            display: block;
-            width: 100%;
-            text-align: left;
-            padding: 0.65rem 0;
-            color: var(--gray-700);
-            font-weight: 500;
-            text-decoration: none;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 0.95rem;
-            font-family: 'DM Sans', sans-serif;
+        .mobile-menu a, .mobile-menu button {
+            display: block; width: 100%; text-align: left;
+            padding: 0.65rem 0; color: var(--gray-700);
+            font-weight: 500; text-decoration: none;
+            background: none; border: none; cursor: pointer;
+            font-size: 0.95rem; font-family: 'DM Sans', sans-serif;
             transition: color 0.2s;
         }
-
-        .mobile-menu a:hover,
-        .mobile-menu button:hover { color: var(--orange); }
+        .mobile-menu a:hover, .mobile-menu button:hover { color: var(--orange); }
 
         @media (max-width: 768px) {
             .nav-links { display: none; }
             .hamburger { display: flex; }
         }
 
-        /* ── TOAST ── */
+        /* ── Toast ── */
         .toast-wrap {
-            position: fixed;
-            top: 74px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 100;
+            position: fixed; top: 74px; left: 50%;
+            transform: translateX(-50%); z-index: 100;
         }
-
         .toast-alert {
-            display: flex;
-            align-items: center;
-            gap: 0.55rem;
+            display: flex; align-items: center; gap: 0.55rem;
             background: var(--white);
-            border: 1.5px solid rgba(234, 88, 12, 0.3);
-            color: var(--orange);
-            font-size: 0.85rem;
-            font-weight: 600;
-            padding: 0.65rem 1.3rem;
-            border-radius: 999px;
-            box-shadow: var(--shadow-md);
-            white-space: nowrap;
+            border: 1.5px solid rgba(234,88,12,0.3);
+            color: var(--orange); font-size: 0.85rem; font-weight: 600;
+            padding: 0.65rem 1.3rem; border-radius: 999px;
+            box-shadow: var(--shadow-md); white-space: nowrap;
             animation: toastFade 4s ease-in-out forwards;
         }
-
         .toast-alert svg { width: 15px; height: 15px; flex-shrink: 0; }
 
         @keyframes toastFade {
@@ -334,21 +259,12 @@
             100% { opacity: 0; transform: translateY(-6px); pointer-events: none; }
         }
 
-        /* ── MAIN ── */
+        /* ── Main ── */
         main {
-            position: relative;
-            z-index: 1;
-            flex: 1;
-            width: 100%;
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 2.5rem 1.5rem;
+            position: relative; z-index: 1; flex: 1; width: 100%;
+            max-width: 1100px; margin: 0 auto; padding: 2.5rem 1.5rem;
         }
-
-        main.full-width {
-            max-width: 100% !important;
-            padding: 0 !important;
-        }
+        main.full-width { max-width: 100% !important; padding: 0 !important; }
     </style>
 </head>
 
@@ -358,26 +274,27 @@
     <nav id="navbar" class="nav-top">
         <div class="nav-inner">
 
-            {{-- Logo --}}
-            <a href="/" class="nav-logo">
-                <span class="accent">VOX</span>URA
-            </a>
+            <a href="/" class="nav-logo"><span class="accent">VOX</span>URA</a>
 
-            {{-- Center Links --}}
             <div class="nav-links">
                 <a href="/#products">Products</a>
                 <a href="/#about">About</a>
                 <a href="/#contact">Contact</a>
                 @auth
+                    <a href="/orders">My Orders</a>
                     @if(auth()->user()->isAdmin())
                         <a href="/admin">Admin</a>
                     @endif
                 @endauth
             </div>
 
-            {{-- Right Side --}}
             <div class="nav-end">
                 @auth
+                    @php
+                        $cartCount     = auth()->user()->cartCount();
+                        $wishlistCount = auth()->user()->wishlistCount();
+                    @endphp
+
                     {{-- Wishlist --}}
                     <a href="/wishlist" class="nav-icon-btn" title="Wishlist">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
@@ -385,6 +302,9 @@
                             <path stroke-linecap="round" stroke-linejoin="round"
                                   d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z"/>
                         </svg>
+                        @if($wishlistCount > 0)
+                            <span class="nav-badge">{{ $wishlistCount > 99 ? '99+' : $wishlistCount }}</span>
+                        @endif
                     </a>
 
                     {{-- Cart --}}
@@ -394,6 +314,9 @@
                             <path stroke-linecap="round" stroke-linejoin="round"
                                   d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                         </svg>
+                        @if($cartCount > 0)
+                            <span class="nav-badge">{{ $cartCount > 99 ? '99+' : $cartCount }}</span>
+                        @endif
                     </a>
 
                     <span class="nav-user">{{ auth()->user()->name }}</span>
@@ -413,7 +336,6 @@
                     <a href="{{ route('register') }}" class="btn btn-primary">Sign Up</a>
                 @endauth
 
-                {{-- Hamburger --}}
                 <button class="hamburger" id="hamburger" onclick="toggleMenu()">
                     <svg id="icon-menu" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
                          viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -432,14 +354,15 @@
             <a href="/#products">Products</a>
             <a href="/#about">About</a>
             <a href="/#contact">Contact</a>
-            <a href="/wishlist">Wishlist</a>
-            <a href="/cart">Cart</a>
+            <a href="/wishlist">Wishlist @auth @if(auth()->user()->wishlistCount() > 0)({{ auth()->user()->wishlistCount() }})@endif @endauth</a>
+            <a href="/cart">Cart @auth @if(auth()->user()->cartCount() > 0)({{ auth()->user()->cartCount() }})@endif @endauth</a>
+            <a href="/orders">My Orders</a>
             @auth
                 @if(auth()->user()->isAdmin())
                     <a href="/admin">Admin</a>
                 @endif
-                <div style="border-top:1px solid #e5e7eb; margin-top:1rem; padding-top:1rem;">
-                    <div style="font-size:0.85rem; font-weight:600; color:#111; margin-bottom:0.5rem;">
+                <div style="border-top:1px solid #e5e7eb;margin-top:1rem;padding-top:1rem;">
+                    <div style="font-size:0.85rem;font-weight:600;color:#111;margin-bottom:0.5rem;">
                         {{ auth()->user()->name }}
                     </div>
                     <form method="POST" action="/logout">
@@ -448,7 +371,7 @@
                     </form>
                 </div>
             @else
-                <div style="border-top:1px solid #e5e7eb; margin-top:1rem; padding-top:1rem;">
+                <div style="border-top:1px solid #e5e7eb;margin-top:1rem;padding-top:1rem;">
                     <a href="/login">Sign In</a>
                     <a href="{{ route('register') }}" style="color:#ea580c;">Sign Up</a>
                 </div>
@@ -456,7 +379,7 @@
         </div>
     </nav>
 
-    {{-- ── Success Toast ── --}}
+    {{-- Toast --}}
     @if (session('success'))
         <div class="toast-wrap">
             <div class="toast-alert">
@@ -469,16 +392,15 @@
         </div>
     @endif
 
-    {{-- ── Page Content ── --}}
+    {{-- Page Content --}}
     <main {{ isset($mainClass) ? "class=$mainClass" : '' }}>
         {{ $slot }}
     </main>
 
-    {{-- ── Footer ── --}}
+    {{-- Footer --}}
     <footer style="background:#000;color:#fff;padding:4rem 0;">
         <div style="max-width:1280px;margin:0 auto;padding:0 1.5rem;">
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:2rem;margin-bottom:2rem;">
-
                 <div>
                     <h3 style="font-size:1.5rem;font-weight:700;margin:0 0 1rem;">
                         <span style="color:#ea580c;">VOX</span>URA
@@ -487,7 +409,6 @@
                         Elevating your tech experience with premium products
                     </p>
                 </div>
-
                 <div>
                     <h4 style="font-weight:600;margin:0 0 1rem;font-size:15px;">Shop</h4>
                     <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;">
@@ -497,7 +418,6 @@
                         <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">Sale</a></li>
                     </ul>
                 </div>
-
                 <div>
                     <h4 style="font-weight:600;margin:0 0 1rem;font-size:15px;">Support</h4>
                     <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;">
@@ -507,7 +427,6 @@
                         <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">FAQ</a></li>
                     </ul>
                 </div>
-
                 <div>
                     <h4 style="font-weight:600;margin:0 0 1rem;font-size:15px;">Company</h4>
                     <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;">
@@ -517,9 +436,7 @@
                         <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">Privacy</a></li>
                     </ul>
                 </div>
-
             </div>
-
             <div style="border-top:1px solid #1f2937;padding-top:2rem;text-align:center;">
                 <p style="color:#9ca3af;margin:0;font-size:14px;">&copy; {{ date('Y') }} Voxura. All rights reserved.</p>
             </div>
@@ -539,11 +456,11 @@
         });
 
         function toggleMenu() {
-            const menu = document.getElementById('mobileMenu');
-            const iconMenu = document.getElementById('icon-menu');
+            const menu      = document.getElementById('mobileMenu');
+            const iconMenu  = document.getElementById('icon-menu');
             const iconClose = document.getElementById('icon-close');
             menu.classList.toggle('open');
-            iconMenu.style.display = menu.classList.contains('open') ? 'none' : 'block';
+            iconMenu.style.display  = menu.classList.contains('open') ? 'none'  : 'block';
             iconClose.style.display = menu.classList.contains('open') ? 'block' : 'none';
         }
     </script>
