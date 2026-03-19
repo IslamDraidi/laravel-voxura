@@ -284,6 +284,7 @@
                     <a href="/orders">My Orders</a>
                     @if(auth()->user()->isAdmin())
                         <a href="/admin">Admin</a>
+                        <a href="/admin/orders">Orders</a>
                     @endif
                 @endauth
             </div>
@@ -317,6 +318,15 @@
                         @if($cartCount > 0)
                             <span class="nav-badge">{{ $cartCount > 99 ? '99+' : $cartCount }}</span>
                         @endif
+                    </a>
+
+                    {{-- Settings --}}
+                    <a href="/profile" class="nav-icon-btn" title="Settings">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
+                             viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
                     </a>
 
                     <span class="nav-user">{{ auth()->user()->name }}</span>
@@ -357,6 +367,7 @@
             <a href="/wishlist">Wishlist @auth @if(auth()->user()->wishlistCount() > 0)({{ auth()->user()->wishlistCount() }})@endif @endauth</a>
             <a href="/cart">Cart @auth @if(auth()->user()->cartCount() > 0)({{ auth()->user()->cartCount() }})@endif @endauth</a>
             <a href="/orders">My Orders</a>
+            <a href="/profile">Settings</a>
             @auth
                 @if(auth()->user()->isAdmin())
                     <a href="/admin">Admin</a>
@@ -388,6 +399,19 @@
                     <path d="M20 6 9 17l-5-5"/>
                 </svg>
                 {{ session('success') }}
+            </div>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="toast-wrap">
+            <div class="toast-alert" style="color:#ef4444;border-color:rgba(239,68,68,0.3);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 8v4m0 4h.01"/>
+                </svg>
+                {{ session('error') }}
             </div>
         </div>
     @endif
