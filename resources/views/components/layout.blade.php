@@ -284,6 +284,7 @@
                     <a href="/orders">My Orders</a>
                     @if(auth()->user()->isAdmin())
                         <a href="/admin">Admin</a>
+                        <a href="/admin/orders">Orders</a>
                     @endif
                 @endauth
             </div>
@@ -388,6 +389,19 @@
                     <path d="M20 6 9 17l-5-5"/>
                 </svg>
                 {{ session('success') }}
+            </div>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="toast-wrap">
+            <div class="toast-alert" style="color:#ef4444;border-color:rgba(239,68,68,0.3);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 8v4m0 4h.01"/>
+                </svg>
+                {{ session('error') }}
             </div>
         </div>
     @endif
