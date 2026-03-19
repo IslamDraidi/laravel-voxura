@@ -302,6 +302,7 @@
         <div class="admin-actions">
             <a href="/" class="btn-admin btn-admin-ghost">← Home</a>
             <a href="/admin/categories" class="btn-admin btn-admin-ghost">🏷️ Categories</a>
+            <a href="/admin/orders" class="btn-admin btn-admin-ghost">📋 Orders</a>
             <a href="/admin/archive" class="btn-admin btn-admin-ghost">📦 Archive</a>
             <a href="/admin/products/create" class="btn-admin">+ Add Product</a>
         </div>
@@ -340,6 +341,13 @@
         <div class="stat-card orange">
             <span class="stat-label">Categories</span>
             <span class="stat-value">{{ $categories->count() }}</span>
+        </div>
+        <div class="stat-card {{ $stats['pending_orders'] > 0 ? 'red' : 'green' }}">
+            <span class="stat-label">Pending Orders</span>
+            <span class="stat-value">
+                <a href="/admin/orders?status=pending"
+                   style="text-decoration:none;color:inherit;">{{ $stats['pending_orders'] }}</a>
+            </span>
         </div>
     </div>
 
