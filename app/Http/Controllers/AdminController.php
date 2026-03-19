@@ -4,15 +4,50 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\User;
+use App\Models\ShoppingCart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class AdminController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with('category')->get();
-        return view('admin.dashboard', compact('products'));
+        $query = Product::with('category');
+
+        // Search
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        // Filter by category
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->category);
+        }
+
+        // Filter by stock
+        if ($request->filled('stock')) {
+            if ($request->stock === 'low') {
+                $query->where('stock', '<=', 10);
+            } elseif ($request->stock === 'out') {
+                $query->where('stock', 0);
+            }
+        }
+
+        $products   = $query->get();
+        $categories = Category::all();
+
+        // Stats
+        $stats = [
+            'total'     => Product::count(),
+            'low_stock' => Product::where('stock', '<=', 10)->where('stock', '>', 0)->count(),
+            'out'       => Product::where('stock', 0)->count(),
+            'archived'  => Product::onlyTrashed()->count(),
+            'users'     => User::count(),
+            'revenue'   => Product::sum(\DB::raw('price * (100 - stock)')), // rough estimate
+        ];
+
+        return view('admin.dashboard', compact('products', 'categories', 'stats'));
     }
 
     public function create()
@@ -53,7 +88,7 @@ class AdminController extends Controller
 
     public function edit($id)
     {
-        $product = Product::withTrashed()->findOrFail($id);
+        $product    = Product::withTrashed()->findOrFail($id);
         $categories = Category::all();
         return view('admin.products.edit', compact('product', 'categories'));
     }
@@ -72,7 +107,7 @@ class AdminController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $imageName = time() . '.' . $request->image->extension();
+            $imageName    = time() . '.' . $request->image->extension();
             $request->image->move(public_path('images'), $imageName);
             $product->image = $imageName;
         }
@@ -94,7 +129,7 @@ class AdminController extends Controller
     public function destroy(Product $product)
     {
         $product->delete();
-        return redirect('/admin')->with('success', 'Product deleted successfully!');
+        return redirect('/admin')->with('success', 'Product moved to archive.');
     }
 
     public function archive()
@@ -107,5 +142,19 @@ class AdminController extends Controller
     {
         Product::withTrashed()->findOrFail($id)->restore();
         return redirect('/admin/archive')->with('success', 'Product restored successfully!');
+    }
+
+    public function forceDelete($id)
+    {
+        $product = Product::withTrashed()->findOrFail($id);
+
+        // Delete image file if it exists
+        $imagePath = public_path('images/' . $product->image);
+        if ($product->image && file_exists($imagePath)) {
+            unlink($imagePath);
+        }
+
+        $product->forceDelete();
+        return redirect('/admin/archive')->with('success', 'Product permanently deleted.');
     }
 }
