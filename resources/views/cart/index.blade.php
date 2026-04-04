@@ -354,7 +354,12 @@
                             <div class="cart-item-info">
                                 <p class="cart-item-category">{{ $item->product->category->name }}</p>
                                 <p class="cart-item-name">{{ $item->product->name }}</p>
-                                <p class="cart-item-price">${{ number_format($item->product->price) }} each</p>
+                                @if($item->variant)
+                                    <p style="font-size:0.78rem;color:var(--orange);font-weight:600;margin-bottom:0.25rem;">
+                                        {{ $item->variant->label() }}
+                                    </p>
+                                @endif
+                                <p class="cart-item-price">${{ number_format($item->unitPrice(), 2) }} each</p>
                             </div>
 
                             {{-- Actions --}}

@@ -60,6 +60,43 @@
                     Learn more →
                 </a>
             </div>
+            {{-- Compare toggle --}}
+            @php $inCompare = in_array($product->id, session('compare', [])); @endphp
+            <form method="POST" action="/compare/{{ $product->id }}"
+                  style="margin-top:0.5rem;">
+                @csrf
+                @if($inCompare)
+                    @method('DELETE')
+                    <button type="submit" style="
+                        background:none;border:none;padding:0;
+                        font-size:0.75rem;font-weight:600;cursor:pointer;
+                        color:var(--orange);font-family:'DM Sans',sans-serif;
+                        display:flex;align-items:center;gap:0.3rem;
+                        transition:color 0.15s;
+                    ">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none"
+                             viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        Added to compare
+                    </button>
+                @else
+                    <button type="submit" style="
+                        background:none;border:none;padding:0;
+                        font-size:0.75rem;font-weight:600;cursor:pointer;
+                        color:var(--gray-400);font-family:'DM Sans',sans-serif;
+                        display:flex;align-items:center;gap:0.3rem;
+                        transition:color 0.15s;
+                    " onmouseover="this.style.color='var(--orange)'" onmouseout="this.style.color='var(--gray-400)'">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none"
+                             viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                        </svg>
+                        Compare
+                    </button>
+                @endif
+            </form>
         </div>
 
     </div>

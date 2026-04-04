@@ -1,206 +1,180 @@
-<x-layout title="Add Product">
+<x-admin-layout title="Add Product" section="catalog" active="products">
 <style>
-.admin-page { padding-top: 90px; padding-bottom: 4rem; }
-
-.form-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 2rem;
-}
-
-.form-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem;
-    font-weight: 800;
-    color: var(--gray-900);
-    letter-spacing: -0.03em;
-}
-
-.btn-back {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.5rem 1.25rem;
-    border: 1.5px solid var(--gray-200);
-    border-radius: 999px;
-    text-decoration: none;
-    color: var(--gray-600);
-    font-size: 0.85rem;
-    font-weight: 600;
-    transition: color 0.15s, border-color 0.15s;
-}
-
-.btn-back:hover { color: var(--orange); border-color: var(--orange); }
-
-.form-card {
-    background: #fff;
-    border: 1.5px solid var(--gray-200);
-    border-radius: var(--radius);
-    padding: 2rem;
-    box-shadow: var(--shadow-md);
-}
-
-.form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.25rem;
-}
-
-@media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
-
-.form-group { display: flex; flex-direction: column; gap: 0.4rem; }
 .form-group.full { grid-column: 1 / -1; }
-
-.form-label {
-    font-size: 0.8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--gray-500);
-}
-
-.form-input,
-.form-select,
-.form-textarea {
-    padding: 0.7rem 0.9rem;
-    border: 1.5px solid var(--gray-200);
-    border-radius: 0.5rem;
-    font-size: 0.9rem;
-    font-family: 'DM Sans', sans-serif;
-    color: var(--gray-900);
-    outline: none;
-    transition: border-color 0.15s;
-    width: 100%;
-}
-
-.form-input:focus,
-.form-select:focus,
-.form-textarea:focus { border-color: var(--orange); }
-
-.form-textarea { resize: vertical; }
-
-.form-error {
-    font-size: 0.78rem;
-    color: #ef4444;
-    margin-top: 0.2rem;
-}
-
-.form-actions {
-    display: flex;
-    gap: 0.75rem;
-    margin-top: 1.75rem;
-    flex-wrap: wrap;
-}
-
-.btn-save {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    background: var(--orange);
-    color: #fff;
-    padding: 0.7rem 2rem;
-    border-radius: 999px;
-    border: none;
-    cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: 700;
-    font-family: 'DM Sans', sans-serif;
-    transition: background 0.15s;
-}
-
-.btn-save:hover { background: var(--orange-dark); }
-
-.btn-cancel {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.7rem 2rem;
-    border: 1.5px solid var(--gray-200);
-    border-radius: 999px;
-    text-decoration: none;
-    color: var(--gray-600);
-    font-size: 0.9rem;
-    font-weight: 600;
-    transition: color 0.15s, border-color 0.15s;
-}
-
-.btn-cancel:hover { color: var(--orange); border-color: var(--orange); }
+.form-group.split { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:0.85rem; }
+.form-note { font-size:0.78rem; color:var(--muted); margin-top:0.35rem; line-height:1.5; }
+.form-toggle { display:flex; align-items:center; gap:0.65rem; min-height:46px; }
+.form-toggle input { width:18px; height:18px; accent-color:var(--orange); }
+@media (max-width: 720px) { .form-group.split { grid-template-columns:1fr; } }
 </style>
 
-<div class="admin-page">
+<div class="card">
+    <form method="POST" action="/admin/products" enctype="multipart/form-data">
+        @csrf
 
-    <div class="form-header">
-        <h1 class="form-title">Add New Product</h1>
-        <a href="/admin" class="btn-back">← Back</a>
-    </div>
+        <div class="form-grid">
 
-    <div class="form-card">
-        <form method="POST" action="/admin/products" enctype="multipart/form-data">
-            @csrf
-
-            <div class="form-grid">
-
-                <div class="form-group">
-                    <label class="form-label">Product Name</label>
-                    <input type="text" name="name" class="form-input"
-                           placeholder="e.g. Voxura Pro Headset"
-                           value="{{ old('name') }}" required>
-                    @error('name')<p class="form-error">{{ $message }}</p>@enderror
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Price ($)</label>
-                    <input type="number" name="price" class="form-input"
-                           placeholder="999" min="0" step="0.01"
-                           value="{{ old('price') }}" required>
-                    @error('price')<p class="form-error">{{ $message }}</p>@enderror
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Category</label>
-                    <select name="category_id" class="form-select" required>
-                        <option value="">Select category…</option>
-                        @foreach($categories as $category)
-                            <option value="{{ $category->id }}"
-                                    {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                                {{ $category->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('category_id')<p class="form-error">{{ $message }}</p>@enderror
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Stock</label>
-                    <input type="number" name="stock" class="form-input"
-                           placeholder="50" min="0"
-                           value="{{ old('stock') }}" required>
-                    @error('stock')<p class="form-error">{{ $message }}</p>@enderror
-                </div>
-
-                <div class="form-group full">
-                    <label class="form-label">Product Image</label>
-                    <input type="file" name="image" class="form-input" accept="image/*">
-                    @error('image')<p class="form-error">{{ $message }}</p>@enderror
-                </div>
-
-                <div class="form-group full">
-                    <label class="form-label">Description</label>
-                    <textarea name="description" class="form-textarea" rows="4"
-                              placeholder="Describe this product…" required>{{ old('description') }}</textarea>
-                    @error('description')<p class="form-error">{{ $message }}</p>@enderror
-                </div>
-
+            <div class="form-group">
+                <label class="form-label">Product Name</label>
+                <input type="text" name="name" class="form-input"
+                       placeholder="e.g. Voxura Pro Headset"
+                       value="{{ old('name') }}" required>
+                @error('name')<p class="form-error">{{ $message }}</p>@enderror
             </div>
 
-            <div class="form-actions">
-                <button type="submit" class="btn-save">💾 Save Product</button>
-                <a href="/admin" class="btn-cancel">✕ Cancel</a>
+            <div class="form-group">
+                <label class="form-label">Price ($)</label>
+                <input type="number" name="price" class="form-input"
+                       placeholder="999" min="0" step="0.01"
+                       value="{{ old('price') }}" required>
+                @error('price')<p class="form-error">{{ $message }}</p>@enderror
             </div>
 
-        </form>
-    </div>
+            <div class="form-group">
+                <label class="form-label">Category</label>
+                <select name="category_id" class="form-select" required>
+                    <option value="">Select category…</option>
+                    @foreach($categories as $category)
+                        <option value="{{ $category->id }}"
+                                {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                            {{ $category->name }}
+                        </option>
+                    @endforeach
+                </select>
+                @error('category_id')<p class="form-error">{{ $message }}</p>@enderror
+            </div>
 
+            <div class="form-group">
+                <label class="form-label">Stock</label>
+                <input type="number" name="stock" class="form-input"
+                       placeholder="50" min="0"
+                       value="{{ old('stock') }}" required>
+                @error('stock')<p class="form-error">{{ $message }}</p>@enderror
+            </div>
+
+            <div class="form-group full">
+                <label class="form-label">Cover Image</label>
+                <input type="file" name="image" class="form-input" accept="image/*">
+                @error('image')<p class="form-error">{{ $message }}</p>@enderror
+            </div>
+
+            <div class="form-group full">
+                <label class="form-label">Gallery Images (optional, multiple)</label>
+                <input type="file" name="gallery[]" class="form-input" accept="image/*" multiple>
+                <p style="font-size:0.78rem;color:var(--muted);margin-top:0.25rem;">Hold Ctrl/Cmd to select multiple images</p>
+                @error('gallery.*')<p class="form-error">{{ $message }}</p>@enderror
+            </div>
+
+            <div class="form-group full">
+                <label class="form-label">Description</label>
+                <textarea name="description" class="form-textarea" rows="4"
+                          placeholder="Describe this product…" required>{{ old('description') }}</textarea>
+                @error('description')<p class="form-error">{{ $message }}</p>@enderror
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Sale Badge</label>
+                <input type="text" name="sale_badge" class="form-input"
+                       placeholder="e.g. 20% OFF"
+                       value="{{ old('sale_badge') }}">
+                @error('sale_badge')<p class="form-error">{{ $message }}</p>@enderror
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Delivery Estimate</label>
+                <input type="text" name="delivery_estimate" class="form-input"
+                       placeholder="e.g. Arrives in 2-4 business days"
+                       value="{{ old('delivery_estimate', 'Arrives in 2-4 business days') }}">
+                @error('delivery_estimate')<p class="form-error">{{ $message }}</p>@enderror
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Max Order Quantity</label>
+                <input type="number" name="max_order_quantity" class="form-input"
+                       min="1" max="99" value="{{ old('max_order_quantity', 5) }}" required>
+                @error('max_order_quantity')<p class="form-error">{{ $message }}</p>@enderror
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Low Stock Alert Threshold</label>
+                <input type="number" name="stock_alert_threshold" class="form-input"
+                       min="1" max="99" value="{{ old('stock_alert_threshold', 6) }}" required>
+                @error('stock_alert_threshold')<p class="form-error">{{ $message }}</p>@enderror
+            </div>
+
+            <div class="form-group full">
+                <label class="form-label">Product Flags</label>
+                <label class="form-toggle form-input" style="justify-content:flex-start;cursor:pointer;">
+                    <input type="checkbox" name="is_new" value="1" {{ old('is_new') ? 'checked' : '' }}>
+                    <span>Show a New badge on the product image</span>
+                </label>
+                @error('is_new')<p class="form-error">{{ $message }}</p>@enderror
+            </div>
+
+            <div class="form-group split full">
+                <div>
+                    <label class="form-label">SKU</label>
+                    <input type="text" name="sku" class="form-input"
+                           placeholder="e.g. VX-TSH-001"
+                           value="{{ old('sku') }}">
+                    @error('sku')<p class="form-error">{{ $message }}</p>@enderror
+                </div>
+                <div>
+                    <label class="form-label">Material</label>
+                    <input type="text" name="material" class="form-input"
+                           placeholder="e.g. 100% Cotton"
+                           value="{{ old('material') }}">
+                    @error('material')<p class="form-error">{{ $message }}</p>@enderror
+                </div>
+            </div>
+
+            <div class="form-group split full">
+                <div>
+                    <label class="form-label">Fit</label>
+                    <input type="text" name="fit" class="form-input"
+                           placeholder="e.g. Relaxed fit"
+                           value="{{ old('fit') }}">
+                    @error('fit')<p class="form-error">{{ $message }}</p>@enderror
+                </div>
+                <div>
+                    <label class="form-label">Care Instructions</label>
+                    <textarea name="care_instructions" class="form-textarea" rows="3" placeholder="Machine wash cold. Tumble dry low.">{{ old('care_instructions') }}</textarea>
+                    @error('care_instructions')<p class="form-error">{{ $message }}</p>@enderror
+                </div>
+            </div>
+
+            <div class="form-group full">
+                <label class="form-label">Shipping & Returns</label>
+                <textarea name="shipping_returns" class="form-textarea" rows="4" placeholder="Add shipping windows, free shipping threshold, and return policy details.">{{ old('shipping_returns') }}</textarea>
+                @error('shipping_returns')<p class="form-error">{{ $message }}</p>@enderror
+            </div>
+
+            <div class="form-group full">
+                <label class="form-label">Color Swatches</label>
+                <textarea name="color_swatches_rows" class="form-textarea" rows="5" placeholder="Midnight|#111827&#10;Clay|#c2410c&#10;Sand|#d6b58a">{{ old('color_swatches_rows') }}</textarea>
+                <p class="form-note">One swatch per line in the format <strong>Name|#HEX</strong>. These render as the clickable color picker on the product page.</p>
+                @error('color_swatches_rows')<p class="form-error">{{ $message }}</p>@enderror
+                @error('color_swatches')<p class="form-error">{{ $message }}</p>@enderror
+                @error('color_swatches.*.name')<p class="form-error">{{ $message }}</p>@enderror
+                @error('color_swatches.*.hex')<p class="form-error">{{ $message }}</p>@enderror
+            </div>
+
+            <div class="form-group full">
+                <label class="form-label">Size Guide</label>
+                <textarea name="size_guide_rows" class="form-textarea" rows="5" placeholder="XS|34-36|28-30|25&#10;S|36-38|30-32|26&#10;M|38-40|32-34|27">{{ old('size_guide_rows') }}</textarea>
+                <p class="form-note">One size per line in the format <strong>Size|Chest|Waist|Length</strong>. Use the variant manager after saving to add the actual Size options (XS to XXL) and mark stock per size.</p>
+                @error('size_guide_rows')<p class="form-error">{{ $message }}</p>@enderror
+                @error('size_guide')<p class="form-error">{{ $message }}</p>@enderror
+                @error('size_guide.*.size')<p class="form-error">{{ $message }}</p>@enderror
+            </div>
+
+        </div>
+
+        <div style="display:flex;gap:0.75rem;margin-top:1.75rem;flex-wrap:wrap;">
+            <button type="submit" class="add-btn">💾 Save Product</button>
+            <a href="/admin" class="act-btn" style="text-decoration:none;">✕ Cancel</a>
+        </div>
+
+    </form>
 </div>
-</x-layout>
+</x-admin-layout>

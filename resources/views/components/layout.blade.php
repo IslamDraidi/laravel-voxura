@@ -278,6 +278,7 @@
 
             <div class="nav-links">
                 <a href="/#products">Products</a>
+                <a href="/search">Search</a>
                 <a href="/#about">About</a>
                 <a href="/#contact">Contact</a>
                 @auth
@@ -420,6 +421,51 @@
     <main {{ isset($mainClass) ? "class=$mainClass" : '' }}>
         {{ $slot }}
     </main>
+
+    {{-- ── Compare Bar ── --}}
+    @php $compareCount = count(session('compare', [])); @endphp
+    @if($compareCount > 0)
+    <div id="compareBar" style="
+        position: fixed; bottom: 0; left: 0; right: 0; z-index: 90;
+        background: rgba(17,24,39,0.97); backdrop-filter: blur(8px);
+        border-top: 2px solid var(--orange);
+        padding: 0.9rem 1.5rem;
+        display: flex; align-items: center; justify-content: center; gap: 1.25rem;
+        font-family: 'DM Sans', sans-serif;
+    ">
+        <span style="color:#fff;font-size:0.88rem;font-weight:600;">
+            <span style="color:var(--orange);font-weight:800;">{{ $compareCount }}</span>
+            {{ $compareCount === 1 ? 'product' : 'products' }} in compare
+        </span>
+        <a href="/compare" style="
+            background:var(--orange);color:#fff;
+            border:none;border-radius:999px;
+            padding:0.5rem 1.25rem;
+            font-size:0.85rem;font-weight:700;
+            text-decoration:none;
+            transition:background 0.15s;
+            white-space:nowrap;
+        " onmouseover="this.style.background='#c2410c'" onmouseout="this.style.background='#ea580c'">
+            Compare now →
+        </a>
+        <form method="POST" action="/compare" style="margin:0;">
+            @csrf @method('DELETE')
+            <button type="submit" style="
+                background:none;border:1.5px solid rgba(255,255,255,0.25);
+                color:rgba(255,255,255,0.6);
+                border-radius:999px;
+                padding:0.45rem 1rem;
+                font-size:0.82rem;font-weight:600;
+                cursor:pointer;
+                font-family:'DM Sans',sans-serif;
+                transition:border-color 0.15s,color 0.15s;
+            " onmouseover="this.style.borderColor='#ef4444';this.style.color='#ef4444'"
+               onmouseout="this.style.borderColor='rgba(255,255,255,0.25)';this.style.color='rgba(255,255,255,0.6)'">
+                Clear
+            </button>
+        </form>
+    </div>
+    @endif
 
     {{-- Footer --}}
     <footer style="background:#000;color:#fff;padding:4rem 0;">

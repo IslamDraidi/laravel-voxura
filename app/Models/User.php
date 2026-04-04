@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -11,23 +10,47 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    protected $fillable = ['name', 'email', 'password', 'role'];
-    protected $hidden   = ['password', 'remember_token'];
+    protected $fillable = ['name', 'email', 'password', 'role', 'is_blocked'];
+
+    protected $hidden = ['password', 'remember_token'];
 
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
-            'password'          => 'hashed',
+            'password' => 'hashed',
         ];
     }
 
-    public function isAdmin(): bool { return (bool) $this->is_admin; }
-    public function isBuyer(): bool { return $this->role === 'buyer'; }
+    public function isAdmin(): bool
+    {
+        return (bool) $this->is_admin;
+    }
 
-    public function cart()   { return $this->hasOne(ShoppingCart::class); }
-    public function likes()  { return $this->hasMany(Like::class); }
-    public function orders() { return $this->hasMany(Order::class); }
+    public function isBlocked(): bool
+    {
+        return (bool) $this->is_blocked;
+    }
+
+    public function isBuyer(): bool
+    {
+        return $this->role === 'buyer';
+    }
+
+    public function cart()
+    {
+        return $this->hasOne(ShoppingCart::class);
+    }
+
+    public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
 
     public function likedProducts()
     {

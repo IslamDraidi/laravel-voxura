@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CartItem extends Model
 {
-    protected $fillable = ['shopping_cart_id', 'product_id', 'quantity'];
+    protected $fillable = ['shopping_cart_id', 'product_id', 'variant_id', 'quantity'];
 
     public function cart()
     {
@@ -18,8 +18,23 @@ class CartItem extends Model
         return $this->belongsTo(Product::class);
     }
 
-    public function subtotal()
+    public function variant()
     {
-        return $this->product->price * $this->quantity;
+        return $this->belongsTo(ProductVariant::class);
+    }
+
+    public function unitPrice(): float
+    {
+        $price = (float) $this->product->price;
+        if ($this->variant) {
+            $price += (float) $this->variant->price_modifier;
+        }
+
+        return $price;
+    }
+
+    public function subtotal(): float
+    {
+        return $this->unitPrice() * $this->quantity;
     }
 }

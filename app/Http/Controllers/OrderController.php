@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\ShippingMethod;
+use App\Models\TaxRate;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -12,31 +15,36 @@ class OrderController extends Controller
     public function checkout()
     {
         $cart = auth()->user()->getOrCreateCart();
-        $cart->load('items.product.category');
+        $cart->load('items.product.category', 'items.variant');
 
         if ($cart->items->isEmpty()) {
             return redirect('/cart')->with('success', 'Add items to your cart before checking out.');
         }
 
-        return view('checkout.index', compact('cart'));
+        $taxRate = TaxRate::effectiveRate();
+        $shippingMethods = ShippingMethod::active()->orderBy('price')->get();
+
+        return view('checkout.index', compact('cart', 'taxRate', 'shippingMethods'));
     }
 
     /** POST /checkout — place the order */
     public function place(Request $request)
     {
         $request->validate([
-            'full_name'    => 'required|string|max:255',
-            'email'        => 'required|email',
-            'phone'        => 'required|string|max:30',
-            'address'      => 'required|string|max:500',
-            'city'         => 'required|string|max:100',
-            'postal_code'  => 'required|string|max:20',
-            'country'      => 'required|string|max:100',
+            'full_name' => 'required|string|max:255',
+            'email' => 'required|email',
+            'phone' => 'required|string|max:30',
+            'address' => 'required|string|max:500',
+            'city' => 'required|string|max:100',
+            'postal_code' => 'required|string|max:20',
+            'country' => 'required|string|max:100',
+            'coupon_code' => 'nullable|string|max:50',
+            'shipping_method_id' => 'nullable|exists:shipping_methods,id',
         ]);
 
         $user = auth()->user();
         $cart = $user->getOrCreateCart();
-        $cart->load('items.product');
+        $cart->load('items.product', 'items.variant');
 
         if ($cart->items->isEmpty()) {
             return redirect('/cart')->with('success', 'Your cart is empty.');
@@ -51,23 +59,56 @@ class OrderController extends Controller
             $request->phone,
         ]);
 
-        $total = $cart->items->sum(fn($i) => $i->product->price * $i->quantity);
+        $total = $cart->items->sum(fn ($i) => $i->subtotal());
+        $discountAmount = 0;
+        $coupon = null;
+
+        if ($request->filled('coupon_code')) {
+            $coupon = Coupon::where('code', strtoupper($request->coupon_code))->first();
+            if ($coupon && $coupon->isValid($total)) {
+                $discountAmount = $coupon->calculateDiscount($total);
+            }
+        }
+
+        $taxRate = TaxRate::effectiveRate();
+        $taxAmount = round(($total - $discountAmount) * $taxRate / 100, 2);
+
+        $shippingMethod = null;
+        $shippingCost = 0;
+        if ($request->filled('shipping_method_id')) {
+            $shippingMethod = ShippingMethod::active()->find($request->shipping_method_id);
+            if ($shippingMethod) {
+                $shippingCost = (float) $shippingMethod->price;
+            }
+        }
 
         // Create order
         $order = Order::create([
-            'user_id'          => $user->id,
-            'total_amount'     => $total,
-            'status'           => 'pending',
+            'user_id' => $user->id,
+            'coupon_id' => $coupon?->id,
+            'shipping_method_id' => $shippingMethod?->id,
+            'coupon_code' => $coupon?->code,
+            'total_amount' => $total,
+            'discount_amount' => $discountAmount,
+            'tax_amount' => $taxAmount,
+            'shipping_cost' => $shippingCost,
+            'status' => 'pending',
             'shipping_address' => $shippingAddress,
         ]);
+
+        if ($coupon) {
+            $coupon->increment('used_count');
+        }
 
         // Create order items
         foreach ($cart->items as $item) {
             OrderItem::create([
-                'order_id'   => $order->id,
+                'order_id' => $order->id,
                 'product_id' => $item->product_id,
-                'quantity'   => $item->quantity,
-                'price'      => $item->product->price,
+                'variant_id' => $item->variant_id,
+                'variant_label' => $item->variant?->label(),
+                'quantity' => $item->quantity,
+                'price' => $item->unitPrice(),
             ]);
 
             // Decrement stock
@@ -77,8 +118,8 @@ class OrderController extends Controller
         // Clear the cart
         $cart->items()->delete();
 
-        return redirect('/orders/' . $order->id)
-            ->with('success', 'Order placed successfully! Your order #' . $order->id . ' is confirmed.');
+        return redirect('/orders/'.$order->id)
+            ->with('success', 'Order placed successfully! Your order #'.$order->id.' is confirmed.');
     }
 
     /** GET /orders — order history */

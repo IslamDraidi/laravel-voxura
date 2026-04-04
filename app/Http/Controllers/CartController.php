@@ -4,17 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Models\CartItem;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
-  
-
     /** GET /cart — show the cart */
     public function index()
     {
         $cart = auth()->user()->getOrCreateCart();
-        $cart->load('items.product.category');
+        $cart->load('items.product.category', 'items.variant');
 
         return view('cart.index', compact('cart'));
     }
@@ -24,19 +23,46 @@ class CartController extends Controller
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
-            'quantity'   => 'sometimes|integer|min:1|max:99',
+            'variant_id' => 'nullable|exists:product_variants,id',
+            'quantity' => 'sometimes|integer|min:1|max:99',
         ]);
 
-        $cart    = auth()->user()->getOrCreateCart();
-        $qty     = $request->input('quantity', 1);
+        $cart = auth()->user()->getOrCreateCart();
+        $qty = $request->input('quantity', 1);
         $product = Product::findOrFail($request->product_id);
 
+        $variant = null;
+        $variantId = null;
+        if ($request->filled('variant_id')) {
+            $variant = ProductVariant::where('id', $request->variant_id)
+                ->where('product_id', $product->id)
+                ->firstOrFail();
+            $variantId = $variant->id;
+        }
+
+        $maxAllowedQuantity = $this->maxAllowedQuantity($product, $variant);
+        if ($maxAllowedQuantity < 1) {
+            return back()->withErrors([
+                'quantity' => 'This product is currently out of stock.',
+            ]);
+        }
+
         $item = $cart->items()->firstOrCreate(
-            ['product_id' => $product->id],
-            ['quantity'   => 0]
+            ['product_id' => $product->id, 'variant_id' => $variantId],
+            ['quantity' => 0]
         );
 
+        if (($item->quantity + $qty) > $maxAllowedQuantity) {
+            return back()->withErrors([
+                'quantity' => "You can add up to {$maxAllowedQuantity} of this item.",
+            ])->withInput();
+        }
+
         $item->increment('quantity', $qty);
+
+        if ($request->boolean('buy_now')) {
+            return redirect()->route('checkout')->with('success', 'Item added to your cart.');
+        }
 
         return back()->with('success', "\"{$product->name}\" added to your cart!");
     }
@@ -45,8 +71,17 @@ class CartController extends Controller
     public function update(Request $request, CartItem $item)
     {
         $this->authorizeItem($item);
+        $item->loadMissing('product', 'variant');
 
         $request->validate(['quantity' => 'required|integer|min:1|max:99']);
+
+        $maxAllowedQuantity = $this->maxAllowedQuantity($item->product, $item->variant);
+        if ((int) $request->quantity > $maxAllowedQuantity) {
+            return back()->withErrors([
+                'quantity' => "You can keep up to {$maxAllowedQuantity} of this item in your cart.",
+            ]);
+        }
+
         $item->update(['quantity' => $request->quantity]);
 
         return back()->with('success', 'Cart updated.');
@@ -65,6 +100,7 @@ class CartController extends Controller
     public function clear()
     {
         auth()->user()->getOrCreateCart()->items()->delete();
+
         return back()->with('success', 'Cart cleared.');
     }
 
@@ -73,5 +109,13 @@ class CartController extends Controller
     private function authorizeItem(CartItem $item): void
     {
         abort_unless($item->cart->user_id === auth()->id(), 403);
+    }
+
+    private function maxAllowedQuantity(Product $product, ?ProductVariant $variant = null): int
+    {
+        $availableStock = $variant?->effectiveStock($product) ?? (int) $product->stock;
+        $productLimit = (int) ($product->max_order_quantity ?? 99);
+
+        return max(0, min($availableStock, $productLimit));
     }
 }

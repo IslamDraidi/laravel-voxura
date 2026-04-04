@@ -18,9 +18,9 @@ class ShoppingCart extends Model
         return $this->hasMany(CartItem::class, 'shopping_cart_id');
     }
 
-    public function total()
+    public function total(): float
     {
-        return $this->items->sum(fn($item) => $item->product->price * $item->quantity);
+        return $this->items->sum(fn ($item) => $item->subtotal());
     }
 
     public function itemCount()

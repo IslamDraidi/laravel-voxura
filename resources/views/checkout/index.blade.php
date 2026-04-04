@@ -286,6 +286,32 @@
 
                 </div>
 
+                {{-- Shipping Method ── --}}
+                @if($shippingMethods->isNotEmpty())
+                <p class="checkout-section-title" style="margin-top:1.5rem;">🚚 Shipping Method</p>
+                <div style="display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1rem;" id="shippingOptions">
+                    @foreach($shippingMethods as $sm)
+                    <label style="display:flex;align-items:center;gap:0.85rem;padding:0.85rem 1rem;border:1.5px solid var(--gray-200);border-radius:0.5rem;cursor:pointer;transition:border-color 0.15s;"
+                           onmouseover="this.style.borderColor='var(--orange-muted)'" onmouseout="highlightSelected()">
+                        <input type="radio" name="shipping_method_id" value="{{ $sm->id }}"
+                               data-price="{{ $sm->price }}"
+                               {{ $loop->first ? 'checked' : '' }}
+                               onchange="updateShipping({{ $sm->price }}, {{ $sm->id }})"
+                               style="accent-color:var(--orange);width:16px;height:16px;flex-shrink:0;">
+                        <div style="flex:1;">
+                            <p style="font-weight:700;font-size:0.9rem;color:var(--gray-900);">{{ $sm->name }}</p>
+                            @if($sm->estimated_delivery)
+                                <p style="font-size:0.78rem;color:var(--gray-400);">{{ $sm->estimated_delivery }}</p>
+                            @endif
+                        </div>
+                        <span style="font-weight:700;font-size:0.95rem;color:{{ $sm->price == 0 ? '#16a34a' : 'var(--gray-900)' }};">
+                            {{ $sm->price == 0 ? 'Free' : '$' . number_format($sm->price, 2) }}
+                        </span>
+                    </label>
+                    @endforeach
+                </div>
+                @endif
+
                 {{-- Payment ── --}}
                 <p class="checkout-section-title">💳 Payment</p>
                 <div class="payment-placeholder">
@@ -294,6 +320,21 @@
                         Payment gateway not connected yet
                     </p>
                     <p>Order will be placed as <strong>Cash on Delivery</strong> for now.</p>
+                </div>
+
+                {{-- Coupon ── --}}
+                <p class="checkout-section-title" style="margin-top:1.5rem;">🏷️ Coupon Code</p>
+                <div id="couponSection">
+                    <div style="display:flex;gap:0.6rem;margin-bottom:0.5rem;">
+                        <input type="text" id="couponInput" placeholder="Enter coupon code"
+                               style="flex:1;padding:0.65rem 0.9rem;border:1.5px solid var(--gray-200);border-radius:0.5rem;font-size:0.9rem;font-family:'DM Sans',sans-serif;outline:none;text-transform:uppercase;"
+                               oninput="this.value=this.value.toUpperCase()">
+                        <button type="button" onclick="applyCoupon()"
+                                style="background:var(--orange);color:#fff;border:none;padding:0.65rem 1.25rem;border-radius:0.5rem;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background 0.15s;"
+                                onmouseover="this.style.background='#c2410c'" onmouseout="this.style.background='#ea580c'">Apply</button>
+                    </div>
+                    <div id="couponFeedback" style="font-size:0.82rem;min-height:1.2rem;"></div>
+                    <input type="hidden" name="coupon_code" id="couponCode">
                 </div>
 
                 <button type="submit" class="btn-place-order">
@@ -313,6 +354,9 @@
                          alt="{{ $item->product->name }}">
                     <div class="summary-item-info">
                         <p class="summary-item-name">{{ $item->product->name }}</p>
+                        @if($item->variant)
+                            <p style="font-size:0.75rem;color:var(--orange);font-weight:600;">{{ $item->variant->label() }}</p>
+                        @endif
                         <p class="summary-item-qty">Qty: {{ $item->quantity }}</p>
                     </div>
                     <span class="summary-item-price">${{ number_format($item->subtotal()) }}</span>
@@ -323,19 +367,35 @@
 
             <div class="summary-row">
                 <span>Subtotal</span>
-                <span>${{ number_format($cart->total()) }}</span>
+                <span id="summarySubtotal">${{ number_format($cart->total(), 2) }}</span>
             </div>
-            <div class="summary-row">
+            <div class="summary-row" id="discountRow" style="display:none;">
+                <span id="discountLabel" style="color:#16a34a;font-weight:600;">Discount</span>
+                <span id="discountAmount" style="color:#16a34a;font-weight:700;"></span>
+            </div>
+            <div class="summary-row" id="shippingRow">
                 <span>Shipping</span>
-                <span style="color:#22c55e;font-weight:600;">Free</span>
+                @if($shippingMethods->isNotEmpty())
+                    <span id="shippingCost" style="font-weight:600;color:{{ $shippingMethods->first()->price == 0 ? '#16a34a' : 'var(--gray-900)' }};">
+                        {{ $shippingMethods->first()->price == 0 ? 'Free' : '$' . number_format($shippingMethods->first()->price, 2) }}
+                    </span>
+                @else
+                    <span style="color:#22c55e;font-weight:600;">Free</span>
+                @endif
             </div>
-            <div class="summary-row">
-                <span>Tax (est.)</span>
-                <span>${{ number_format($cart->total() * 0.08) }}</span>
+            @if($taxRate > 0)
+            <div class="summary-row" id="taxRow">
+                <span>Tax ({{ number_format($taxRate, $taxRate == floor($taxRate) ? 0 : 2) }}%)</span>
+                <span id="taxAmount">${{ number_format($cart->total() * $taxRate / 100, 2) }}</span>
             </div>
+            @endif
             <div class="summary-row total">
                 <span>Total</span>
-                <span>${{ number_format($cart->total() * 1.08) }}</span>
+                @php
+                    $firstShipping = $shippingMethods->isNotEmpty() ? (float) $shippingMethods->first()->price : 0;
+                    $initialTotal  = $cart->total() * (1 + $taxRate / 100) + $firstShipping;
+                @endphp
+                <span id="summaryTotal">${{ number_format($initialTotal, 2) }}</span>
             </div>
 
             <a href="/cart" class="back-link">← Edit cart</a>
@@ -343,4 +403,94 @@
 
     </div>
 </div>
+<script>
+const TAX_RATE = {{ $taxRate }};
+let currentShipping = {{ $shippingMethods->isNotEmpty() ? $shippingMethods->first()->price : 0 }};
+let currentDiscount = 0;
+
+function getGrandTotal(subtotal, discount, shipping) {
+    const afterDiscount = subtotal - discount;
+    const tax = afterDiscount * TAX_RATE / 100;
+    return afterDiscount + tax + shipping;
+}
+
+function updateShipping(price, id) {
+    currentShipping = price;
+    const el = document.getElementById('shippingCost');
+    if (el) {
+        el.textContent = price === 0 ? 'Free' : '$' + price.toFixed(2);
+        el.style.color = price === 0 ? '#16a34a' : 'var(--gray-900)';
+    }
+    recalcTotal();
+    highlightSelected();
+}
+
+function recalcTotal() {
+    const subtotal = parseFloat('{{ $cart->total() }}');
+    const grand = getGrandTotal(subtotal, currentDiscount, currentShipping);
+
+    const tax = (subtotal - currentDiscount) * TAX_RATE / 100;
+    if (document.getElementById('taxAmount')) {
+        document.getElementById('taxAmount').textContent = '$' + tax.toFixed(2);
+    }
+    document.getElementById('summaryTotal').textContent = '$' + grand.toFixed(2);
+}
+
+function highlightSelected() {
+    document.querySelectorAll('#shippingOptions label').forEach(label => {
+        const radio = label.querySelector('input[type=radio]');
+        label.style.borderColor = radio && radio.checked ? 'var(--orange)' : 'var(--gray-200)';
+        label.style.background  = radio && radio.checked ? 'rgba(234,88,12,0.04)' : '';
+    });
+}
+
+// Highlight the first option on load
+document.addEventListener('DOMContentLoaded', highlightSelected);
+
+async function applyCoupon() {
+    const code = document.getElementById('couponInput').value.trim();
+    const fb   = document.getElementById('couponFeedback');
+    if (!code) { fb.innerHTML = '<span style="color:#ef4444;">Enter a coupon code first.</span>'; return; }
+
+    fb.innerHTML = '<span style="color:var(--gray-400);">Checking…</span>';
+
+    try {
+        const res = await fetch('{{ route("coupon.apply") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content
+                    || '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ code })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            fb.innerHTML = `<span style="color:#ef4444;">✕ ${data.error}</span>`;
+            document.getElementById('couponCode').value = '';
+            document.getElementById('discountRow').style.display = 'none';
+            currentDiscount = 0;
+            recalcTotal();
+        } else {
+            fb.innerHTML = `<span style="color:#16a34a;">✓ ${data.discount_label} applied!</span>`;
+            document.getElementById('couponCode').value = data.coupon_code;
+            document.getElementById('discountRow').style.display = 'flex';
+            document.getElementById('discountLabel').textContent = 'Discount (' + data.coupon_code + ')';
+            document.getElementById('discountAmount').textContent = '-$' + data.discount.toFixed(2);
+
+            currentDiscount = data.discount;
+            recalcTotal();
+        }
+    } catch (e) {
+        fb.innerHTML = '<span style="color:#ef4444;">Something went wrong. Please try again.</span>';
+    }
+}
+
+function resetTotal() {
+    currentDiscount = 0;
+    recalcTotal();
+}
+</script>
 </x-layout>

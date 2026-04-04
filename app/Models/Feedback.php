@@ -6,7 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class Feedback extends Model
 {
-    protected $fillable = ['user_id', 'product_id', 'rating', 'comment'];
+    protected $table = 'feedbacks';
+
+    protected $fillable = ['user_id', 'product_id', 'rating', 'comment', 'helpful_votes'];
+
+    protected function casts(): array
+    {
+        return [
+            'helpful_votes' => 'integer',
+        ];
+    }
 
     public function user()
     {
