@@ -453,8 +453,9 @@
     </div>
     @elseif($section === 'configure')
     <div class="admin-subnav">
-        <a href="/admin/shipping"  class="subnav-tab {{ $active === 'shipping' ? 'active' : '' }}"><span class="tab-icon">🚚</span> Shipping</a>
-        <a href="/admin/tax"       class="subnav-tab {{ $active === 'tax'      ? 'active' : '' }}"><span class="tab-icon">🧾</span> Tax</a>
+        <a href="/admin/shipping/methods" class="subnav-tab {{ $active === 'shipping' ? 'active' : '' }}"><span class="tab-icon">🚚</span> Shipping Methods</a>
+        <a href="/admin/shipping/zones"   class="subnav-tab {{ $active === 'zones'    ? 'active' : '' }}"><span class="tab-icon">🌍</span> Shipping Zones</a>
+        <a href="/admin/tax"              class="subnav-tab {{ $active === 'tax'      ? 'active' : '' }}"><span class="tab-icon">🧾</span> Tax Rates</a>
     </div>
     @endif
 

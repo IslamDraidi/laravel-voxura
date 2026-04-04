@@ -7,16 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     protected $fillable = [
-        'user_id',
-        'coupon_id',
-        'shipping_method_id',
-        'total_amount',
-        'discount_amount',
-        'tax_amount',
-        'shipping_cost',
-        'coupon_code',
-        'status',
-        'shipping_address',
+        'user_id', 'coupon_id', 'shipping_method_id', 'shipping_zone_id',
+        'total_amount', 'discount_amount', 'tax_amount', 'shipping_cost',
+        'tax_breakdown', 'shipping_tax_amount', 'subtotal', 'grand_total',
+        'currency', 'channel', 'coupon_code', 'status', 'shipping_address',
+    ];
+
+    protected $casts = [
+        'tax_breakdown' => 'array',
+        'subtotal' => 'decimal:2',
+        'grand_total' => 'decimal:2',
+        'shipping_tax_amount' => 'decimal:2',
     ];
 
     public function user()
@@ -29,19 +30,24 @@ class Order extends Model
         return $this->belongsTo(Coupon::class);
     }
 
-    public function grandTotal(): float
-    {
-        return max(0, $this->total_amount - $this->discount_amount + $this->tax_amount + $this->shipping_cost);
-    }
-
     public function shippingMethod()
     {
         return $this->belongsTo(ShippingMethod::class);
     }
 
+    public function shippingZone()
+    {
+        return $this->belongsTo(ShippingZone::class);
+    }
+
     public function items()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function grandTotal(): float
+    {
+        return max(0, $this->total_amount - $this->discount_amount + $this->tax_amount + $this->shipping_cost);
     }
 
     public function statusColor(): string

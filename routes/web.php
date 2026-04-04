@@ -66,6 +66,9 @@ Route::middleware('auth')->group(function () {
 
     // Coupon apply (AJAX)
     Route::post('/coupon/apply', [CouponController::class, 'apply'])->name('coupon.apply');
+
+    // Checkout AJAX — calculate totals on shipping method change
+    Route::post('/checkout/calculate', [OrderController::class, 'calculateTotals'])->name('checkout.calculate');
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
@@ -107,16 +110,31 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 
     // Tax Rate Management
     Route::get('/tax', [AdminController::class, 'taxRates'])->name('admin.tax.index');
+    Route::get('/tax/create', [AdminController::class, 'createTaxRate'])->name('admin.tax.create');
     Route::post('/tax', [AdminController::class, 'storeTaxRate'])->name('admin.tax.store');
+    Route::get('/tax/{rate}/edit', [AdminController::class, 'editTaxRate'])->name('admin.tax.edit');
+    Route::put('/tax/{rate}', [AdminController::class, 'updateTaxRate'])->name('admin.tax.update');
     Route::post('/tax/{rate}/toggle', [AdminController::class, 'toggleTaxRate'])->name('admin.tax.toggle');
     Route::delete('/tax/{rate}', [AdminController::class, 'destroyTaxRate'])->name('admin.tax.destroy');
 
     // Shipping Method Management
-    Route::get('/shipping', [AdminController::class, 'shippingMethods'])->name('admin.shipping.index');
-    Route::post('/shipping', [AdminController::class, 'storeShippingMethod'])->name('admin.shipping.store');
-    Route::post('/shipping/{method}/toggle', [AdminController::class, 'toggleShippingMethod'])->name('admin.shipping.toggle');
-    Route::put('/shipping/{method}', [AdminController::class, 'updateShippingMethod'])->name('admin.shipping.update');
-    Route::delete('/shipping/{method}', [AdminController::class, 'destroyShippingMethod'])->name('admin.shipping.destroy');
+    Route::get('/shipping', fn () => redirect('/admin/shipping/methods'));
+    Route::get('/shipping/methods', [AdminController::class, 'shippingMethods'])->name('admin.shipping.index');
+    Route::get('/shipping/methods/create', [AdminController::class, 'createShippingMethod'])->name('admin.shipping.create');
+    Route::post('/shipping/methods', [AdminController::class, 'storeShippingMethod'])->name('admin.shipping.store');
+    Route::get('/shipping/methods/{method}/edit', [AdminController::class, 'editShippingMethod'])->name('admin.shipping.edit');
+    Route::put('/shipping/methods/{method}', [AdminController::class, 'updateShippingMethod'])->name('admin.shipping.update');
+    Route::post('/shipping/methods/{method}/toggle', [AdminController::class, 'toggleShippingMethod'])->name('admin.shipping.toggle');
+    Route::delete('/shipping/methods/{method}', [AdminController::class, 'destroyShippingMethod'])->name('admin.shipping.destroy');
+
+    // Shipping Zone Management
+    Route::get('/shipping/zones', [AdminController::class, 'shippingZones'])->name('admin.zones.index');
+    Route::get('/shipping/zones/create', [AdminController::class, 'createShippingZone'])->name('admin.zones.create');
+    Route::post('/shipping/zones', [AdminController::class, 'storeShippingZone'])->name('admin.zones.store');
+    Route::get('/shipping/zones/{zone}/edit', [AdminController::class, 'editShippingZone'])->name('admin.zones.edit');
+    Route::put('/shipping/zones/{zone}', [AdminController::class, 'updateShippingZone'])->name('admin.zones.update');
+    Route::post('/shipping/zones/{zone}/toggle', [AdminController::class, 'toggleShippingZone'])->name('admin.zones.toggle');
+    Route::delete('/shipping/zones/{zone}', [AdminController::class, 'destroyShippingZone'])->name('admin.zones.destroy');
 
     // Banner / Slider Management
     Route::get('/banners', [AdminController::class, 'banners'])->name('admin.banners.index');

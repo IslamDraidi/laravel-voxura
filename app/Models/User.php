@@ -24,7 +24,7 @@ class User extends Authenticatable
 
     public function isAdmin(): bool
     {
-        return (bool) $this->is_admin;
+        return $this->role === 'admin';
     }
 
     public function isBlocked(): bool

@@ -13,7 +13,6 @@
 .checkout-heading .accent { color: var(--orange); }
 .checkout-sub { color: var(--gray-500); font-size: 0.95rem; margin-bottom: 2.5rem; }
 
-/* ── Layout ── */
 .checkout-layout {
     display: grid;
     grid-template-columns: 1fr 360px;
@@ -22,7 +21,6 @@
 }
 @media (max-width: 900px) { .checkout-layout { grid-template-columns: 1fr; } }
 
-/* ── Form Card ── */
 .checkout-card {
     background: #fff;
     border: 1.5px solid var(--gray-200);
@@ -78,7 +76,6 @@
 .form-input:focus, .form-select:focus { border-color: var(--orange); }
 .form-error { font-size: 0.75rem; color: #ef4444; }
 
-/* ── Payment placeholder ── */
 .payment-placeholder {
     background: var(--gray-50);
     border: 1.5px dashed var(--gray-300);
@@ -89,10 +86,8 @@
     font-size: 0.85rem;
     margin-top: 0.5rem;
 }
-
 .payment-placeholder p { margin-top: 0.4rem; font-size: 0.78rem; }
 
-/* ── Submit ── */
 .btn-place-order {
     display: flex;
     align-items: center;
@@ -115,7 +110,6 @@
 .btn-place-order:hover { background: var(--orange-dark); box-shadow: 0 6px 24px rgba(234,88,12,0.38); }
 .btn-place-order:active { transform: scale(0.98); }
 
-/* ── Order Summary ── */
 .summary-card {
     background: #fff;
     border: 1.5px solid var(--gray-200);
@@ -210,6 +204,22 @@
     transition: color 0.15s;
 }
 .back-link:hover { color: var(--orange); }
+
+.tax-breakdown-tooltip {
+    position: relative;
+    cursor: help;
+}
+.tax-breakdown-detail {
+    font-size: 0.72rem;
+    color: var(--gray-400);
+    margin-top: 2px;
+}
+
+.delivery-estimate {
+    font-size: 0.72rem;
+    color: var(--gray-400);
+    font-style: italic;
+}
 </style>
 
 <div class="checkout-page">
@@ -224,7 +234,7 @@
             <form method="POST" action="/checkout">
                 @csrf
 
-                {{-- Shipping ── --}}
+                {{-- Shipping Info ── --}}
                 <p class="checkout-section-title">📦 Shipping Information</p>
                 <div class="form-grid">
 
@@ -278,7 +288,7 @@
 
                     <div class="form-group full">
                         <label class="form-label">Country</label>
-                        <input type="text" name="country" class="form-input"
+                        <input type="text" name="country" class="form-input" id="countryInput"
                                placeholder="United States"
                                value="{{ old('country') }}" required>
                         @error('country')<p class="form-error">{{ $message }}</p>@enderror
@@ -291,21 +301,26 @@
                 <p class="checkout-section-title" style="margin-top:1.5rem;">🚚 Shipping Method</p>
                 <div style="display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1rem;" id="shippingOptions">
                     @foreach($shippingMethods as $sm)
+                    @php
+                        $rate = $sm->calculated_rate ?? (float) $sm->price;
+                        $isFree = ($sm->calculated_free ?? false) || $rate == 0;
+                        $delivery = $sm->estimated_delivery_text ?? $sm->estimated_delivery;
+                    @endphp
                     <label style="display:flex;align-items:center;gap:0.85rem;padding:0.85rem 1rem;border:1.5px solid var(--gray-200);border-radius:0.5rem;cursor:pointer;transition:border-color 0.15s;"
                            onmouseover="this.style.borderColor='var(--orange-muted)'" onmouseout="highlightSelected()">
                         <input type="radio" name="shipping_method_id" value="{{ $sm->id }}"
-                               data-price="{{ $sm->price }}"
+                               data-price="{{ $rate }}"
                                {{ $loop->first ? 'checked' : '' }}
-                               onchange="updateShipping({{ $sm->price }}, {{ $sm->id }})"
+                               onchange="selectShipping({{ $sm->id }}, {{ $rate }})"
                                style="accent-color:var(--orange);width:16px;height:16px;flex-shrink:0;">
                         <div style="flex:1;">
                             <p style="font-weight:700;font-size:0.9rem;color:var(--gray-900);">{{ $sm->name }}</p>
-                            @if($sm->estimated_delivery)
-                                <p style="font-size:0.78rem;color:var(--gray-400);">{{ $sm->estimated_delivery }}</p>
+                            @if($delivery)
+                                <p style="font-size:0.78rem;color:var(--gray-400);">{{ $delivery }}</p>
                             @endif
                         </div>
-                        <span style="font-weight:700;font-size:0.95rem;color:{{ $sm->price == 0 ? '#16a34a' : 'var(--gray-900)' }};">
-                            {{ $sm->price == 0 ? 'Free' : '$' . number_format($sm->price, 2) }}
+                        <span style="font-weight:700;font-size:0.95rem;color:{{ $isFree ? '#16a34a' : 'var(--gray-900)' }};">
+                            {{ $isFree ? 'Free' : '$' . number_format($rate, 2) }}
                         </span>
                     </label>
                     @endforeach
@@ -375,25 +390,32 @@
             </div>
             <div class="summary-row" id="shippingRow">
                 <span>Shipping</span>
-                @if($shippingMethods->isNotEmpty())
-                    <span id="shippingCost" style="font-weight:600;color:{{ $shippingMethods->first()->price == 0 ? '#16a34a' : 'var(--gray-900)' }};">
-                        {{ $shippingMethods->first()->price == 0 ? 'Free' : '$' . number_format($shippingMethods->first()->price, 2) }}
-                    </span>
-                @else
-                    <span style="color:#22c55e;font-weight:600;">Free</span>
+                @php
+                    $firstRate = $shippingMethods->isNotEmpty() ? ($shippingMethods->first()->calculated_rate ?? (float)$shippingMethods->first()->price) : 0;
+                    $firstFree = $firstRate == 0;
+                @endphp
+                <span id="shippingCost" style="font-weight:600;color:{{ $firstFree ? '#16a34a' : 'var(--gray-900)' }};">
+                    {{ $firstFree ? 'Free' : '$' . number_format($firstRate, 2) }}
+                </span>
+            </div>
+            <div id="deliveryEstimate" class="delivery-estimate" style="text-align:right;margin-bottom:0.5rem;">
+                @if($shippingMethods->isNotEmpty() && ($shippingMethods->first()->estimated_delivery_text ?? $shippingMethods->first()->estimated_delivery))
+                    Est. {{ $shippingMethods->first()->estimated_delivery_text ?? $shippingMethods->first()->estimated_delivery }}
                 @endif
             </div>
             @if($taxRate > 0)
             <div class="summary-row" id="taxRow">
-                <span>Tax ({{ number_format($taxRate, $taxRate == floor($taxRate) ? 0 : 2) }}%)</span>
+                <span class="tax-breakdown-tooltip">
+                    Tax ({{ number_format($taxRate, $taxRate == floor($taxRate) ? 0 : 2) }}%)
+                </span>
                 <span id="taxAmount">${{ number_format($cart->total() * $taxRate / 100, 2) }}</span>
             </div>
+            <div id="taxBreakdownDetail" class="tax-breakdown-detail" style="text-align:right;"></div>
             @endif
             <div class="summary-row total">
                 <span>Total</span>
                 @php
-                    $firstShipping = $shippingMethods->isNotEmpty() ? (float) $shippingMethods->first()->price : 0;
-                    $initialTotal  = $cart->total() * (1 + $taxRate / 100) + $firstShipping;
+                    $initialTotal = $cart->total() * (1 + $taxRate / 100) + $firstRate;
                 @endphp
                 <span id="summaryTotal">${{ number_format($initialTotal, 2) }}</span>
             </div>
@@ -405,8 +427,10 @@
 </div>
 <script>
 const TAX_RATE = {{ $taxRate }};
-let currentShipping = {{ $shippingMethods->isNotEmpty() ? $shippingMethods->first()->price : 0 }};
+const CSRF = document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}';
+let currentShipping = {{ $firstRate }};
 let currentDiscount = 0;
+let currentMethodId = {{ $shippingMethods->isNotEmpty() ? $shippingMethods->first()->id : 'null' }};
 
 function getGrandTotal(subtotal, discount, shipping) {
     const afterDiscount = subtotal - discount;
@@ -414,15 +438,81 @@ function getGrandTotal(subtotal, discount, shipping) {
     return afterDiscount + tax + shipping;
 }
 
-function updateShipping(price, id) {
-    currentShipping = price;
+function selectShipping(methodId, fallbackPrice) {
+    currentMethodId = methodId;
+    currentShipping = fallbackPrice;
+
+    // Update display immediately with fallback
     const el = document.getElementById('shippingCost');
     if (el) {
-        el.textContent = price === 0 ? 'Free' : '$' + price.toFixed(2);
-        el.style.color = price === 0 ? '#16a34a' : 'var(--gray-900)';
+        el.textContent = fallbackPrice === 0 ? 'Free' : '$' + fallbackPrice.toFixed(2);
+        el.style.color = fallbackPrice === 0 ? '#16a34a' : 'var(--gray-900)';
     }
     recalcTotal();
     highlightSelected();
+
+    // AJAX call for accurate server-side calculation
+    fetchTotals();
+}
+
+async function fetchTotals() {
+    if (!currentMethodId) return;
+
+    try {
+        const res = await fetch('{{ route("checkout.calculate") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': CSRF
+            },
+            body: JSON.stringify({
+                shipping_method_id: currentMethodId,
+                country: document.getElementById('countryInput')?.value || '',
+                coupon_code: document.getElementById('couponCode')?.value || ''
+            })
+        });
+
+        if (!res.ok) return;
+        const data = await res.json();
+
+        // Update shipping
+        const el = document.getElementById('shippingCost');
+        if (el) {
+            el.textContent = data.shipping_free ? 'Free' : '$' + data.shipping_amount.toFixed(2);
+            el.style.color = data.shipping_free ? '#16a34a' : 'var(--gray-900)';
+        }
+        currentShipping = data.shipping_amount;
+
+        // Update delivery estimate
+        const deliveryEl = document.getElementById('deliveryEstimate');
+        if (deliveryEl) {
+            deliveryEl.textContent = data.estimated_delivery ? 'Est. ' + data.estimated_delivery : '';
+        }
+
+        // Update tax
+        const taxEl = document.getElementById('taxAmount');
+        if (taxEl) {
+            const totalTax = data.tax_amount + (data.shipping_tax_amount || 0);
+            taxEl.textContent = '$' + totalTax.toFixed(2);
+        }
+
+        // Show tax breakdown
+        if (data.tax_breakdown && data.tax_breakdown.length > 0) {
+            const breakdownEl = document.getElementById('taxBreakdownDetail');
+            if (breakdownEl) {
+                breakdownEl.innerHTML = data.tax_breakdown.map(t =>
+                    `<div>${t.name}: $${t.amount.toFixed(2)}</div>`
+                ).join('');
+            }
+        }
+
+        // Update total
+        document.getElementById('summaryTotal').textContent = '$' + data.grand_total.toFixed(2);
+
+    } catch(e) {
+        // Fallback to client-side calculation
+        recalcTotal();
+    }
 }
 
 function recalcTotal() {
@@ -444,7 +534,6 @@ function highlightSelected() {
     });
 }
 
-// Highlight the first option on load
 document.addEventListener('DOMContentLoaded', highlightSelected);
 
 async function applyCoupon() {
@@ -459,8 +548,7 @@ async function applyCoupon() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content
-                    || '{{ csrf_token() }}'
+                'X-CSRF-TOKEN': CSRF
             },
             body: JSON.stringify({ code })
         });
@@ -472,7 +560,7 @@ async function applyCoupon() {
             document.getElementById('couponCode').value = '';
             document.getElementById('discountRow').style.display = 'none';
             currentDiscount = 0;
-            recalcTotal();
+            fetchTotals();
         } else {
             fb.innerHTML = `<span style="color:#16a34a;">✓ ${data.discount_label} applied!</span>`;
             document.getElementById('couponCode').value = data.coupon_code;
@@ -481,16 +569,11 @@ async function applyCoupon() {
             document.getElementById('discountAmount').textContent = '-$' + data.discount.toFixed(2);
 
             currentDiscount = data.discount;
-            recalcTotal();
+            fetchTotals();
         }
     } catch (e) {
         fb.innerHTML = '<span style="color:#ef4444;">Something went wrong. Please try again.</span>';
     }
-}
-
-function resetTotal() {
-    currentDiscount = 0;
-    recalcTotal();
 }
 </script>
 </x-layout>

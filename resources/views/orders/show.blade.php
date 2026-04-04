@@ -231,9 +231,23 @@
 
             {{-- Shipping --}}
             <div class="order-detail-card">
-                <div class="card-header">📦 Shipping Address</div>
+                <div class="card-header">📦 Shipping</div>
                 <div class="shipping-info">
-                    {{ $order->shipping_address }}
+                    <p>{{ $order->shipping_address }}</p>
+                    @if($order->shippingMethod)
+                        <p style="margin-top:0.75rem;font-weight:700;color:var(--orange);">
+                            {{ $order->shippingMethod->name }}
+                            @if($order->shippingMethod->estimated_days_min && $order->shippingMethod->estimated_days_max)
+                                <span style="font-weight:400;color:var(--gray-400);font-size:0.85rem;">
+                                    — {{ $order->shippingMethod->estimated_days_min }}-{{ $order->shippingMethod->estimated_days_max }} business days
+                                </span>
+                            @elseif($order->shippingMethod->estimated_delivery)
+                                <span style="font-weight:400;color:var(--gray-400);font-size:0.85rem;">
+                                    — {{ $order->shippingMethod->estimated_delivery }}
+                                </span>
+                            @endif
+                        </p>
+                    @endif
                 </div>
             </div>
 
@@ -245,15 +259,37 @@
 
             <div class="sidebar-row">
                 <span>Subtotal</span>
-                <span>${{ number_format($order->total_amount) }}</span>
+                <span>${{ number_format($order->subtotal ?: $order->total_amount, 2) }}</span>
             </div>
+            @if($order->discount_amount > 0)
+            <div class="sidebar-row">
+                <span style="color:#16a34a;font-weight:600;">Discount{{ $order->coupon_code ? ' ('.$order->coupon_code.')' : '' }}</span>
+                <span style="color:#16a34a;font-weight:700;">-${{ number_format($order->discount_amount, 2) }}</span>
+            </div>
+            @endif
             <div class="sidebar-row">
                 <span>Shipping</span>
-                <span style="color:#22c55e;font-weight:600;">Free</span>
+                <span style="font-weight:600;color:{{ (float)$order->shipping_cost == 0 ? '#22c55e' : 'var(--gray-900)' }};">
+                    {{ (float)$order->shipping_cost == 0 ? 'Free' : '$'.number_format($order->shipping_cost, 2) }}
+                </span>
             </div>
+            @if($order->tax_amount > 0 || $order->shipping_tax_amount > 0)
+            <div class="sidebar-row">
+                <span>Tax</span>
+                <span>${{ number_format($order->tax_amount + $order->shipping_tax_amount, 2) }}</span>
+            </div>
+            @if($order->tax_breakdown)
+                @foreach($order->tax_breakdown as $tb)
+                <div class="sidebar-row" style="font-size:0.78rem;color:var(--gray-400);">
+                    <span>{{ $tb['name'] ?? 'Tax' }} ({{ $tb['rate'] ?? 0 }}%)</span>
+                    <span>${{ number_format($tb['amount'] ?? 0, 2) }}</span>
+                </div>
+                @endforeach
+            @endif
+            @endif
             <div class="sidebar-row total">
                 <span>Total</span>
-                <span>${{ number_format($order->total_amount) }}</span>
+                <span>${{ number_format($order->grand_total ?: $order->grandTotal(), 2) }}</span>
             </div>
 
             <div class="status-block"

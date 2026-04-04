@@ -12,6 +12,7 @@ use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductVariant;
 use App\Models\ShippingMethod;
+use App\Models\ShippingZone;
 use App\Models\TaxRate;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -423,9 +424,16 @@ class AdminController extends Controller
 
     public function taxRates()
     {
-        $rates = TaxRate::orderBy('name')->get();
+        $rates = TaxRate::with('category')->orderBy('priority')->orderBy('name')->get();
 
         return view('admin.tax.index', compact('rates'));
+    }
+
+    public function createTaxRate()
+    {
+        $categories = Category::orderBy('name')->get();
+
+        return view('admin.tax.create', compact('categories'));
     }
 
     public function storeTaxRate(Request $request)
@@ -433,15 +441,101 @@ class AdminController extends Controller
         $request->validate([
             'name' => 'required|string|max:100',
             'rate' => 'required|numeric|min:0|max:100',
+            'type' => 'required|in:percentage,fixed,compound',
+            'scope' => 'required|in:product,category,order,shipping',
+            'category_id' => 'nullable|exists:categories,id',
+            'country' => 'nullable|string|size:2',
+            'region' => 'nullable|string|max:100',
+            'postal_code_pattern' => 'nullable|string|max:255',
+            'channel' => 'nullable|string|max:50',
+            'priority' => 'integer|min:0',
+            'is_inclusive' => 'boolean',
+            'apply_to_shipping' => 'boolean',
+            'valid_from' => 'nullable|date',
+            'valid_to' => 'nullable|date|after_or_equal:valid_from',
+            'name_en' => 'nullable|string|max:100',
+            'name_ar' => 'nullable|string|max:100',
+        ]);
+
+        $translations = array_filter([
+            'en' => $request->name_en ?: $request->name,
+            'ar' => $request->name_ar,
         ]);
 
         TaxRate::create([
             'name' => $request->name,
+            'name_translations' => $translations,
             'rate' => $request->rate,
+            'type' => $request->type,
+            'scope' => $request->scope,
+            'category_id' => $request->scope === 'category' ? $request->category_id : null,
+            'country' => $request->country ? strtoupper($request->country) : null,
+            'region' => $request->region,
+            'postal_code_pattern' => $request->postal_code_pattern,
+            'channel' => $request->channel ?: null,
+            'priority' => $request->priority ?? 0,
+            'is_inclusive' => $request->boolean('is_inclusive'),
+            'apply_to_shipping' => $request->boolean('apply_to_shipping'),
+            'valid_from' => $request->valid_from,
+            'valid_to' => $request->valid_to,
             'is_active' => true,
         ]);
 
-        return back()->with('success', 'Tax rate added.');
+        return redirect('/admin/tax')->with('success', 'Tax rate added.');
+    }
+
+    public function editTaxRate(TaxRate $rate)
+    {
+        $categories = Category::orderBy('name')->get();
+
+        return view('admin.tax.edit', compact('rate', 'categories'));
+    }
+
+    public function updateTaxRate(Request $request, TaxRate $rate)
+    {
+        $request->validate([
+            'name' => 'required|string|max:100',
+            'rate' => 'required|numeric|min:0|max:100',
+            'type' => 'required|in:percentage,fixed,compound',
+            'scope' => 'required|in:product,category,order,shipping',
+            'category_id' => 'nullable|exists:categories,id',
+            'country' => 'nullable|string|size:2',
+            'region' => 'nullable|string|max:100',
+            'postal_code_pattern' => 'nullable|string|max:255',
+            'channel' => 'nullable|string|max:50',
+            'priority' => 'integer|min:0',
+            'is_inclusive' => 'boolean',
+            'apply_to_shipping' => 'boolean',
+            'valid_from' => 'nullable|date',
+            'valid_to' => 'nullable|date|after_or_equal:valid_from',
+            'name_en' => 'nullable|string|max:100',
+            'name_ar' => 'nullable|string|max:100',
+        ]);
+
+        $translations = array_filter([
+            'en' => $request->name_en ?: $request->name,
+            'ar' => $request->name_ar,
+        ]);
+
+        $rate->update([
+            'name' => $request->name,
+            'name_translations' => $translations,
+            'rate' => $request->rate,
+            'type' => $request->type,
+            'scope' => $request->scope,
+            'category_id' => $request->scope === 'category' ? $request->category_id : null,
+            'country' => $request->country ? strtoupper($request->country) : null,
+            'region' => $request->region,
+            'postal_code_pattern' => $request->postal_code_pattern,
+            'channel' => $request->channel ?: null,
+            'priority' => $request->priority ?? 0,
+            'is_inclusive' => $request->boolean('is_inclusive'),
+            'apply_to_shipping' => $request->boolean('apply_to_shipping'),
+            'valid_from' => $request->valid_from,
+            'valid_to' => $request->valid_to,
+        ]);
+
+        return redirect('/admin/tax')->with('success', 'Tax rate updated.');
     }
 
     public function toggleTaxRate(TaxRate $rate)
@@ -462,27 +556,120 @@ class AdminController extends Controller
 
     public function shippingMethods()
     {
-        $methods = ShippingMethod::orderBy('price')->get();
+        $methods = ShippingMethod::withCount('zones')->orderBy('sort_order')->get();
 
         return view('admin.shipping.index', compact('methods'));
+    }
+
+    public function createShippingMethod()
+    {
+        return view('admin.shipping.create');
     }
 
     public function storeShippingMethod(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:100',
-            'price' => 'required|numeric|min:0',
-            'estimated_delivery' => 'nullable|string|max:100',
+            'type' => 'required|in:flat,per_unit,weight_based,free,custom',
+            'base_rate' => 'required|numeric|min:0',
+            'per_unit_rate' => 'nullable|numeric|min:0',
+            'weight_rate' => 'nullable|numeric|min:0',
+            'weight_unit' => 'in:kg,lb',
+            'free_above' => 'nullable|numeric|min:0',
+            'min_order_amount' => 'nullable|numeric|min:0',
+            'max_order_amount' => 'nullable|numeric|min:0',
+            'max_weight' => 'nullable|numeric|min:0',
+            'channel' => 'nullable|string|max:50',
+            'estimated_days_min' => 'nullable|integer|min:0',
+            'estimated_days_max' => 'nullable|integer|min:0',
+            'sort_order' => 'integer|min:0',
+            'name_en' => 'nullable|string|max:100',
+            'name_ar' => 'nullable|string|max:100',
+            'metadata' => 'nullable|json',
+        ]);
+
+        $translations = array_filter([
+            'en' => $request->name_en ?: $request->name,
+            'ar' => $request->name_ar,
         ]);
 
         ShippingMethod::create([
             'name' => $request->name,
-            'price' => $request->price,
-            'estimated_delivery' => $request->estimated_delivery,
+            'name_translations' => $translations,
+            'type' => $request->type,
+            'price' => $request->base_rate,
+            'base_rate' => $request->base_rate,
+            'per_unit_rate' => $request->per_unit_rate,
+            'weight_rate' => $request->weight_rate,
+            'weight_unit' => $request->weight_unit ?? 'kg',
+            'free_above' => $request->free_above,
+            'min_order_amount' => $request->min_order_amount,
+            'max_order_amount' => $request->max_order_amount,
+            'max_weight' => $request->max_weight,
+            'channel' => $request->channel ?: null,
+            'estimated_days_min' => $request->estimated_days_min,
+            'estimated_days_max' => $request->estimated_days_max,
+            'sort_order' => $request->sort_order ?? 0,
+            'metadata' => $request->metadata ? json_decode($request->metadata, true) : null,
             'is_active' => true,
         ]);
 
-        return back()->with('success', 'Shipping method added.');
+        return redirect('/admin/shipping/methods')->with('success', 'Shipping method added.');
+    }
+
+    public function editShippingMethod(ShippingMethod $method)
+    {
+        return view('admin.shipping.edit', compact('method'));
+    }
+
+    public function updateShippingMethod(Request $request, ShippingMethod $method)
+    {
+        $request->validate([
+            'name' => 'required|string|max:100',
+            'type' => 'required|in:flat,per_unit,weight_based,free,custom',
+            'base_rate' => 'required|numeric|min:0',
+            'per_unit_rate' => 'nullable|numeric|min:0',
+            'weight_rate' => 'nullable|numeric|min:0',
+            'weight_unit' => 'in:kg,lb',
+            'free_above' => 'nullable|numeric|min:0',
+            'min_order_amount' => 'nullable|numeric|min:0',
+            'max_order_amount' => 'nullable|numeric|min:0',
+            'max_weight' => 'nullable|numeric|min:0',
+            'channel' => 'nullable|string|max:50',
+            'estimated_days_min' => 'nullable|integer|min:0',
+            'estimated_days_max' => 'nullable|integer|min:0',
+            'sort_order' => 'integer|min:0',
+            'name_en' => 'nullable|string|max:100',
+            'name_ar' => 'nullable|string|max:100',
+            'metadata' => 'nullable|json',
+        ]);
+
+        $translations = array_filter([
+            'en' => $request->name_en ?: $request->name,
+            'ar' => $request->name_ar,
+        ]);
+
+        $method->update([
+            'name' => $request->name,
+            'name_translations' => $translations,
+            'type' => $request->type,
+            'price' => $request->base_rate,
+            'base_rate' => $request->base_rate,
+            'per_unit_rate' => $request->per_unit_rate,
+            'weight_rate' => $request->weight_rate,
+            'weight_unit' => $request->weight_unit ?? 'kg',
+            'free_above' => $request->free_above,
+            'min_order_amount' => $request->min_order_amount,
+            'max_order_amount' => $request->max_order_amount,
+            'max_weight' => $request->max_weight,
+            'channel' => $request->channel ?: null,
+            'estimated_days_min' => $request->estimated_days_min,
+            'estimated_days_max' => $request->estimated_days_max,
+            'sort_order' => $request->sort_order ?? 0,
+            'metadata' => $request->metadata ? json_decode($request->metadata, true) : null,
+        ]);
+
+        return redirect('/admin/shipping/methods')->with('success', 'Shipping method updated.');
     }
 
     public function toggleShippingMethod(ShippingMethod $method)
@@ -492,28 +679,115 @@ class AdminController extends Controller
         return back()->with('success', 'Shipping method '.($method->is_active ? 'activated' : 'deactivated').'.');
     }
 
-    public function updateShippingMethod(Request $request, ShippingMethod $method)
-    {
-        $request->validate([
-            'name' => 'required|string|max:100',
-            'price' => 'required|numeric|min:0',
-            'estimated_delivery' => 'nullable|string|max:100',
-        ]);
-
-        $method->update([
-            'name' => $request->name,
-            'price' => $request->price,
-            'estimated_delivery' => $request->estimated_delivery,
-        ]);
-
-        return back()->with('success', 'Shipping method updated.');
-    }
-
     public function destroyShippingMethod(ShippingMethod $method)
     {
         $method->delete();
 
-        return back()->with('success', 'Shipping method deleted.');
+        return redirect('/admin/shipping/methods')->with('success', 'Shipping method deleted.');
+    }
+
+    // ── Shipping Zone Management ─────────────────────────────────
+
+    public function shippingZones()
+    {
+        $zones = ShippingZone::withCount('methods')->orderBy('name')->get();
+
+        return view('admin.shipping.zones.index', compact('zones'));
+    }
+
+    public function createShippingZone()
+    {
+        $methods = ShippingMethod::active()->ordered()->get();
+
+        return view('admin.shipping.zones.create', compact('methods'));
+    }
+
+    public function storeShippingZone(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:100',
+            'countries' => 'required|array|min:1',
+            'countries.*' => 'string|size:2',
+            'regions' => 'nullable|string',
+            'methods' => 'nullable|array',
+            'methods.*' => 'exists:shipping_methods,id',
+            'rate_overrides' => 'nullable|array',
+            'rate_overrides.*' => 'nullable|numeric|min:0',
+        ]);
+
+        $zone = ShippingZone::create([
+            'name' => $request->name,
+            'countries' => array_map('strtoupper', $request->countries),
+            'regions' => $request->regions ? array_map('trim', explode(',', $request->regions)) : null,
+            'is_active' => true,
+        ]);
+
+        if ($request->methods) {
+            $pivotData = [];
+            foreach ($request->methods as $methodId) {
+                $pivotData[$methodId] = [
+                    'rate_override' => $request->rate_overrides[$methodId] ?? null,
+                    'is_active' => true,
+                ];
+            }
+            $zone->methods()->attach($pivotData);
+        }
+
+        return redirect('/admin/shipping/zones')->with('success', 'Shipping zone created.');
+    }
+
+    public function editShippingZone(ShippingZone $zone)
+    {
+        $zone->load('methods');
+        $methods = ShippingMethod::active()->ordered()->get();
+
+        return view('admin.shipping.zones.edit', compact('zone', 'methods'));
+    }
+
+    public function updateShippingZone(Request $request, ShippingZone $zone)
+    {
+        $request->validate([
+            'name' => 'required|string|max:100',
+            'countries' => 'required|array|min:1',
+            'countries.*' => 'string|size:2',
+            'regions' => 'nullable|string',
+            'methods' => 'nullable|array',
+            'methods.*' => 'exists:shipping_methods,id',
+            'rate_overrides' => 'nullable|array',
+            'rate_overrides.*' => 'nullable|numeric|min:0',
+        ]);
+
+        $zone->update([
+            'name' => $request->name,
+            'countries' => array_map('strtoupper', $request->countries),
+            'regions' => $request->regions ? array_map('trim', explode(',', $request->regions)) : null,
+        ]);
+
+        $pivotData = [];
+        foreach (($request->methods ?? []) as $methodId) {
+            $pivotData[$methodId] = [
+                'rate_override' => $request->rate_overrides[$methodId] ?? null,
+                'is_active' => true,
+            ];
+        }
+        $zone->methods()->sync($pivotData);
+
+        return redirect('/admin/shipping/zones')->with('success', 'Shipping zone updated.');
+    }
+
+    public function toggleShippingZone(ShippingZone $zone)
+    {
+        $zone->update(['is_active' => ! $zone->is_active]);
+
+        return back()->with('success', 'Shipping zone '.($zone->is_active ? 'activated' : 'deactivated').'.');
+    }
+
+    public function destroyShippingZone(ShippingZone $zone)
+    {
+        $zone->methods()->detach();
+        $zone->delete();
+
+        return redirect('/admin/shipping/zones')->with('success', 'Shipping zone deleted.');
     }
 
     // ── Email Templates ──────────────────────────────────────────
