@@ -39,7 +39,7 @@
     <span style="font-size:1.3rem;flex-shrink:0;">📧</span>
     <div>
         These are the transactional email templates used by your store. Edit the <strong>subject</strong> and <strong>HTML body</strong> of each template.
-        Use <code style="background:#ffedd5;padding:0 4px;border-radius:3px;">{{ '{{variable_name}}' }}</code> placeholders - the available variables are shown on each template.
+        Use <code style="background:#ffedd5;padding:0 4px;border-radius:3px;">@verbatim{{variable_name}}@endverbatim</code> placeholders - the available variables are shown on each template.
         Click <strong>Preview</strong> to see how the template will render.
     </div>
 </div>
