@@ -68,7 +68,7 @@ class OrderController extends Controller
         $subtotal = $cart->total();
         $country = $request->country ?? 'US';
 
-        $method = ShippingMethod::findOrFail($request->shipping_method_id);
+        $method = ShippingMethod::with('zones')->findOrFail($request->shipping_method_id);
         $zone = $shippingCalculator->resolveZone($country);
 
         $context = [
@@ -79,8 +79,6 @@ class OrderController extends Controller
             'item_count' => $cart->itemCount(),
         ];
 
-        // If the method has zones loaded, use zone-aware calculation
-        $method->load('zones');
         $shippingResult = $shippingCalculator->calculate($method, $context, $zone);
 
         // Calculate discount

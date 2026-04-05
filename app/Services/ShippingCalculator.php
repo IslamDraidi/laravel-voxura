@@ -22,7 +22,7 @@ class ShippingCalculator
                 ->where('shipping_zone_method.is_active', true));
         }
 
-        $methods = $query->get();
+        $methods = $query->with('zones')->get();
 
         return $methods->filter(function (ShippingMethod $method) use ($context) {
             if ($method->min_order_amount && $context['order_total'] < (float) $method->min_order_amount) {

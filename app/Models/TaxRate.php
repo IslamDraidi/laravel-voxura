@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TaxRate extends Model
 {
+    use HasTranslations;
+
     protected $fillable = [
         'name', 'name_translations', 'type', 'rate', 'scope',
         'category_id', 'channel', 'country', 'region',
@@ -29,14 +32,6 @@ class TaxRate extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
-    }
-
-    public function getTranslatedNameAttribute(): string
-    {
-        $locale = app()->getLocale();
-        $translations = $this->name_translations;
-
-        return $translations[$locale] ?? $translations['en'] ?? $this->name;
     }
 
     public function isCurrentlyValid(): bool

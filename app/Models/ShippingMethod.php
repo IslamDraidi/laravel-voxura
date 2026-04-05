@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class ShippingMethod extends Model
 {
+    use HasTranslations;
+
     protected $fillable = [
         'name', 'name_translations', 'type', 'price', 'base_rate',
         'per_unit_rate', 'weight_rate', 'weight_unit', 'free_above',
@@ -45,14 +48,6 @@ class ShippingMethod extends Model
             'custom' => 'Custom rate',
             default => '$'.number_format($this->base_rate, 2),
         };
-    }
-
-    public function getTranslatedNameAttribute(): string
-    {
-        $locale = app()->getLocale();
-        $translations = $this->name_translations;
-
-        return $translations[$locale] ?? $translations['en'] ?? $this->name;
     }
 
     public function scopeActive($query)
