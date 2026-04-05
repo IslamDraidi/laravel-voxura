@@ -383,10 +383,10 @@
     </div>
 
     <nav class="sidebar-nav">
-        <a href="/admin"           class="nav-item {{ $section === 'dashboard' ? 'active' : '' }}"><span class="nav-icon">⊞</span> Dashboard</a>
+        <a href="/admin" class="nav-item {{ $section === 'dashboard' ? 'active' : '' }}"><span class="nav-icon">⊞</span> Dashboard</a>
         <a href="/admin/orders"    class="nav-item {{ $section === 'sales' ? 'active' : '' }}"><span class="nav-icon">🛒</span> Sales</a>
         <a href="/admin/customers" class="nav-item {{ $section === 'customers' ? 'active' : '' }}"><span class="nav-icon">👥</span> Customers</a>
-        <a href="/admin"           class="nav-item {{ $section === 'catalog' ? 'active' : '' }}"><span class="nav-icon">📦</span> Catalog</a>
+        <a href="/admin/categories" class="nav-item {{ $section === 'catalog' ? 'active' : '' }}"><span class="nav-icon">📦</span> Catalog</a>
         <a href="/admin/cms/pages"   class="nav-item {{ $section === 'cms' ? 'active' : '' }}"><span class="nav-icon">🖼️</span> CMS</a>
         <a href="/admin/coupons"   class="nav-item {{ $section === 'marketing' ? 'active' : '' }}"><span class="nav-icon">🏷️</span> Marketing</a>
         <a href="/admin/reports"   class="nav-item {{ $section === 'reporting' ? 'active' : '' }}"><span class="nav-icon">📈</span> Reporting</a>
@@ -404,7 +404,7 @@
         <div class="topbar-title">{{ $pageTitle ?? $title }}</div>
         <div class="topbar-right">
             <a href="/admin/products/create" class="topbar-btn">+ Add Product</a>
-            <a href="/" class="topbar-ghost">← Store</a>
+            <a href="/logout" class="topbar-btn">← Logout</a>
             <div class="topbar-avatar">{{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}</div>
         </div>
     </div>
@@ -421,7 +421,7 @@
     </div>
     @elseif($section === 'catalog')
     <div class="admin-subnav">
-        <a href="/admin"                    class="subnav-tab {{ $active === 'products'    ? 'active' : '' }}"><span class="tab-icon">📦</span> Products</a>
+        <a href="/admin/products/create"           class="subnav-tab {{ $active === 'products'    ? 'active' : '' }}"><span class="tab-icon">📦</span> Products</a>
         <a href="/admin/categories"         class="subnav-tab {{ $active === 'categories'  ? 'active' : '' }}"><span class="tab-icon">🗂️</span> Categories</a>
         <a href="/admin/attributes"         class="subnav-tab {{ $active === 'attributes'  ? 'active' : '' }}"><span class="tab-icon">✏️</span> Attributes</a>
         <a href="/admin/attribute-families" class="subnav-tab {{ $active === 'attr-families' ? 'active' : '' }}"><span class="tab-icon">🗃️</span> Attribute Families</a>

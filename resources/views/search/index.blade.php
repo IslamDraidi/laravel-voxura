@@ -170,7 +170,7 @@
                         <span class="card-category">{{ $product->category->name }}</span>
                     @endif
                     <p class="card-name">{{ $product->name }}</p>
-                    <p class="card-price">${{ number_format($product->price, 2) }}</p>
+                    <p class="card-price">₪{{ number_format($product->price, 2) }}</p>
                     <p class="card-stock {{ $product->stock < 1 ? 'out' : '' }}">
                         {{ $product->stock > 0 ? $product->stock . ' in stock' : 'Out of stock' }}
                     </p>

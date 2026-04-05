@@ -259,7 +259,7 @@
 
             <div class="sidebar-row">
                 <span>Subtotal</span>
-                <span>${{ number_format($order->subtotal ?: $order->total_amount, 2) }}</span>
+                <span>₪{{ number_format($order->subtotal ?: $order->total_amount, 2) }}</span>
             </div>
             @if($order->discount_amount > 0)
             <div class="sidebar-row">
@@ -270,26 +270,26 @@
             <div class="sidebar-row">
                 <span>Shipping</span>
                 <span style="font-weight:600;color:{{ (float)$order->shipping_cost == 0 ? '#22c55e' : 'var(--gray-900)' }};">
-                    {{ (float)$order->shipping_cost == 0 ? 'Free' : '$'.number_format($order->shipping_cost, 2) }}
+                    {{ (float)$order->shipping_cost == 0 ? 'Free' : '₪'.number_format($order->shipping_cost, 2) }}
                 </span>
             </div>
             @if($order->tax_amount > 0 || $order->shipping_tax_amount > 0)
             <div class="sidebar-row">
                 <span>Tax</span>
-                <span>${{ number_format($order->tax_amount + $order->shipping_tax_amount, 2) }}</span>
+                <span>₪{{ number_format($order->tax_amount + $order->shipping_tax_amount, 2) }}</span>
             </div>
             @if($order->tax_breakdown)
                 @foreach($order->tax_breakdown as $tb)
                 <div class="sidebar-row" style="font-size:0.78rem;color:var(--gray-400);">
                     <span>{{ $tb['name'] ?? 'Tax' }} ({{ $tb['rate'] ?? 0 }}%)</span>
-                    <span>${{ number_format($tb['amount'] ?? 0, 2) }}</span>
+                    <span>₪{{ number_format($tb['amount'] ?? 0, 2) }}</span>
                 </div>
                 @endforeach
             @endif
             @endif
             <div class="sidebar-row total">
                 <span>Total</span>
-                <span>${{ number_format($order->grand_total ?: $order->grandTotal(), 2) }}</span>
+                <span>₪{{ number_format($order->grand_total ?: $order->grandTotal(), 2) }}</span>
             </div>
 
             <div class="status-block"

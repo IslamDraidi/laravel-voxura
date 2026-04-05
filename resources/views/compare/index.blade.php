@@ -265,7 +265,7 @@
                     <tr>
                         <td>Price</td>
                         @foreach($products as $product)
-                            <td><span class="cmp-price">${{ number_format($product->price, 2) }}</span></td>
+                            <td><span class="cmp-price">₪{{ number_format($product->price, 2) }}</span></td>
                         @endforeach
                     </tr>
 

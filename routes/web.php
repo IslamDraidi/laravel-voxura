@@ -34,6 +34,7 @@ Route::post('/reviews/{feedback}/helpful', [FeedbackController::class, 'markHelp
 Route::view('/register', 'auth.register')->middleware('guest')->name('register');
 Route::post('/register', [RegisterController::class, 'store'])->middleware('guest');
 Route::post('/logout', Logout::class)->middleware('auth')->name('logout');
+Route::get('/logout', Logout::class)->middleware('auth');
 Route::view('/login', 'auth.login')->middleware('guest')->name('login');
 Route::post('/login', [Login::class, 'store'])->middleware('guest');
 
@@ -79,6 +80,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::put('/products/{product}', [AdminController::class, 'update'])->name('admin.products.update');
     Route::delete('/products/{product}', [AdminController::class, 'destroy'])->name('admin.products.delete');
     Route::get('/archive', [AdminController::class, 'archive'])->name('admin.archive');
+    Route::get('/products', [AdminController::class, 'index'])->name('admin.products.index');
     Route::post('/products/{product}/variants', [AdminController::class, 'addVariant'])->name('admin.variants.store');
     Route::delete('/products/{product}/variants/{variant}', [AdminController::class, 'removeVariant'])->name('admin.variants.destroy');
     Route::post('/products/{id}/restore', [AdminController::class, 'restore'])->name('admin.restore');

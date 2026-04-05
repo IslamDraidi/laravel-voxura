@@ -180,7 +180,7 @@
                 @endif
             </div>
 
-            <div class="prod-price">${{ number_format($product->price, 2) }}</div>
+            <div class="prod-price">₪{{ number_format($product->price, 2) }}</div>
             @if($product->sku)
                 <div class="prod-sku">SKU: {{ $product->sku }}</div>
             @endif
@@ -436,7 +436,7 @@
                     <img src="{{ asset('images/' . $related->image) }}" alt="{{ $related->name }}" class="related-img">
                     <div class="related-body">
                         <div class="related-name">{{ $related->name }}</div>
-                        <div class="related-price">${{ number_format($related->price, 2) }}</div>
+                        <div class="related-price">₪{{ number_format($related->price, 2) }}</div>
                     </div>
                 </a>
             @endforeach

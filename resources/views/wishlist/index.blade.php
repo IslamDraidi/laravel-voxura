@@ -294,7 +294,7 @@
                             <a href="/product/{{ $product->id }}">{{ $product->name }}</a>
                         </h3>
                         <div class="wish-card-footer">
-                            <span class="wish-card-price">${{ number_format($product->price) }}</span>
+                            <span class="wish-card-price">₪{{ number_format($product->price) }}</span>
                             <a href="/product/{{ $product->id }}" class="wish-card-learn">View →</a>
                         </div>
                     </div>
