@@ -1,5 +1,11 @@
 <x-admin-layout title="Products" section="catalog" active="products">
 
+{{-- Page header --}}
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;">
+    <h2 style="font-size:16px;font-weight:700;color:var(--dark);margin:0;">All Products</h2>
+    <a href="/admin/products/create" class="add-btn">+ Add Product</a>
+</div>
+
 {{-- Filters --}}
 <form method="GET" action="/admin/products">
     <div class="search-bar" style="margin-bottom:1.25rem;">

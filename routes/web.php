@@ -95,7 +95,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::put('/products/{product}', [AdminController::class, 'update'])->name('admin.products.update');
     Route::delete('/products/{product}', [AdminController::class, 'destroy'])->name('admin.products.delete');
     Route::get('/archive', [AdminController::class, 'archive'])->name('admin.archive');
-    Route::get('/products', [AdminController::class, 'index'])->name('admin.products.index');
     Route::post('/products/{product}/variants', [AdminController::class, 'addVariant'])->name('admin.variants.store');
     Route::delete('/products/{product}/variants/{variant}', [AdminController::class, 'removeVariant'])->name('admin.variants.destroy');
     Route::post('/products/{id}/restore', [AdminController::class, 'restore'])->name('admin.restore');
