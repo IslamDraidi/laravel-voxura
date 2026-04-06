@@ -28,7 +28,7 @@
 
         {{-- السعر + الزر --}}
       <div class="fp-actions">
-    <span class="fp-price">₪{{ number_format($product->price) }}</span>
+    <span class="fp-price">${{ number_format($product->price) }}</span>
 
             <form method="POST" action="/cart/add">
                 @csrf

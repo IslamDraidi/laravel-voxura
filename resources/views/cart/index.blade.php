@@ -359,7 +359,7 @@
                                         {{ $item->variant->label() }}
                                     </p>
                                 @endif
-                                <p class="cart-item-price">₪{{ number_format($item->unitPrice(), 2) }} each</p>
+                                <p class="cart-item-price">${{ number_format($item->unitPrice(), 2) }} each</p>
                             </div>
 
                             {{-- Actions --}}
@@ -430,7 +430,7 @@
 
                 <div class="summary-row">
                     <span>Subtotal ({{ $cart->itemCount() }} items)</span>
-                    <span>₪{{ number_format($cart->total()) }}</span>
+                    <span>${{ number_format($cart->total()) }}</span>
                 </div>
                 <div class="summary-row">
                     <span>Shipping</span>
@@ -438,11 +438,11 @@
                 </div>
                 <div class="summary-row">
                     <span>Tax (est.)</span>
-                    <span>₪{{ number_format($cart->total() * 0.08) }}</span>
+                    <span>${{ number_format($cart->total() * 0.08) }}</span>
                 </div>
                 <div class="summary-row total">
                     <span>Total</span>
-                    <span>₪{{ number_format($cart->total() * 1.08) }}</span>
+                    <span>${{ number_format($cart->total() * 1.08) }}</span>
                 </div>
 
                 @if(\App\Http\Middleware\AdminPreviewMode::isActive())
