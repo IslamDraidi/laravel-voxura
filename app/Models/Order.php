@@ -45,6 +45,37 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function refunds()
+    {
+        return $this->hasMany(Refund::class);
+    }
+
+    public function totalRefunded(): float
+    {
+        return (float) $this->refunds()->where('status', 'completed')->sum('amount');
+    }
+
+    public function refundableAmount(): float
+    {
+        return max(0, (float) $this->grand_total - $this->totalRefunded());
+    }
+
+    public function isFullyRefunded(): bool
+    {
+        return $this->totalRefunded() >= (float) $this->grand_total;
+    }
+
+    public function isPartiallyRefunded(): bool
+    {
+        $refunded = $this->totalRefunded();
+        return $refunded > 0 && $refunded < (float) $this->grand_total;
+    }
+
     public function grandTotal(): float
     {
         return max(0, $this->total_amount - $this->discount_amount + $this->tax_amount + $this->shipping_cost);
@@ -56,8 +87,10 @@ class Order extends Model
             'pending' => '#f59e0b',
             'processing' => '#3b82f6',
             'shipped' => '#8b5cf6',
-            'delivered' => '#16a34a',
-            'cancelled' => '#ef4444',
+            'delivered', 'paid' => '#16a34a',
+            'cancelled', 'payment_blocked' => '#ef4444',
+            'refunded' => '#8b5cf6',
+            'partially_refunded' => '#d97706',
             default => '#6b7280',
         };
     }
@@ -68,8 +101,10 @@ class Order extends Model
             'pending' => '#fef3c7',
             'processing' => '#dbeafe',
             'shipped' => '#ede9fe',
-            'delivered' => '#dcfce7',
-            'cancelled' => '#fee2e2',
+            'delivered', 'paid' => '#dcfce7',
+            'cancelled', 'payment_blocked' => '#fee2e2',
+            'refunded' => '#ede9fe',
+            'partially_refunded' => '#fef3c7',
             default => '#f3f4f6',
         };
     }
