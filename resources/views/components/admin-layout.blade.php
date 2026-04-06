@@ -386,7 +386,7 @@
         <a href="/admin"           class="nav-item {{ $section === 'dashboard' ? 'active' : '' }}"><span class="nav-icon">⊞</span> Dashboard</a>
         <a href="/admin/orders"    class="nav-item {{ $section === 'sales' ? 'active' : '' }}"><span class="nav-icon">🛒</span> Sales</a>
         <a href="/admin/customers" class="nav-item {{ $section === 'customers' ? 'active' : '' }}"><span class="nav-icon">👥</span> Customers</a>
-        <a href="/admin"           class="nav-item {{ $section === 'catalog' ? 'active' : '' }}"><span class="nav-icon">📦</span> Catalog</a>
+        <a href="/admin/products"  class="nav-item {{ $section === 'catalog' ? 'active' : '' }}"><span class="nav-icon">📦</span> Catalog</a>
         <a href="/admin/cms/pages"   class="nav-item {{ $section === 'cms' ? 'active' : '' }}"><span class="nav-icon">🖼️</span> CMS</a>
         <a href="/admin/coupons"   class="nav-item {{ $section === 'marketing' ? 'active' : '' }}"><span class="nav-icon">🏷️</span> Marketing</a>
         <a href="/admin/reports"   class="nav-item {{ $section === 'reporting' ? 'active' : '' }}"><span class="nav-icon">📈</span> Reporting</a>
@@ -403,7 +403,7 @@
     <div class="admin-topbar">
         <div class="topbar-title">{{ $pageTitle ?? $title }}</div>
         <div class="topbar-right">
-            <a href="/admin/products/create" class="topbar-btn">+ Add Product</a>
+<a href="{{ route('admin.preview.enable') }}" target="_blank" class="topbar-ghost" title="Browse the storefront as a customer with interactive features hidden">👁 View as Customer</a>
             <a href="/" class="topbar-ghost">← Store</a>
             <div class="topbar-avatar">{{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}</div>
         </div>
@@ -421,7 +421,7 @@
     </div>
     @elseif($section === 'catalog')
     <div class="admin-subnav">
-        <a href="/admin"                    class="subnav-tab {{ $active === 'products'    ? 'active' : '' }}"><span class="tab-icon">📦</span> Products</a>
+        <a href="/admin/products"            class="subnav-tab {{ $active === 'products'    ? 'active' : '' }}"><span class="tab-icon">📦</span> Products</a>
         <a href="/admin/categories"         class="subnav-tab {{ $active === 'categories'  ? 'active' : '' }}"><span class="tab-icon">🗂️</span> Categories</a>
         <a href="/admin/attributes"         class="subnav-tab {{ $active === 'attributes'  ? 'active' : '' }}"><span class="tab-icon">✏️</span> Attributes</a>
         <a href="/admin/attribute-families" class="subnav-tab {{ $active === 'attr-families' ? 'active' : '' }}"><span class="tab-icon">🗃️</span> Attribute Families</a>
@@ -436,7 +436,6 @@
     @elseif($section === 'marketing')
     <div class="admin-subnav">
         <a href="/admin/coupons"         class="subnav-tab {{ $active === 'promotions'     ? 'active' : '' }}"><span class="tab-icon">🏷️</span> Promotions</a>
-        <a href="/admin/communications"  class="subnav-tab {{ $active === 'communications' ? 'active' : '' }}"><span class="tab-icon">📧</span> Communications</a>
         <a href="/admin/seo"             class="subnav-tab {{ $active === 'seo'            ? 'active' : '' }}"><span class="tab-icon">🔍</span> Search &amp; SEO</a>
     </div>
     @elseif($section === 'cms')

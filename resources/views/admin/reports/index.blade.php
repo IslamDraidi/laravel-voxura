@@ -84,13 +84,13 @@
         <p class="section-title">Order Status Breakdown</p>
         @php
             $total = $statusBreakdown->sum();
-            $statusColors = ['pending'=>'#f59e0b','processing'=>'#3b82f6','shipped'=>'#8b5cf6','delivered'=>'#16a34a','cancelled'=>'#ef4444'];
+            $statusColors = ['pending'=>'#f59e0b','paid'=>'#16a34a','processing'=>'#3b82f6','shipped'=>'#8b5cf6','delivered'=>'#16a34a','cancelled'=>'#ef4444','payment_blocked'=>'#ef4444','refunded'=>'#8b5cf6','partially_refunded'=>'#d97706'];
         @endphp
         @if($total === 0)
             <p style="color:var(--muted);font-size:0.9rem;">No orders for this period.</p>
         @else
             <div class="status-bars">
-                @foreach(['pending','processing','shipped','delivered','cancelled'] as $status)
+                @foreach(['pending','paid','processing','shipped','delivered','cancelled','payment_blocked','refunded','partially_refunded'] as $status)
                 @php $count = $statusBreakdown->get($status, 0); $pct = $total > 0 ? round($count / $total * 100) : 0; @endphp
                 <div class="status-bar-item">
                     <div class="status-bar-label">
@@ -107,6 +107,46 @@
     </div>
 
 </div>
+
+{{-- Refund & Payment Stats --}}
+<div class="stat-grid" style="margin-top:2rem;margin-bottom:1.5rem;">
+    <div class="stat-card">
+        <span class="sc-label">Refunds Issued</span>
+        <span class="sc-value red">{{ $refundStats['count'] }}</span>
+        <span class="sc-sub">${{ number_format($refundStats['amount'], 2) }} total</span>
+    </div>
+    <div class="stat-card">
+        <span class="sc-label">Refund Rate</span>
+        <span class="sc-value" style="color:{{ $refundStats['rate'] > 5 ? 'var(--red)' : 'var(--green)' }};">{{ $refundStats['rate'] }}%</span>
+        <span class="sc-sub">Refunds ÷ Orders</span>
+    </div>
+    <div class="stat-card">
+        <span class="sc-label">Failed Payments</span>
+        <span class="sc-value red">{{ $refundStats['failed_payments'] }}</span>
+        <span class="sc-sub">{{ $refundStats['failed_rate'] }}% failure rate</span>
+    </div>
+</div>
+
+@if($refundStats['top_reasons']->isNotEmpty())
+<div class="card" style="margin-bottom:2rem;">
+    <p class="section-title">Top Refund Reasons</p>
+    <table>
+        <thead>
+            <tr><th>#</th><th>Reason</th><th>Count</th><th>Total</th></tr>
+        </thead>
+        <tbody>
+            @foreach($refundStats['top_reasons'] as $i => $r)
+            <tr>
+                <td><span class="rank">{{ $i + 1 }}</span></td>
+                <td>{{ Str::limit($r->reason, 60) }}</td>
+                <td>{{ $r->count }}</td>
+                <td style="font-weight:700;color:var(--red);">${{ number_format($r->total, 2) }}</td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
+@endif
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>

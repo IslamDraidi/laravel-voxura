@@ -17,7 +17,9 @@ use App\Models\ProductVariant;
 use App\Models\ShippingMethod;
 use App\Models\ShippingZone;
 use App\Models\TaxRate;
+use App\Models\Refund;
 use App\Models\User;
+use App\Services\Payment\RefundService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -77,6 +79,32 @@ class AdminController extends Controller
             'todaySales', 'todayOrders', 'todayCustomers',
             'topProducts', 'topCustomers'
         ));
+    }
+
+    public function products(Request $request)
+    {
+        $query = Product::with('category');
+
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->category);
+        }
+
+        if ($request->filled('status')) {
+            if ($request->status === 'active') {
+                $query->where('stock', '>', 0);
+            } elseif ($request->status === 'out') {
+                $query->where('stock', 0);
+            }
+        }
+
+        $products   = $query->orderBy('name')->get();
+        $categories = Category::orderBy('name')->get();
+
+        return view('admin.products.index', compact('products', 'categories'));
     }
 
     public function create()
@@ -221,10 +249,14 @@ class AdminController extends Controller
         $statusCounts = [
             'all' => Order::count(),
             'pending' => Order::where('status', 'pending')->count(),
+            'paid' => Order::where('status', 'paid')->count(),
             'processing' => Order::where('status', 'processing')->count(),
             'shipped' => Order::where('status', 'shipped')->count(),
             'delivered' => Order::where('status', 'delivered')->count(),
             'cancelled' => Order::where('status', 'cancelled')->count(),
+            'payment_blocked' => Order::where('status', 'payment_blocked')->count(),
+            'refunded' => Order::where('status', 'refunded')->count(),
+            'partially_refunded' => Order::where('status', 'partially_refunded')->count(),
         ];
 
         return view('admin.orders.index', compact('orders', 'statusCounts'));
@@ -233,12 +265,21 @@ class AdminController extends Controller
     public function updateOrderStatus(Request $request, Order $order)
     {
         $request->validate([
-            'status' => 'required|in:pending,processing,shipped,delivered,cancelled',
+            'status' => 'required|in:pending,paid,processing,shipped,delivered,cancelled,payment_blocked,refunded,partially_refunded',
         ]);
 
         $order->update(['status' => $request->status]);
 
         return back()->with('success', "Order #{$order->id} status updated to ".ucfirst($request->status).'.');
+    }
+
+    public function showOrder(Order $order)
+    {
+        $order->load(['user', 'items.product', 'payments', 'refunds.admin', 'shippingMethod', 'coupon']);
+
+        $refundableAmount = (new RefundService)->getRefundableAmount($order);
+
+        return view('admin.orders.show', compact('order', 'refundableAmount'));
     }
 
     // ── Product Variants ─────────────────────────────────────────
@@ -275,11 +316,10 @@ class AdminController extends Controller
 
     public function customers(Request $request)
     {
-        $query = User::where('is_admin', false)->withCount('orders')
-            ->withSum('orders', 'total_amount');
+        $base = User::withCount('orders')->withSum('orders', 'total_amount');
 
         if ($request->filled('search')) {
-            $query->where(function ($q) use ($request) {
+            $base->where(function ($q) use ($request) {
                 $q->where('name', 'like', '%'.$request->search.'%')
                     ->orWhere('email', 'like', '%'.$request->search.'%');
             });
@@ -287,21 +327,25 @@ class AdminController extends Controller
 
         if ($request->filled('status')) {
             if ($request->status === 'blocked') {
-                $query->where('is_blocked', true);
+                $base->where('is_blocked', true);
             }
             if ($request->status === 'active') {
-                $query->where('is_blocked', false);
+                $base->where('is_blocked', false);
             }
         }
 
-        $customers = $query->latest()->get();
+        $all       = $base->latest()->get();
+        $admins    = $all->filter(fn($u) => $u->isAdmin())->values();
+        $customers = $all->reject(fn($u) => $u->isAdmin())->values();
 
-        return view('admin.customers.index', compact('customers'));
+        return view('admin.customers.index', compact('admins', 'customers'));
     }
 
     public function blockCustomer(User $user)
     {
-        abort_if($user->isAdmin(), 403);
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'You cannot block yourself.');
+        }
         $user->update(['is_blocked' => true]);
 
         return back()->with('success', "{$user->name} has been blocked.");
@@ -767,10 +811,27 @@ class AdminController extends Controller
             ->groupBy('status')
             ->pluck('count', 'status');
 
+        // Refund & payment failure stats
+        $refundStats = [
+            'count' => Refund::where('created_at', '>=', $from)->where('status', 'completed')->count(),
+            'amount' => Refund::where('created_at', '>=', $from)->where('status', 'completed')->sum('amount'),
+            'rate' => $ordersCount > 0
+                ? round(Refund::where('created_at', '>=', $from)->where('status', 'completed')->count() / $ordersCount * 100, 1)
+                : 0,
+            'failed_payments' => DB::table('payments')->where('created_at', '>=', $from)->where('status', 'failed')->count(),
+            'total_payments' => DB::table('payments')->where('created_at', '>=', $from)->count(),
+            'top_reasons' => Refund::where('created_at', '>=', $from)->where('status', 'completed')
+                ->selectRaw('reason, COUNT(*) as count, SUM(amount) as total')
+                ->groupBy('reason')->orderByDesc('count')->limit(5)->get(),
+        ];
+        $refundStats['failed_rate'] = $refundStats['total_payments'] > 0
+            ? round($refundStats['failed_payments'] / $refundStats['total_payments'] * 100, 1)
+            : 0;
+
         return view('admin.reports.index', compact(
             'period', 'revenue', 'ordersCount', 'newCustomers', 'avgOrder',
             'chartLabels', 'chartRevenue', 'chartOrders',
-            'topProducts', 'statusBreakdown'
+            'topProducts', 'statusBreakdown', 'refundStats'
         ));
     }
 
@@ -821,14 +882,16 @@ class AdminController extends Controller
 
     public function refunds()
     {
-        $refunds = Order::with('user')
-            ->where('status', 'cancelled')
-            ->latest()
-            ->get();
+        $refunds = Refund::with(['order.user', 'admin', 'payment'])->latest()->get();
 
-        $totalRefunded = $refunds->sum('total_amount');
+        $stats = [
+            'total_count' => $refunds->count(),
+            'completed_count' => $refunds->where('status', 'completed')->count(),
+            'failed_count' => $refunds->where('status', 'failed')->count(),
+            'total_amount' => $refunds->where('status', 'completed')->sum('amount'),
+        ];
 
-        return view('admin.sales.refunds', compact('refunds', 'totalRefunded'));
+        return view('admin.sales.refunds', compact('refunds', 'stats'));
     }
 
     // ── Transactions ──────────────────────────────────────────────
