@@ -66,7 +66,7 @@
     <div class="ov-card">
         <div class="ov-icon">💰</div>
         <div class="ov-label">Total Sales</div>
-        <div class="ov-value orange">${{ number_format($totalSales, 0) }}</div>
+        <div class="ov-value orange">₪{{ number_format($totalSales, 0) }}</div>
         <div class="ov-sub">All time revenue</div>
     </div>
 
@@ -87,7 +87,7 @@
     <div class="ov-card">
         <div class="ov-icon">📈</div>
         <div class="ov-label">Avg Order Sale</div>
-        <div class="ov-value orange">${{ number_format($avgOrderSale, 2) }}</div>
+        <div class="ov-value orange">₪{{ number_format($avgOrderSale, 2) }}</div>
         <div class="ov-sub">Per transaction</div>
     </div>
 
@@ -106,7 +106,7 @@
 
     <div class="td-card orange">
         <div class="td-label">Today's Sales</div>
-        <div class="td-value">${{ number_format($todaySales, 0) }}</div>
+        <div class="td-value">₪{{ number_format($todaySales, 0) }}</div>
     </div>
 
     <div class="td-card dark">
@@ -148,7 +148,7 @@
                             </a>
                         </td>
                         <td style="text-align:right;color:var(--dark);">{{ number_format($p->total_sold) }}</td>
-                        <td style="text-align:right;color:var(--dark);">${{ number_format($p->revenue) }}</td>
+                        <td style="text-align:right;color:var(--dark);">₪{{ number_format($p->revenue) }}</td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -175,7 +175,7 @@
                     <tr>
                         <td style="font-weight:500;">{{ $c->name }}</td>
                         <td style="text-align:right;color:var(--dark);">{{ $c->order_count }}</td>
-                        <td style="text-align:right;color:var(--dark);">${{ number_format($c->total_spent) }}</td>
+                        <td style="text-align:right;color:var(--dark);">₪{{ number_format($c->total_spent) }}</td>
                     </tr>
                     @endforeach
                 </tbody>

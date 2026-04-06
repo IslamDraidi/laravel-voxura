@@ -367,7 +367,7 @@
 
                                 {{-- Subtotal --}}
                                 <span class="cart-item-subtotal">
-                                    ${{ number_format($item->subtotal()) }}
+                                    ₪{{ number_format($item->subtotal()) }}
                                 </span>
 
                                 {{-- Qty --}}

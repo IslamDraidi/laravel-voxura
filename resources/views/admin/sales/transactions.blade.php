@@ -3,15 +3,15 @@
     <div class="stat-grid">
         <div class="stat-card">
             <div class="sc-label">Total Processed</div>
-            <div class="sc-value green" style="font-size:1.4rem;">${{ number_format($stats['completed'], 2) }}</div>
+            <div class="sc-value green" style="font-size:1.4rem;">₪{{ number_format($stats['completed'], 2) }}</div>
         </div>
         <div class="stat-card">
             <div class="sc-label">Total Volume</div>
-            <div class="sc-value" style="font-size:1.4rem;">${{ number_format($stats['total'], 2) }}</div>
+            <div class="sc-value" style="font-size:1.4rem;">₪{{ number_format($stats['total'], 2) }}</div>
         </div>
         <div class="stat-card">
             <div class="sc-label">Refunded</div>
-            <div class="sc-value red" style="font-size:1.4rem;">${{ number_format($stats['refunded'], 2) }}</div>
+            <div class="sc-value red" style="font-size:1.4rem;">₪{{ number_format($stats['refunded'], 2) }}</div>
         </div>
         <div class="stat-card">
             <div class="sc-label">Pending</div>
@@ -67,7 +67,7 @@
                             <div style="font-size:11px;color:var(--muted);">{{ $tx->customer_email }}</div>
                         </td>
                         <td style="font-size:12px;">{{ ucfirst($tx->payment_method ?? '—') }}</td>
-                        <td style="font-weight:700;">${{ number_format($tx->amount, 2) }}</td>
+                        <td style="font-weight:700;">₪{{ number_format($tx->amount, 2) }}</td>
                         <td><span class="badge {{ $badge }}">{{ ucfirst($tx->status) }}</span></td>
                         <td style="white-space:nowrap;font-size:12px;">{{ \Carbon\Carbon::parse($tx->created_at)->format('M d, Y H:i') }}</td>
                     </tr>

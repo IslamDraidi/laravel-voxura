@@ -20,7 +20,7 @@
         <div class="stat-card">
             <div class="sc-icon" style="background:#dbeafe;color:#2563eb;">$</div>
             <div class="sc-label">Total Revenue</div>
-            <div class="sc-value blue" style="font-size:1.5rem;">${{ number_format($customers->sum('orders_sum_total_amount')) }}</div>
+            <div class="sc-value blue" style="font-size:1.5rem;">₪{{ number_format($customers->sum('orders_sum_total_amount')) }}</div>
         </div>
     </div>
 
@@ -131,7 +131,7 @@
                         <td style="color:var(--muted);">{{ $customer->email }}</td>
                         <td style="white-space:nowrap;">{{ $customer->created_at->format('M d, Y') }}</td>
                         <td>{{ $customer->orders_count }}</td>
-                        <td>${{ number_format($customer->orders_sum_total_amount ?? 0) }}</td>
+                        <td>₪{{ number_format($customer->orders_sum_total_amount ?? 0) }}</td>
                         <td>
                             <span class="badge {{ $customer->is_blocked ? 'badge-red' : 'badge-green' }}">
                                 {{ $customer->is_blocked ? 'Blocked' : 'Active' }}

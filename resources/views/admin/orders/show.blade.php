@@ -117,7 +117,7 @@
                         @endif
                         <span class="item-name">{{ $item->product?->name ?? 'Deleted' }}</span>
                         <span class="item-qty">× {{ $item->quantity }}</span>
-                        <span class="item-total">${{ number_format($item->subtotal(), 2) }}</span>
+                        <span class="item-total">₪{{ number_format($item->subtotal(), 2) }}</span>
                     </div>
                 @endforeach
             </div>
@@ -167,7 +167,7 @@
                         </div>
                         <div>
                             <p class="info-label">Amount</p>
-                            <p class="info-value">${{ number_format($payment->amount, 2) }}</p>
+                            <p class="info-value">₪{{ number_format($payment->amount, 2) }}</p>
                         </div>
                     </div>
 
@@ -205,7 +205,7 @@
                 💸 Refunds
                 @if($order->totalRefunded() > 0)
                     <span style="margin-left:auto;font-size:0.78rem;color:var(--muted);">
-                        Total refunded: <strong style="color:#dc2626;">${{ number_format($order->totalRefunded(), 2) }}</strong>
+                        Total refunded: <strong style="color:#dc2626;">₪{{ number_format($order->totalRefunded(), 2) }}</strong>
                     </span>
                 @endif
             </div>
@@ -221,7 +221,7 @@
                         @foreach($order->refunds as $refund)
                         <tr>
                             <td>{{ $refund->created_at->format('M d, Y') }}</td>
-                            <td style="font-weight:700;">${{ number_format($refund->amount, 2) }}</td>
+                            <td style="font-weight:700;">₪{{ number_format($refund->amount, 2) }}</td>
                             <td>{{ Str::limit($refund->reason, 40) }}</td>
                             <td>
                                 @php
@@ -272,7 +272,7 @@
                                           placeholder="Describe the reason for this refund…"></textarea>
                             </div>
                             <button type="submit" class="btn-refund">💸 Issue Refund</button>
-                            <span style="font-size:0.75rem;color:var(--muted);margin-left:0.75rem;">Max: ${{ number_format($refundableAmount, 2) }}</span>
+                            <span style="font-size:0.75rem;color:var(--muted);margin-left:0.75rem;">Max: ₪{{ number_format($refundableAmount, 2) }}</span>
                         </form>
                     </div>
                 @endif
@@ -291,33 +291,33 @@
             <div class="detail-card-body">
                 <div class="totals-row">
                     <span>Subtotal</span>
-                    <span>${{ number_format($order->subtotal ?: $order->total_amount, 2) }}</span>
+                    <span>₪{{ number_format($order->subtotal ?: $order->total_amount, 2) }}</span>
                 </div>
                 @if($order->discount_amount > 0)
                 <div class="totals-row" style="color:#16a34a;">
                     <span>Discount {{ $order->coupon_code ? '('.$order->coupon_code.')' : '' }}</span>
-                    <span>−${{ number_format($order->discount_amount, 2) }}</span>
+                    <span>−₪{{ number_format($order->discount_amount, 2) }}</span>
                 </div>
                 @endif
                 <div class="totals-row">
                     <span>Shipping</span>
-                    <span>{{ (float)$order->shipping_cost == 0 ? 'Free' : '$'.number_format($order->shipping_cost, 2) }}</span>
+                    <span>{{ (float)$order->shipping_cost == 0 ? 'Free' : '₪'.number_format($order->shipping_cost, 2) }}</span>
                 </div>
                 @if($order->tax_amount > 0 || $order->shipping_tax_amount > 0)
                 <div class="totals-row">
                     <span>Tax</span>
-                    <span>${{ number_format($order->tax_amount + $order->shipping_tax_amount, 2) }}</span>
+                    <span>₪{{ number_format($order->tax_amount + $order->shipping_tax_amount, 2) }}</span>
                 </div>
                 @endif
                 <div class="totals-row grand">
                     <span>Total</span>
-                    <span>${{ number_format($order->grand_total ?: $order->grandTotal(), 2) }}</span>
+                    <span>₪{{ number_format($order->grand_total ?: $order->grandTotal(), 2) }}</span>
                 </div>
 
                 @if($order->totalRefunded() > 0)
                 <div class="totals-row" style="color:#dc2626;margin-top:0.5rem;">
                     <span>Refunded</span>
-                    <span>−${{ number_format($order->totalRefunded(), 2) }}</span>
+                    <span>−₪{{ number_format($order->totalRefunded(), 2) }}</span>
                 </div>
                 @endif
             </div>

@@ -211,7 +211,7 @@
                 </div>
 
                 <button type="submit" class="btn-pay">
-                    Pay ${{ number_format($order->grand_total, 2) }} →
+                    Pay ₪{{ number_format($order->grand_total, 2) }} →
                 </button>
             </form>
         </div>
@@ -225,7 +225,7 @@
                 <div class="sidebar-item">
                     <img src="{{ asset('images/' . $item->product->image) }}" alt="{{ $item->product->name }}">
                     <span class="sidebar-item-name">{{ Str::limit($item->product->name, 25) }} × {{ $item->quantity }}</span>
-                    <span class="sidebar-item-price">${{ number_format($item->subtotal(), 2) }}</span>
+                    <span class="sidebar-item-price">₪{{ number_format($item->subtotal(), 2) }}</span>
                 </div>
                 @endif
             @endforeach
@@ -233,27 +233,27 @@
             <div style="margin-top:1rem; padding-top:0.75rem; border-top:1.5px solid var(--gray-100);">
                 <div class="sidebar-row">
                     <span>Subtotal</span>
-                    <span>${{ number_format($order->subtotal ?: $order->total_amount, 2) }}</span>
+                    <span>₪{{ number_format($order->subtotal ?: $order->total_amount, 2) }}</span>
                 </div>
                 @if($order->discount_amount > 0)
                 <div class="sidebar-row">
                     <span style="color:#16a34a;font-weight:600;">Discount</span>
-                    <span style="color:#16a34a;font-weight:700;">−${{ number_format($order->discount_amount, 2) }}</span>
+                    <span style="color:#16a34a;font-weight:700;">−₪{{ number_format($order->discount_amount, 2) }}</span>
                 </div>
                 @endif
                 <div class="sidebar-row">
                     <span>Shipping</span>
-                    <span>{{ (float)$order->shipping_cost == 0 ? 'Free' : '$'.number_format($order->shipping_cost, 2) }}</span>
+                    <span>{{ (float)$order->shipping_cost == 0 ? 'Free' : '₪'.number_format($order->shipping_cost, 2) }}</span>
                 </div>
                 @if($order->tax_amount > 0 || $order->shipping_tax_amount > 0)
                 <div class="sidebar-row">
                     <span>Tax</span>
-                    <span>${{ number_format($order->tax_amount + $order->shipping_tax_amount, 2) }}</span>
+                    <span>₪{{ number_format($order->tax_amount + $order->shipping_tax_amount, 2) }}</span>
                 </div>
                 @endif
                 <div class="sidebar-row total">
                     <span>Total</span>
-                    <span>${{ number_format($order->grand_total ?: $order->grandTotal(), 2) }}</span>
+                    <span>₪{{ number_format($order->grand_total ?: $order->grandTotal(), 2) }}</span>
                 </div>
             </div>
         </div>

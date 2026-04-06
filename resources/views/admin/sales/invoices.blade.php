@@ -36,10 +36,10 @@
                             <div style="font-size:11px;color:var(--muted);">{{ $order->user->email }}</div>
                         </td>
                         <td>{{ $order->items->count() }}</td>
-                        <td>${{ number_format($order->total_amount - $order->tax_amount - $order->shipping_cost + $order->discount_amount, 2) }}</td>
-                        <td>${{ number_format($order->tax_amount, 2) }}</td>
-                        <td>${{ number_format($order->shipping_cost, 2) }}</td>
-                        <td style="font-weight:700;">${{ number_format($order->grandTotal(), 2) }}</td>
+                        <td>₪{{ number_format($order->total_amount - $order->tax_amount - $order->shipping_cost + $order->discount_amount, 2) }}</td>
+                        <td>₪{{ number_format($order->tax_amount, 2) }}</td>
+                        <td>₪{{ number_format($order->shipping_cost, 2) }}</td>
+                        <td style="font-weight:700;">₪{{ number_format($order->grandTotal(), 2) }}</td>
                         <td>
                             <span class="badge" style="background:{{ $order->statusBg() }};color:{{ $order->statusColor() }};">
                                 {{ ucfirst($order->status) }}

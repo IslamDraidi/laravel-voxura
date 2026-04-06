@@ -23,7 +23,7 @@
 <div class="stat-grid" style="margin-bottom:2rem;">
     <div class="stat-card">
         <span class="sc-label">Total Revenue</span>
-        <span class="sc-value" style="color:var(--orange);">${{ number_format($revenue) }}</span>
+        <span class="sc-value" style="color:var(--orange);">₪{{ number_format($revenue) }}</span>
         <span class="sc-sub">Excluding cancelled orders</span>
     </div>
     <div class="stat-card">
@@ -36,7 +36,7 @@
     </div>
     <div class="stat-card">
         <span class="sc-label">Avg. Order Value</span>
-        <span class="sc-value">${{ number_format($avgOrder, 2) }}</span>
+        <span class="sc-value">₪{{ number_format($avgOrder, 2) }}</span>
     </div>
 </div>
 
@@ -71,7 +71,7 @@
                         <td><span class="rank">{{ $i + 1 }}</span></td>
                         <td>{{ $product->name }}</td>
                         <td>{{ number_format($product->total_qty) }}</td>
-                        <td style="font-weight:700;color:var(--orange);">${{ number_format($product->total_revenue) }}</td>
+                        <td style="font-weight:700;color:var(--orange);">₪{{ number_format($product->total_revenue) }}</td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -113,7 +113,7 @@
     <div class="stat-card">
         <span class="sc-label">Refunds Issued</span>
         <span class="sc-value red">{{ $refundStats['count'] }}</span>
-        <span class="sc-sub">${{ number_format($refundStats['amount'], 2) }} total</span>
+        <span class="sc-sub">₪{{ number_format($refundStats['amount'], 2) }} total</span>
     </div>
     <div class="stat-card">
         <span class="sc-label">Refund Rate</span>
@@ -140,7 +140,7 @@
                 <td><span class="rank">{{ $i + 1 }}</span></td>
                 <td>{{ Str::limit($r->reason, 60) }}</td>
                 <td>{{ $r->count }}</td>
-                <td style="font-weight:700;color:var(--red);">${{ number_format($r->total, 2) }}</td>
+                <td style="font-weight:700;color:var(--red);">₪{{ number_format($r->total, 2) }}</td>
             </tr>
             @endforeach
         </tbody>
@@ -184,7 +184,7 @@ new Chart(ctx, {
                 grid: { color: 'rgba(0,0,0,0.04)' },
                 ticks: {
                     font: { family: 'DM Sans' },
-                    callback: v => '$' + v.toLocaleString()
+                    callback: v => '₪' + v.toLocaleString()
                 }
             }
         }

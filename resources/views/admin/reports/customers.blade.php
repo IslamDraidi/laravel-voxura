@@ -55,7 +55,7 @@
                                 <div style="font-size:11px;color:var(--muted);">{{ $customer->email }}</div>
                             </td>
                             <td>{{ $customer->orders_count }}</td>
-                            <td style="font-weight:700;color:var(--green);">${{ number_format($customer->orders_sum_total_amount, 2) }}</td>
+                            <td style="font-weight:700;color:var(--green);">₪{{ number_format($customer->orders_sum_total_amount, 2) }}</td>
                         </tr>
                         @endforeach
                     </tbody>

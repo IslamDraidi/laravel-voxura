@@ -101,7 +101,7 @@
             </div>
             <div class="failed-details-row">
                 <span>Amount</span>
-                <span>${{ number_format($order->grand_total, 2) }}</span>
+                <span>₪{{ number_format($order->grand_total, 2) }}</span>
             </div>
             <div class="failed-details-row">
                 <span>Gateway</span>

@@ -11,7 +11,7 @@
     <div class="stat-grid">
         <div class="stat-card">
             <div class="sc-label">Revenue (Period)</div>
-            <div class="sc-value green" style="font-size:1.5rem;">${{ number_format($totalRevenue, 2) }}</div>
+            <div class="sc-value green" style="font-size:1.5rem;">₪{{ number_format($totalRevenue, 2) }}</div>
         </div>
         <div class="stat-card">
             <div class="sc-label">Units Sold</div>
@@ -45,7 +45,7 @@
                 <div style="margin-bottom:12px;">
                     <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px;">
                         <span style="font-weight:600;">{{ $product->name }}</span>
-                        <span style="color:var(--green);font-weight:700;">${{ number_format($product->total_revenue, 2) }}</span>
+                        <span style="color:var(--green);font-weight:700;">₪{{ number_format($product->total_revenue, 2) }}</span>
                     </div>
                     <div style="background:var(--gray-100);border-radius:4px;height:6px;">
                         <div style="background:var(--orange);height:6px;border-radius:4px;width:{{ min(100, round($pct)) }}%;"></div>
@@ -87,7 +87,7 @@
                     </td>
                     <td style="font-size:12px;color:var(--muted);">{{ $product->category }}</td>
                     <td>{{ $product->total_qty }}</td>
-                    <td style="font-weight:700;color:var(--green);">${{ number_format($product->total_revenue, 2) }}</td>
+                    <td style="font-weight:700;color:var(--green);">₪{{ number_format($product->total_revenue, 2) }}</td>
                     <td>
                         <div style="display:flex;align-items:center;gap:6px;">
                             <div style="background:var(--gray-100);border-radius:4px;height:6px;width:80px;">

@@ -264,9 +264,9 @@
                         <td><strong>{{ $variant->value }}</strong></td>
                         <td>
                             @if($variant->price_modifier > 0)
-                                <span style="color:#16a34a;font-weight:700;">+${{ number_format($variant->price_modifier, 2) }}</span>
+                                <span style="color:#16a34a;font-weight:700;">+₪{{ number_format($variant->price_modifier, 2) }}</span>
                             @elseif($variant->price_modifier < 0)
-                                <span style="color:#ef4444;font-weight:700;">${{ number_format($variant->price_modifier, 2) }}</span>
+                                <span style="color:#ef4444;font-weight:700;">₪{{ number_format($variant->price_modifier, 2) }}</span>
                             @else
                                 <span style="color:var(--muted);">—</span>
                             @endif

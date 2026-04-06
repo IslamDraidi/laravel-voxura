@@ -94,7 +94,7 @@
                                 {{ $order->items->sum('quantity') }} {{ Str::plural('item', $order->items->sum('quantity')) }}
                             </div>
                         </td>
-                        <td style="font-weight:700;">${{ number_format($order->total_amount) }}</td>
+                        <td style="font-weight:700;">₪{{ number_format($order->total_amount) }}</td>
                         <td><span class="badge {{ $statusBadge }}">{{ ucfirst($order->status) }}</span></td>
                         <td>
                             <form method="POST" action="/admin/orders/{{ $order->id }}/status"

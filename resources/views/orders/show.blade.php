@@ -218,11 +218,11 @@
                             <p class="order-item-category">{{ $item->product->category?->name }}</p>
                             <p class="order-item-name">{{ $item->product->name }}</p>
                             <p class="order-item-qty">
-                                ${{ number_format($item->price) }} × {{ $item->quantity }}
+                                ₪{{ number_format($item->price) }} × {{ $item->quantity }}
                             </p>
                         </div>
                         <span class="order-item-subtotal">
-                            ${{ number_format($item->subtotal()) }}
+                            ₪{{ number_format($item->subtotal()) }}
                         </span>
                     </div>
                     @endif
@@ -264,7 +264,7 @@
             @if($order->discount_amount > 0)
             <div class="sidebar-row">
                 <span style="color:#16a34a;font-weight:600;">Discount{{ $order->coupon_code ? ' ('.$order->coupon_code.')' : '' }}</span>
-                <span style="color:#16a34a;font-weight:700;">-${{ number_format($order->discount_amount, 2) }}</span>
+                <span style="color:#16a34a;font-weight:700;">-₪{{ number_format($order->discount_amount, 2) }}</span>
             </div>
             @endif
             <div class="sidebar-row">

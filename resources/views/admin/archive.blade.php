@@ -28,7 +28,7 @@
                         </td>
                         <td style="font-weight:600;">{{ $product->name }}</td>
                         <td>{{ $product->category->name }}</td>
-                        <td>${{ number_format($product->price) }}</td>
+                        <td>₪{{ number_format($product->price) }}</td>
                         <td style="white-space:nowrap;">
                             <span class="badge badge-red">{{ $product->deleted_at->format('M d, Y') }}</span>
                         </td>

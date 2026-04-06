@@ -54,7 +54,7 @@
                     </td>
                     <td style="font-weight:800;color:var(--orange);">
                         @if($rate->type === 'fixed')
-                            ${{ number_format($rate->rate, 2) }}
+                            ₪{{ number_format($rate->rate, 2) }}
                         @else
                             {{ number_format($rate->rate, $rate->rate == floor($rate->rate) ? 0 : 2) }}%
                         @endif

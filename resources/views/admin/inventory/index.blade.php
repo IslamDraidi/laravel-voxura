@@ -99,7 +99,7 @@
                         </div>
                     </td>
                     <td style="color:var(--muted);">{{ $p->category?->name ?? '—' }}</td>
-                    <td style="font-weight:700;">${{ number_format($p->price, 2) }}</td>
+                    <td style="font-weight:700;">₪{{ number_format($p->price, 2) }}</td>
                     <td>
                         @if($p->stock === 0)
                             <span class="stock-badge out">Out of stock</span>

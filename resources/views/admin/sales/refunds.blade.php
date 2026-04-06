@@ -15,7 +15,7 @@
         </div>
         <div class="stat-card">
             <div class="sc-label">Total Refunded</div>
-            <div class="sc-value red" style="font-size:1.4rem;">${{ number_format($stats['total_amount'], 2) }}</div>
+            <div class="sc-value red" style="font-size:1.4rem;">₪{{ number_format($stats['total_amount'], 2) }}</div>
         </div>
     </div>
 
@@ -60,7 +60,7 @@
                             <div style="font-weight:600;">{{ $refund->order?->user?->name ?? '—' }}</div>
                             <div style="font-size:11px;color:var(--muted);">{{ $refund->order?->user?->email ?? '' }}</div>
                         </td>
-                        <td style="font-weight:700;color:var(--red);">${{ number_format($refund->amount, 2) }}</td>
+                        <td style="font-weight:700;color:var(--red);">₪{{ number_format($refund->amount, 2) }}</td>
                         <td>
                             <span class="badge {{ $refund->gateway === 'paypal' ? 'badge-amber' : 'badge-green' }}">
                                 {{ ucfirst($refund->gateway) }}

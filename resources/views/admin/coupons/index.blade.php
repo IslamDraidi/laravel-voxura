@@ -86,12 +86,12 @@
                         <td style="font-weight:700;letter-spacing:0.06em;">{{ $coupon->code }}</td>
                         <td>
                             <span class="badge {{ $coupon->type === 'percentage' ? 'badge-blue' : 'badge-green' }}">
-                                {{ $coupon->type === 'percentage' ? $coupon->value . '% off' : '$' . number_format($coupon->value, 2) . ' off' }}
+                                {{ $coupon->type === 'percentage' ? $coupon->value . '% off' : '₪' . number_format($coupon->value, 2) . ' off' }}
                             </span>
                         </td>
                         <td>
                             @if($coupon->min_order_amount > 0)
-                                ${{ number_format($coupon->min_order_amount) }}
+                                ₪{{ number_format($coupon->min_order_amount) }}
                             @else
                                 <span style="color:var(--muted);">—</span>
                             @endif
