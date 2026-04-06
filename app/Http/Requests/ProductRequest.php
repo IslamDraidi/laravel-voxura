@@ -15,9 +15,10 @@ class ProductRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'is_new' => $this->boolean('is_new'),
+            'is_new'      => $this->boolean('is_new'),
+            'has_colors'  => $this->boolean('has_colors'),
             'color_swatches' => $this->parseColorSwatches(),
-            'size_guide' => $this->parseSizeGuide(),
+            'size_guide'  => $this->parseSizeGuide(),
         ]);
     }
 
@@ -38,7 +39,8 @@ class ProductRequest extends FormRequest
             'remove_images' => 'sometimes|array',
             'remove_images.*' => 'integer|exists:product_images,id',
             'sale_badge' => 'nullable|string|max:40',
-            'is_new' => 'boolean',
+            'is_new'     => 'boolean',
+            'has_colors' => 'boolean',
             'max_order_quantity' => 'required|integer|min:1|max:99',
             'stock_alert_threshold' => 'required|integer|min:1|max:99',
             'delivery_estimate' => 'nullable|string|max:255',

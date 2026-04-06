@@ -14,13 +14,14 @@ class Product extends Model
         'price', 'stock', 'image', 'category_id',
         'sale_badge', 'is_new', 'max_order_quantity', 'stock_alert_threshold',
         'delivery_estimate', 'material', 'fit', 'care_instructions', 'sku',
-        'shipping_returns', 'color_swatches', 'size_guide',
+        'shipping_returns', 'color_swatches', 'has_colors', 'size_guide',
     ];
 
     protected function casts(): array
     {
         return [
             'is_new' => 'boolean',
+            'has_colors' => 'boolean',
             'max_order_quantity' => 'integer',
             'stock_alert_threshold' => 'integer',
             'color_swatches' => 'array',
