@@ -407,7 +407,10 @@
             <a href="/admin/products/create" class="topbar-btn">+ Add Product</a>
             <a href="{{ route('admin.preview.enable') }}" target="_blank" class="topbar-ghost" title="Browse the storefront as a customer with interactive features hidden">👁 View as Customer</a>
             <a href="/" class="topbar-ghost">← Store</a>
-            <a href="/logout" class="topbar-btn">← Logout</a>
+            <form method="POST" action="{{ route('logout') }}" style="margin:0;">
+                @csrf
+                <button type="submit" class="topbar-ghost" style="cursor:pointer;border:1px solid var(--border);background:transparent;font-family:'DM Sans',sans-serif;">⎋ Logout</button>
+            </form>
             <div class="topbar-avatar">{{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}</div>
         </div>
     </div>
