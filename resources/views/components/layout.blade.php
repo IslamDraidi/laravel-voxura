@@ -702,6 +702,8 @@
                         <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">Careers</a></li>
                         <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">Press</a></li>
                         <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">Privacy</a></li>
+                        <li><a href="/pages/cookies-policy" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">Cookies Policy</a></li>
+                        <li><a href="/pages/privacy-policy" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">Privacy Policy</a></li>
                     </ul>
                 </div>
             </div>
@@ -711,6 +713,7 @@
         </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js" defer></script>
     <script>
         const navbar = document.getElementById('navbar');
         window.addEventListener('scroll', () => {
