@@ -320,7 +320,7 @@
                             @endif
                         </div>
                         <span style="font-weight:700;font-size:0.95rem;color:{{ $isFree ? '#16a34a' : 'var(--gray-900)' }};">
-                            {{ $isFree ? 'Free' : '$' . number_format($rate, 2) }}
+                            {{ $isFree ? 'Free' : '₪' . number_format($rate, 2) }}
                         </span>
                     </label>
                     @endforeach
@@ -376,7 +376,7 @@
                         @endif
                         <p class="summary-item-qty">Qty: {{ $item->quantity }}</p>
                     </div>
-                    <span class="summary-item-price">${{ number_format($item->subtotal()) }}</span>
+                    <span class="summary-item-price">₪{{ number_format($item->subtotal()) }}</span>
                 </div>
             @endforeach
 
@@ -384,7 +384,7 @@
 
             <div class="summary-row">
                 <span>Subtotal</span>
-                <span id="summarySubtotal">${{ number_format($cart->total(), 2) }}</span>
+                <span id="summarySubtotal">₪{{ number_format($cart->total(), 2) }}</span>
             </div>
             <div class="summary-row" id="discountRow" style="display:none;">
                 <span id="discountLabel" style="color:#16a34a;font-weight:600;">Discount</span>
@@ -397,7 +397,7 @@
                     $firstFree = $firstRate == 0;
                 @endphp
                 <span id="shippingCost" style="font-weight:600;color:{{ $firstFree ? '#16a34a' : 'var(--gray-900)' }};">
-                    {{ $firstFree ? 'Free' : '$' . number_format($firstRate, 2) }}
+                    {{ $firstFree ? 'Free' : '₪' . number_format($firstRate, 2) }}
                 </span>
             </div>
             <div id="deliveryEstimate" class="delivery-estimate" style="text-align:right;margin-bottom:0.5rem;">
@@ -410,7 +410,7 @@
                 <span class="tax-breakdown-tooltip">
                     Tax ({{ number_format($taxRate, $taxRate == floor($taxRate) ? 0 : 2) }}%)
                 </span>
-                <span id="taxAmount">${{ number_format($cart->total() * $taxRate / 100, 2) }}</span>
+                <span id="taxAmount">₪{{ number_format($cart->total() * $taxRate / 100, 2) }}</span>
             </div>
             <div id="taxBreakdownDetail" class="tax-breakdown-detail" style="text-align:right;"></div>
             @endif
@@ -419,7 +419,7 @@
                 @php
                     $initialTotal = $cart->total() * (1 + $taxRate / 100) + $firstRate;
                 @endphp
-                <span id="summaryTotal">${{ number_format($initialTotal, 2) }}</span>
+                <span id="summaryTotal">₪{{ number_format($initialTotal, 2) }}</span>
             </div>
 
             <a href="/cart" class="back-link">← Edit cart</a>
@@ -447,7 +447,7 @@ function selectShipping(methodId, fallbackPrice) {
     // Update display immediately with fallback
     const el = document.getElementById('shippingCost');
     if (el) {
-        el.textContent = fallbackPrice === 0 ? 'Free' : '$' + fallbackPrice.toFixed(2);
+        el.textContent = fallbackPrice === 0 ? 'Free' : '₪' + fallbackPrice.toFixed(2);
         el.style.color = fallbackPrice === 0 ? '#16a34a' : 'var(--gray-900)';
     }
     recalcTotal();
@@ -480,7 +480,7 @@ async function fetchTotals() {
         // Update shipping
         const el = document.getElementById('shippingCost');
         if (el) {
-            el.textContent = data.shipping_free ? 'Free' : '$' + data.shipping_amount.toFixed(2);
+            el.textContent = data.shipping_free ? 'Free' : '₪' + data.shipping_amount.toFixed(2);
             el.style.color = data.shipping_free ? '#16a34a' : 'var(--gray-900)';
         }
         currentShipping = data.shipping_amount;
@@ -495,7 +495,7 @@ async function fetchTotals() {
         const taxEl = document.getElementById('taxAmount');
         if (taxEl) {
             const totalTax = data.tax_amount + (data.shipping_tax_amount || 0);
-            taxEl.textContent = '$' + totalTax.toFixed(2);
+            taxEl.textContent = '₪' + totalTax.toFixed(2);
         }
 
         // Show tax breakdown
@@ -509,7 +509,7 @@ async function fetchTotals() {
         }
 
         // Update total
-        document.getElementById('summaryTotal').textContent = '$' + data.grand_total.toFixed(2);
+        document.getElementById('summaryTotal').textContent = '₪' + data.grand_total.toFixed(2);
 
     } catch(e) {
         // Fallback to client-side calculation
@@ -523,9 +523,9 @@ function recalcTotal() {
 
     const tax = (subtotal - currentDiscount) * TAX_RATE / 100;
     if (document.getElementById('taxAmount')) {
-        document.getElementById('taxAmount').textContent = '$' + tax.toFixed(2);
+        document.getElementById('taxAmount').textContent = '₪' + tax.toFixed(2);
     }
-    document.getElementById('summaryTotal').textContent = '$' + grand.toFixed(2);
+    document.getElementById('summaryTotal').textContent = '₪' + grand.toFixed(2);
 }
 
 function highlightSelected() {

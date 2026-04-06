@@ -59,7 +59,7 @@
             </h3>
             <p class="pc-description">{{ $product->description }}</p>
             <div class="pc-footer">
-                <span class="pc-price">${{ number_format($product->price) }}</span>
+                <span class="pc-price">₪{{ number_format($product->price) }}</span>
                 <a href="/product/{{ $product->id }}" class="pc-learn">
                     Learn more →
                 </a>
