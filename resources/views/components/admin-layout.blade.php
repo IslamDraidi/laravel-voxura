@@ -379,7 +379,7 @@
 <aside class="sidebar">
     <div class="sidebar-brand">
         <h1>Vox<span>ura</span></h1>
-        <div class="sidebar-sub">Admin Panel</div>
+        <div class="sidebar-sub">{{ auth()->user()->name ?? 'Admin' }}</div>
     </div>
 
     <nav class="sidebar-nav">
@@ -403,8 +403,6 @@
     <div class="admin-topbar">
         <div class="topbar-title">{{ $pageTitle ?? $title }}</div>
         <div class="topbar-right">
-            <span style="font-size:13px;color:var(--muted);font-weight:500;">{{ auth()->user()->name ?? 'Admin' }}</span>
-            <a href="/admin/products/create" class="topbar-btn">+ Add Product</a>
             <a href="{{ route('admin.preview.enable') }}" target="_blank" class="topbar-ghost" title="Browse the storefront as a customer with interactive features hidden">👁 View as Customer</a>
             <a href="/" class="topbar-ghost">← Store</a>
             <form method="POST" action="{{ route('logout') }}" style="margin:0;">
