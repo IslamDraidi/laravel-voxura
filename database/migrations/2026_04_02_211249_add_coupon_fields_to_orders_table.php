@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // coupon_id column was partially added in a prior failed run — add FK + remaining columns
         Schema::table('orders', function (Blueprint $table) {
-            $table->foreign('coupon_id')->references('id')->on('coupons')->nullOnDelete();
+            if (! Schema::hasColumn('orders', 'coupon_id')) {
+                $table->foreignId('coupon_id')->nullable()->after('user_id')->constrained()->nullOnDelete();
+            } else {
+                $table->foreign('coupon_id')->references('id')->on('coupons')->nullOnDelete();
+            }
             $table->decimal('discount_amount', 10, 2)->default(0)->after('total_amount');
             $table->string('coupon_code')->nullable()->after('discount_amount');
         });
