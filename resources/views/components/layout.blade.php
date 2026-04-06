@@ -265,18 +265,147 @@
             max-width: 1100px; margin: 0 auto; padding: 2.5rem 1.5rem;
         }
         main.full-width { max-width: 100% !important; padding: 0 !important; }
+
+        /* ── Categories Button in Navbar ── */
+        .nav-cat-btn {
+            display: inline-flex; align-items: center; gap: 4px;
+            background: none; border: none; cursor: pointer;
+            font-size: 0.9rem; font-weight: 500;
+            font-family: 'DM Sans', sans-serif; padding: 0;
+            transition: color 0.3s;
+        }
+        nav.nav-top      .nav-cat-btn       { color: #fff; }
+        nav.nav-top      .nav-cat-btn:hover { color: #fb923c; }
+        nav.nav-scrolled .nav-cat-btn       { color: var(--gray-600); }
+        nav.nav-scrolled .nav-cat-btn:hover { color: var(--orange); }
+
+        .nav-cat-arrow {
+            transition: transform 0.18s ease;
+            flex-shrink: 0;
+        }
+        .nav-cat-arrow.rotated { transform: rotate(180deg); }
+
+        /* ── Mega Dropdown ── */
+        .nav-mega {
+            position: absolute;
+            top: 64px; left: 0; right: 0;
+            z-index: 48;
+            background: #fff;
+            border-top: 2px solid #E8621A;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.13);
+        }
+        /* slide-down enter/leave via x-transition custom classes */
+        .mega-enter        { transition: opacity 0.18s ease, transform 0.18s ease; }
+        .mega-enter-start  { opacity: 0; transform: translateY(-6px); }
+        .mega-enter-end    { opacity: 1; transform: translateY(0); }
+        .mega-leave        { transition: opacity 0.12s ease, transform 0.12s ease; }
+        .mega-leave-start  { opacity: 1; transform: translateY(0); }
+        .mega-leave-end    { opacity: 0; transform: translateY(-6px); }
+
+        .nav-mega-inner {
+            max-width: 1200px; margin: 0 auto;
+            padding: 1.75rem 1.5rem 1.25rem;
+        }
+
+        .nav-mega-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 0.25rem 2.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .nav-mega-group { padding-bottom: 0.5rem; }
+
+        .nav-mega-group-title {
+            font-size: 12px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.09em;
+            color: #E8621A;
+            border-bottom: 1px solid #F0EBE4;
+            padding-bottom: 6px; margin-bottom: 8px;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .nav-mega-child {
+            display: block;
+            font-size: 13px; color: #4B4B4B;
+            text-decoration: none; padding: 4px 0;
+            font-family: 'DM Sans', sans-serif;
+            transition: color 0.15s, padding-left 0.15s;
+        }
+        .nav-mega-child:hover { color: #E8621A; padding-left: 4px; }
+
+        .nav-mega-footer {
+            text-align: center;
+            border-top: 1px solid #F0EBE4;
+            padding-top: 1rem;
+        }
+        .nav-mega-view-all {
+            font-size: 13px; font-weight: 600;
+            color: #E8621A; text-decoration: none;
+            font-family: 'DM Sans', sans-serif;
+            transition: opacity 0.15s;
+        }
+        .nav-mega-view-all:hover { opacity: 0.7; }
+
+        @media (max-width: 768px) {
+            .nav-mega-grid { grid-template-columns: 1fr; gap: 0; }
+            .nav-mega-inner { padding: 1rem 1.5rem; }
+        }
     </style>
 </head>
 
-<body>
+@php $preview = \App\Http\Middleware\AdminPreviewMode::isActive(); @endphp
+<body class="{{ $preview ? 'preview-active' : '' }}">
+
+    {{-- ── Admin Preview Banner ── --}}
+    @if($preview)
+    <div id="previewBanner" style="
+        position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+        background: #E8621A; color: #fff;
+        padding: 0 1.5rem;
+        height: 42px;
+        display: flex; align-items: center; justify-content: center; gap: 1rem;
+        font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    ">
+        <span>👁 You are viewing as a customer — admin preview mode. Interactive features are hidden.</span>
+        <a href="{{ route('admin.preview.disable') }}" style="
+            color: #fff; font-weight: 800; text-decoration: underline;
+            white-space: nowrap; transition: opacity 0.15s;
+        " onmouseover="this.style.opacity='0.75'" onmouseout="this.style.opacity='1'">
+            Click here to exit
+        </a>
+    </div>
+    <style>
+        .preview-active nav { top: 42px !important; }
+        .preview-active .toast-wrap { top: 116px !important; }
+    </style>
+    @endif
 
     {{-- ── Navbar ── --}}
-    <nav id="navbar" class="nav-top">
+    <nav id="navbar" class="nav-top"
+         x-data="{ catOpen: false }"
+         @click.outside="catOpen = false"
+         @keydown.escape.window="catOpen = false">
         <div class="nav-inner">
 
             <a href="/" class="nav-logo"><span class="accent">VOX</span>URA</a>
 
             <div class="nav-links">
+                {{-- Categories mega-dropdown trigger --}}
+                @if(isset($navCategories) && $navCategories->isNotEmpty())
+                <button class="nav-cat-btn" @click="catOpen = !catOpen" :aria-expanded="catOpen">
+                    Categories
+                    <svg class="nav-cat-arrow" :class="{ rotated: catOpen }"
+                         xmlns="http://www.w3.org/2000/svg" width="13" height="13"
+                         viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2.5"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                </button>
+                @endif
+
                 <a href="/#products">Products</a>
                 <a href="/search">Search</a>
                 <a href="/#about">About</a>
@@ -360,8 +489,77 @@
             </div>
         </div>
 
+        {{-- ── Mega Dropdown ── --}}
+        @if(isset($navCategories) && $navCategories->isNotEmpty())
+        <div class="nav-mega"
+             x-show="catOpen"
+             x-transition:enter="mega-enter"
+             x-transition:enter-start="mega-enter-start"
+             x-transition:enter-end="mega-enter-end"
+             x-transition:leave="mega-leave"
+             x-transition:leave-start="mega-leave-start"
+             x-transition:leave-end="mega-leave-end"
+             style="display:none;">
+            <div class="nav-mega-inner">
+                <div class="nav-mega-grid">
+                    @foreach($navCategories as $parent)
+                    <div class="nav-mega-group">
+                        <div class="nav-mega-group-title">{{ $parent->name }}</div>
+                        @if($parent->children->isNotEmpty())
+                            @foreach($parent->children as $child)
+                            <a href="/?cat={{ $child->id }}#products"
+                               class="nav-mega-child"
+                               @click="catOpen = false">
+                                {{ $child->name }}
+                            </a>
+                            @endforeach
+                        @else
+                            <a href="/?cat={{ $parent->id }}#products"
+                               class="nav-mega-child"
+                               @click="catOpen = false">
+                                {{ $parent->name }}
+                            </a>
+                        @endif
+                    </div>
+                    @endforeach
+                </div>
+                <div class="nav-mega-footer">
+                    <a href="/#products" class="nav-mega-view-all" @click="catOpen = false">
+                        View All Categories →
+                    </a>
+                </div>
+            </div>
+        </div>
+        @endif
+
         {{-- Mobile Menu --}}
         <div class="mobile-menu" id="mobileMenu">
+            @if(isset($navCategories) && $navCategories->isNotEmpty())
+            <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;
+                        letter-spacing:0.08em;color:#E8621A;padding:0.5rem 0 0.25rem;
+                        border-bottom:1px solid #F0EBE4;margin-bottom:0.25rem;">
+                Categories
+            </div>
+            @foreach($navCategories as $parent)
+                @if($parent->children->isNotEmpty())
+                <div style="font-size:0.78rem;font-weight:700;color:#1A1A1A;
+                            padding:0.5rem 0 0.1rem;pointer-events:none;">
+                    {{ $parent->name }}
+                </div>
+                @foreach($parent->children as $child)
+                <a href="/?cat={{ $child->id }}#products"
+                   style="padding-left:1rem;" onclick="toggleMenu()">
+                    {{ $child->name }}
+                </a>
+                @endforeach
+                @else
+                <a href="/?cat={{ $parent->id }}#products" onclick="toggleMenu()">
+                    {{ $parent->name }}
+                </a>
+                @endif
+            @endforeach
+            <div style="border-top:1px solid #F0EBE4;margin:0.5rem 0;"></div>
+            @endif
             <a href="/#products">Products</a>
             <a href="/#about">About</a>
             <a href="/#contact">Contact</a>
@@ -504,6 +702,8 @@
                         <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">Careers</a></li>
                         <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">Press</a></li>
                         <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">Privacy</a></li>
+                        <li><a href="/pages/cookies-policy" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">Cookies Policy</a></li>
+                        <li><a href="/pages/privacy-policy" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">Privacy Policy</a></li>
                     </ul>
                 </div>
             </div>
@@ -513,6 +713,7 @@
         </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js" defer></script>
     <script>
         const navbar = document.getElementById('navbar');
         window.addEventListener('scroll', () => {

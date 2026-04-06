@@ -246,8 +246,7 @@ class OrderController extends Controller
         // Clear the cart
         $cart->items()->delete();
 
-        return redirect('/orders/'.$order->id)
-            ->with('success', 'Order placed successfully! Your order #'.$order->id.' is confirmed.');
+        return redirect()->route('payment.methods', $order);
     }
 
     /** GET /orders — order history */

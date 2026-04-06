@@ -109,6 +109,13 @@
                     <span>Show a New badge on the product image</span>
                 </label>
                 @error('is_new')<p class="form-error">{{ $message }}</p>@enderror
+                <label class="form-toggle form-input" style="justify-content:flex-start;cursor:pointer;margin-top:0.5rem;">
+                    <input type="checkbox" name="has_colors" id="has_colors_toggle" value="1"
+                           {{ old('has_colors') ? 'checked' : '' }}
+                           onchange="document.getElementById('color_swatches_section').style.display = this.checked ? 'block' : 'none'">
+                    <span>Enable color picker on the product page</span>
+                </label>
+                @error('has_colors')<p class="form-error">{{ $message }}</p>@enderror
             </div>
 
             <div class="form-group split full">
@@ -149,7 +156,7 @@
                 @error('shipping_returns')<p class="form-error">{{ $message }}</p>@enderror
             </div>
 
-            <div class="form-group full">
+            <div class="form-group full" id="color_swatches_section" style="{{ old('has_colors') ? 'display:block' : 'display:none' }}">
                 <label class="form-label">Color Swatches</label>
                 <textarea name="color_swatches_rows" class="form-textarea" rows="5" placeholder="Midnight|#111827&#10;Clay|#c2410c&#10;Sand|#d6b58a">{{ old('color_swatches_rows') }}</textarea>
                 <p class="form-note">One swatch per line in the format <strong>Name|#HEX</strong>. These render as the clickable color picker on the product page.</p>

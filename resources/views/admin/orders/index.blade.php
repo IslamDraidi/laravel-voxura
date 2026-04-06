@@ -5,12 +5,15 @@
         @php $currentStatus = request('status', ''); @endphp
 
         @foreach([
-            ''           => ['label' => 'All',        'count' => $statusCounts['all']],
-            'pending'    => ['label' => 'Pending',     'count' => $statusCounts['pending']],
-            'processing' => ['label' => 'Processing',  'count' => $statusCounts['processing']],
-            'shipped'    => ['label' => 'Shipped',     'count' => $statusCounts['shipped']],
-            'delivered'  => ['label' => 'Delivered',   'count' => $statusCounts['delivered']],
-            'cancelled'  => ['label' => 'Cancelled',   'count' => $statusCounts['cancelled']],
+            ''                    => ['label' => 'All',                'count' => $statusCounts['all']],
+            'pending'             => ['label' => 'Pending',            'count' => $statusCounts['pending']],
+            'paid'                => ['label' => 'Paid',               'count' => $statusCounts['paid']],
+            'processing'          => ['label' => 'Processing',         'count' => $statusCounts['processing']],
+            'shipped'             => ['label' => 'Shipped',            'count' => $statusCounts['shipped']],
+            'delivered'           => ['label' => 'Delivered',          'count' => $statusCounts['delivered']],
+            'cancelled'           => ['label' => 'Cancelled',          'count' => $statusCounts['cancelled']],
+            'payment_blocked'     => ['label' => 'Blocked',            'count' => $statusCounts['payment_blocked']],
+            'refunded'            => ['label' => 'Refunded',           'count' => $statusCounts['refunded']],
         ] as $val => $tab)
             <a href="/admin/orders?status={{ $val }}{{ request('search') ? '&search='.request('search') : '' }}"
                class="sub-btn {{ $currentStatus === $val ? 'active' : '' }}">
@@ -58,11 +61,13 @@
                     @foreach($orders as $order)
                     @php
                         $statusBadge = match($order->status) {
-                            'pending', 'processing' => 'badge-amber',
-                            'shipped'               => 'badge-blue',
-                            'delivered'             => 'badge-green',
-                            'cancelled'             => 'badge-red',
-                            default                 => 'badge-gray',
+                            'pending', 'processing'       => 'badge-amber',
+                            'shipped'                     => 'badge-blue',
+                            'delivered', 'paid'           => 'badge-green',
+                            'cancelled', 'payment_blocked' => 'badge-red',
+                            'refunded'                    => 'badge-blue',
+                            'partially_refunded'          => 'badge-orange',
+                            default                       => 'badge-gray',
                         };
                     @endphp
                     <tr>
@@ -96,13 +101,14 @@
                                   style="display:flex;gap:6px;align-items:center;">
                                 @csrf @method('PATCH')
                                 <select name="status" class="form-select" style="padding:0.3rem 0.5rem;font-size:0.82rem;">
-                                    @foreach(['pending','processing','shipped','delivered','cancelled'] as $s)
+                                    @foreach(['pending','paid','processing','shipped','delivered','cancelled','payment_blocked','refunded','partially_refunded'] as $s)
                                         <option value="{{ $s }}" {{ $order->status === $s ? 'selected' : '' }}>
-                                            {{ ucfirst($s) }}
+                                            {{ ucfirst(str_replace('_', ' ', $s)) }}
                                         </option>
                                     @endforeach
                                 </select>
                                 <button type="submit" class="act-btn">Update</button>
+                                <a href="/admin/orders/{{ $order->id }}" class="act-btn" style="text-decoration:none;">View</a>
                             </form>
                         </td>
                     </tr>

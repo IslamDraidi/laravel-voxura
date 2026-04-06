@@ -14,6 +14,7 @@
             <div class="pc-overlay"></div>
 
             {{-- زر اللايك --}}
+            @unless(\App\Http\Middleware\AdminPreviewMode::isActive())
             <form method="POST" action="/likes/{{ $product->id }}/toggle"
                   class="pc-like-form">
                 @csrf
@@ -26,8 +27,10 @@
                     </svg>
                 </button>
             </form>
+            @endunless
 
             {{-- زر Add to Cart فوق الصورة --}}
+            @unless(\App\Http\Middleware\AdminPreviewMode::isActive())
             <div class="pc-cart-hover">
                 <form method="POST" action="/cart/add">
                     @csrf
@@ -44,6 +47,7 @@
                     </button>
                 </form>
             </div>
+            @endunless
 
         </div>
 
