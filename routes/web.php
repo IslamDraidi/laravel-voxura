@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminRefundController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminPreviewController;
 use App\Http\Controllers\Auth\Login;
 use App\Http\Controllers\Auth\Logout;
 use App\Http\Controllers\Auth\RegisterController;
@@ -12,6 +14,7 @@ use App\Http\Controllers\CouponController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
@@ -69,10 +72,22 @@ Route::middleware('auth')->group(function () {
 
     // Checkout AJAX — calculate totals on shipping method change
     Route::post('/checkout/calculate', [OrderController::class, 'calculateTotals'])->name('checkout.calculate');
+
+    // Payment flow
+    Route::get('/payment/{order}', [PaymentController::class, 'showMethods'])->name('payment.methods');
+    Route::post('/payment/{order}', [PaymentController::class, 'processPayment'])->name('payment.process');
+    Route::get('/payment/{order}/callback', [PaymentController::class, 'callback'])->name('payment.callback');
+    Route::get('/payment/{order}/cancel', [PaymentController::class, 'cancel'])->name('payment.cancel');
+    Route::get('/payment/{order}/retry', [PaymentController::class, 'retry'])->name('payment.retry')->middleware('throttle:10,1');
+    Route::get('/payment/{order}/failed', [PaymentController::class, 'failed'])->name('payment.failed');
 });
+
+// Payment gateway webhooks (no auth, CSRF exempted in bootstrap/app.php)
+Route::post('/webhooks/payment/{gateway}', [PaymentController::class, 'webhook'])->name('payment.webhook');
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
+    Route::get('/products', [AdminController::class, 'products'])->name('admin.products.index');
     Route::get('/products/create', [AdminController::class, 'create'])->name('admin.products.create');
     Route::post('/products', [AdminController::class, 'store'])->name('admin.products.store');
     Route::get('/products/{product}/edit', [AdminController::class, 'edit'])->name('admin.products.edit');
@@ -88,7 +103,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('admin.categories.update');
     Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
     Route::get('/orders', [AdminController::class, 'orders'])->name('admin.orders.index');
+    Route::get('/orders/{order}', [AdminController::class, 'showOrder'])->name('admin.orders.show');
     Route::patch('/orders/{order}/status', [AdminController::class, 'updateOrderStatus'])->name('admin.orders.status');
+    Route::post('/orders/{order}/refund', [AdminRefundController::class, 'processRefund'])->name('admin.orders.refund');
 
     // Customer management
     Route::get('/customers', [AdminController::class, 'customers'])->name('admin.customers.index');
@@ -172,6 +189,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     // Reporting — extra tabs
     Route::get('/reports/customers', [AdminController::class, 'customerReports'])->name('admin.reports.customers');
     Route::get('/reports/products', [AdminController::class, 'productReports'])->name('admin.reports.products');
+
+    // Admin Preview Mode
+    Route::get('/preview/enable', [AdminPreviewController::class, 'enable'])->name('admin.preview.enable');
+    Route::get('/preview/disable', [AdminPreviewController::class, 'disable'])->name('admin.preview.disable');
 
     // CMS Pages
     Route::get('/cms/pages', [CmsPageController::class, 'index'])->name('admin.cms.pages.index');
