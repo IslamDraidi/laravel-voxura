@@ -23,7 +23,9 @@ class Login extends Controller
             }
             $request->session()->regenerate();
 
-            return redirect('/')->with('success', 'Welcome back!');
+            $destination = auth()->user()->isAdmin() ? '/admin' : '/';
+
+            return redirect($destination)->with('success', 'Welcome back!');
         }
 
         return back()->withErrors([

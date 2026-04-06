@@ -51,6 +51,12 @@
         <div class="form-grid">
 
             <div class="form-group">
+                <label class="form-label">Product ID</label>
+                <input type="text" class="form-input" value="#{{ $product->id }}" disabled style="opacity:0.6;cursor:not-allowed;">
+                <p class="form-note">This ID is permanent and cannot be changed.</p>
+            </div>
+
+            <div class="form-group">
                 <label class="form-label">Product Name</label>
                 <input type="text" name="name" class="form-input"
                        value="{{ old('name', $product->name) }}" required>
