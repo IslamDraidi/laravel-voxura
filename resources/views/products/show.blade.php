@@ -143,7 +143,9 @@
                     <div class="badge-new">NEW</div>
                 @endif
                 <img id="mainImage" src="{{ asset('images/' . ($product->images->first()?->image ?? $product->image)) }}" alt="{{ $product->name }}">
+                @unless(\App\Http\Middleware\AdminPreviewMode::isActive())
                 <button class="btn-wishlist" id="wishlistBtn" onclick="toggleWishlist({{ $product->id }})">♥</button>
+                @endunless
             </div>
 
             {{-- Thumbnails ──--}}
@@ -205,21 +207,11 @@
             </div>
 
             {{-- Color Swatches ──--}}
-            @php
-                $colorSwatches = $product->color_swatches ?? [
-                    ['name' => 'Red', 'hex' => '#ef4444'],
-                    ['name' => 'Blue', 'hex' => '#2563eb'],
-                    ['name' => 'Black', 'hex' => '#1f2937'],
-                    ['name' => 'White', 'hex' => '#f3f4f6'],
-                    ['name' => 'Green', 'hex' => '#10b981'],
-                    ['name' => 'Gray', 'hex' => '#9ca3af'],
-                ];
-            @endphp
-            @if(!empty($colorSwatches))
+            @if($product->has_colors && !empty($product->color_swatches))
             <div class="picker-group">
                 <label class="picker-label">Color</label>
                 <div class="color-swatches">
-                    @foreach($colorSwatches as $idx => $color)
+                    @foreach($product->color_swatches as $idx => $color)
                         <div class="swatch {{ $idx === 0 ? 'active' : '' }}" style="background-color: {{ $color['hex'] }};" onclick="selectColor(this)" title="{{ $color['name'] }}"></div>
                     @endforeach
                 </div>
@@ -262,6 +254,7 @@
             </div>
 
             {{-- CTA Buttons ──--}}
+            @unless(\App\Http\Middleware\AdminPreviewMode::isActive())
             <div class="cta-row">
                 <form method="POST" action="/cart/add" style="flex: 1;">
                     @csrf
@@ -285,6 +278,7 @@
                     </button>
                 </form>
             </div>
+            @endunless
 
             {{-- Share ──--}}
             <div class="share-wrap">

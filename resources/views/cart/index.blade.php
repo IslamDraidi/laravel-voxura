@@ -445,7 +445,11 @@
                     <span>${{ number_format($cart->total() * 1.08) }}</span>
                 </div>
 
+                @if(\App\Http\Middleware\AdminPreviewMode::isActive())
+                <span class="btn-checkout" style="opacity:0.45;cursor:not-allowed;" title="Checkout disabled in preview mode">Proceed to Checkout →</span>
+                @else
                 <a href="/checkout" class="btn-checkout">Proceed to Checkout →</a>
+                @endif
                 <a href="/#products" class="continue-link">← Continue shopping</a>
             </div>
 

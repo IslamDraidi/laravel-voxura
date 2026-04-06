@@ -332,12 +332,13 @@
                 <div class="payment-placeholder">
                     <span style="font-size:2rem;">🔒</span>
                     <p style="font-weight:700;color:var(--gray-600);margin-top:0.5rem;">
-                        Payment gateway not connected yet
+                        Secure payment on the next step
                     </p>
-                    <p>Order will be placed as <strong>Cash on Delivery</strong> for now.</p>
+                    <p>You'll choose your payment method after confirming your order details.</p>
                 </div>
 
                 {{-- Coupon ── --}}
+                @unless(\App\Http\Middleware\AdminPreviewMode::isActive())
                 <p class="checkout-section-title" style="margin-top:1.5rem;">🏷️ Coupon Code</p>
                 <div id="couponSection">
                     <div style="display:flex;gap:0.6rem;margin-bottom:0.5rem;">
@@ -351,6 +352,7 @@
                     <div id="couponFeedback" style="font-size:0.82rem;min-height:1.2rem;"></div>
                     <input type="hidden" name="coupon_code" id="couponCode">
                 </div>
+                @endunless
 
                 <button type="submit" class="btn-place-order">
                     Place Order →

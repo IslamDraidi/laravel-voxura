@@ -11,7 +11,7 @@
     </div>
 
     {{-- Product Grid --}}
-    <x-product-grid :products="$products" />
+    <x-product-grid :products="$products" :activeCategory="$activeCategory" />
 
     {{-- About --}}
     <x-about />
