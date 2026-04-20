@@ -15,6 +15,7 @@ class Product extends Model
         'sale_badge', 'is_new', 'max_order_quantity', 'stock_alert_threshold',
         'delivery_estimate', 'material', 'fit', 'care_instructions', 'sku',
         'shipping_returns', 'color_swatches', 'has_colors', 'size_guide',
+        'model3d_path', 'has_3d_model',
     ];
 
     protected function casts(): array
@@ -26,6 +27,7 @@ class Product extends Model
             'stock_alert_threshold' => 'integer',
             'color_swatches' => 'array',
             'size_guide' => 'array',
+            'has_3d_model' => 'boolean',
         ];
     }
 

@@ -66,6 +66,13 @@
             </div>
 
             <div class="form-group full">
+                <label class="form-label">3D Model (optional)</label>
+                <input type="file" name="model3d" class="form-input" accept=".glb,.gltf">
+                <p style="font-size:0.78rem;color:var(--muted);margin-top:0.25rem;">Upload a .glb or .gltf file for the 3D viewer. Max 50MB.</p>
+                @error('model3d')<p class="form-error">{{ $message }}</p>@enderror
+            </div>
+
+            <div class="form-group full">
                 <label class="form-label">Description</label>
                 <textarea name="description" class="form-textarea" rows="4"
                           placeholder="Describe this product…" required>{{ old('description') }}</textarea>

@@ -129,6 +129,43 @@
 .modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--gray-500); }
 
 @media (max-width: 768px) { .review-stats { grid-template-columns: 1fr; } }
+
+/* ═══ 3D VIEWER ═══ */
+.btn-3d-view { position: absolute; bottom: 12px; left: 12px; background: #1A1A1A; color: #fff; border: none; padding: 0.6rem 1.1rem; border-radius: 999px; font-size: 0.8rem; font-weight: 700; cursor: pointer; z-index: 5; display: flex; align-items: center; gap: 0.4rem; transition: background 0.15s; font-family: 'DM Sans', sans-serif; }
+.btn-3d-view:hover { background: #333; }
+.btn-3d-view svg { width: 16px; height: 16px; }
+#viewer-3d { display: none; width: 100%; aspect-ratio: 1/1; background: #111; border-radius: 1rem; overflow: hidden; position: relative; margin-bottom: 0.75rem; }
+#viewer-3d canvas { display: block; width: 100% !important; height: 100% !important; }
+.btn-close-3d { position: absolute; top: 12px; left: 12px; background: rgba(255,255,255,0.12); color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 999px; font-size: 0.8rem; font-weight: 700; cursor: pointer; z-index: 15; transition: background 0.15s; font-family: 'DM Sans', sans-serif; backdrop-filter: blur(8px); }
+.btn-close-3d:hover { background: rgba(255,255,255,0.22); }
+
+/* "Generating..." loading overlay */
+.viewer-loading { position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); z-index: 10; font-family: 'DM Sans', sans-serif; color: rgba(255,255,255,0.5); font-size: 0.9rem; letter-spacing: 0.05em; }
+@keyframes v3d-dots { 0%,20%{content:''} 40%{content:'.'} 60%{content:'..'} 80%,100%{content:'...'} }
+.viewer-loading::after { content: ''; animation: v3d-dots 1.5s steps(1) infinite; }
+
+/* Right-side control panel */
+.viewer-panel { position: absolute; top: 1rem; right: 1rem; bottom: 1rem; width: 240px; background: rgba(18,18,18,0.82); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 1rem; z-index: 12; display: flex; flex-direction: column; font-family: 'DM Sans', sans-serif; color: #fff; overflow: hidden; border: 1px solid rgba(255,255,255,0.07); transition: opacity 0.3s, transform 0.3s; }
+.viewer-panel.hidden { opacity: 0; pointer-events: none; transform: translateX(20px); }
+.viewer-panel-header { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.15rem 0.5rem; }
+.viewer-panel-title { font-size: 0.95rem; font-weight: 700; }
+.viewer-panel-close { background: rgba(255,255,255,0.08); border: none; color: rgba(255,255,255,0.6); width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+.viewer-panel-close:hover { background: rgba(255,255,255,0.16); color: #fff; }
+.viewer-panel-body { flex: 1; padding: 0.25rem 1.15rem; overflow-y: auto; }
+.viewer-panel-section { padding: 0.7rem 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.viewer-panel-section:last-child { border-bottom: none; }
+.viewer-panel-section-title { font-size: 0.78rem; font-weight: 700; color: #E8621A; margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.45rem; }
+.viewer-panel-section-title svg { width: 16px; height: 16px; opacity: 0.85; }
+.viewer-panel-instruction { font-size: 0.72rem; color: rgba(255,255,255,0.45); line-height: 1.55; }
+.viewer-panel-instruction span { color: rgba(255,255,255,0.8); font-weight: 600; }
+.viewer-panel-footer { padding: 0.75rem 1.15rem 1rem; }
+.viewer-panel-ok { width: 100%; background: #E8621A; color: #fff; border: none; padding: 0.6rem; border-radius: 0.6rem; font-size: 0.82rem; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.15s; }
+.viewer-panel-ok:hover { background: #d4570f; }
+@media (max-width: 768px) {
+    .btn-3d-view { padding: 0.7rem 1.2rem; font-size: 0.85rem; min-height: 44px; }
+    .viewer-panel { top: auto; right: 0; bottom: 0; left: 0; width: 100%; max-height: 50%; border-radius: 1rem 1rem 0 0; }
+    .viewer-panel.hidden { opacity: 0; transform: translateY(100%); }
+}
 </style>
 
 <div class="pdp-page">
@@ -146,6 +183,48 @@
                 @unless(\App\Http\Middleware\AdminPreviewMode::isActive())
                 <button class="btn-wishlist" id="wishlistBtn" onclick="toggleWishlist({{ $product->id }})">♥</button>
                 @endunless
+                <button class="btn-3d-view" onclick="toggle3DViewer(true)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                    View in 3D
+                </button>
+            </div>
+
+            {{-- 3D Viewer Container --}}
+            <div id="viewer-3d">
+                <button class="btn-close-3d" onclick="toggle3DViewer(false)">&times; Close</button>
+
+                <div class="viewer-panel" id="viewerPanel">
+                    <div class="viewer-panel-header">
+                        <span class="viewer-panel-title">View Your Model</span>
+                        <button class="viewer-panel-close" onclick="document.getElementById('viewerPanel').classList.add('hidden')">&times;</button>
+                    </div>
+                    <div class="viewer-panel-body">
+                        <div class="viewer-panel-section">
+                            <div class="viewer-panel-section-title">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                Rotate View
+                            </div>
+                            <div class="viewer-panel-instruction" id="panelRotate"><span>Left click + drag</span></div>
+                        </div>
+                        <div class="viewer-panel-section">
+                            <div class="viewer-panel-section-title">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
+                                Pan View
+                            </div>
+                            <div class="viewer-panel-instruction" id="panelPan"><span>Right click + drag</span></div>
+                        </div>
+                        <div class="viewer-panel-section">
+                            <div class="viewer-panel-section-title">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                                Zoom Active
+                            </div>
+                            <div class="viewer-panel-instruction" id="panelZoom"><span>Scroll up & down</span></div>
+                        </div>
+                    </div>
+                    <div class="viewer-panel-footer">
+                        <button class="viewer-panel-ok" onclick="document.getElementById('viewerPanel').classList.add('hidden')">OK</button>
+                    </div>
+                </div>
             </div>
 
             {{-- Thumbnails ──--}}
@@ -521,5 +600,45 @@ document.getElementById('qty')?.addEventListener('change', () => {
     document.getElementById('cartQty').value = document.getElementById('qty').value;
     document.getElementById('quickbuyQty').value = document.getElementById('qty').value;
 });
+
+// 3D Viewer toggle
+const product3dModelPath = "{{ $product->has_3d_model && $product->model3d_path ? asset('storage/models/' . $product->id . '/' . $product->model3d_path) : asset('models/placeholder.glb') }}";
+let viewerInitialized = false;
+
+function toggle3DViewer(show) {
+    const galleryMain = document.querySelector('.gallery-main');
+    const thumbs = document.querySelector('.gallery-thumbs');
+    const viewer = document.getElementById('viewer-3d');
+    const panel = document.getElementById('viewerPanel');
+    if (show) {
+        galleryMain.style.display = 'none';
+        if (thumbs) thumbs.style.display = 'none';
+        viewer.style.display = 'block';
+        // Show control panel each time
+        if (panel) panel.classList.remove('hidden');
+        // Adapt instructions for touch devices
+        if ('ontouchstart' in window) {
+            document.getElementById('panelRotate').innerHTML = '<span>Press &amp; drag</span>';
+            document.getElementById('panelPan').innerHTML = '<span>Two-finger drag</span>';
+            document.getElementById('panelZoom').innerHTML = '<span>Pinch to zoom</span>';
+        }
+        if (!viewerInitialized && typeof initViewer3D === 'function') {
+            initViewer3D('viewer-3d', product3dModelPath);
+            viewerInitialized = true;
+        }
+    } else {
+        viewer.style.display = 'none';
+        galleryMain.style.display = '';
+        if (thumbs) thumbs.style.display = '';
+        if (typeof disposeViewer3D === 'function') {
+            disposeViewer3D();
+            viewerInitialized = false;
+        }
+    }
+}
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="{{ asset('js/viewer3d.js') }}"></script>
 </x-layout>

@@ -15,8 +15,9 @@ class ProductRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'is_new'      => $this->boolean('is_new'),
-            'has_colors'  => $this->boolean('has_colors'),
+            'is_new'        => $this->boolean('is_new'),
+            'has_colors'    => $this->boolean('has_colors'),
+            'has_3d_model'  => $this->boolean('has_3d_model'),
             'color_swatches' => $this->parseColorSwatches(),
             'size_guide'  => $this->parseSizeGuide(),
         ]);
@@ -59,6 +60,9 @@ class ProductRequest extends FormRequest
             'size_guide.*.chest' => 'nullable|string|max:50',
             'size_guide.*.waist' => 'nullable|string|max:50',
             'size_guide.*.length' => 'nullable|string|max:50',
+            'model3d' => 'nullable|file|max:51200',
+            'has_3d_model' => 'boolean',
+            'remove_3d_model' => 'sometimes|boolean',
         ];
     }
 

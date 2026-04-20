@@ -125,6 +125,24 @@
             </div>
 
             <div class="form-group full">
+                <label class="form-label">3D Model</label>
+                @if($product->has_3d_model && $product->model3d_path)
+                    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem;padding:0.6rem 0.8rem;background:var(--gray-100);border-radius:0.5rem;">
+                        <span style="font-size:0.85rem;font-weight:600;">&#x25A6; {{ $product->model3d_path }}</span>
+                        <label style="font-size:0.78rem;color:#ef4444;cursor:pointer;margin-left:auto;">
+                            <input type="checkbox" name="remove_3d_model" value="1" style="margin-right:0.25rem;" onchange="this.closest('.form-group').querySelector('.remove-hint').style.display=this.checked?'block':'none'">
+                            Remove
+                        </label>
+                    </div>
+                    <p class="remove-hint" style="display:none;font-size:0.78rem;color:#ef4444;margin-bottom:0.5rem;">Model will be removed on save.</p>
+                    <p style="font-size:0.78rem;color:var(--muted);margin-bottom:0.5rem;">Upload a new file below to replace the current model.</p>
+                @endif
+                <input type="file" name="model3d" class="form-input" accept=".glb,.gltf">
+                <p style="font-size:0.78rem;color:var(--muted);margin-top:0.25rem;">Upload a .glb or .gltf file for the 3D viewer. Max 50MB.</p>
+                @error('model3d')<p class="form-error">{{ $message }}</p>@enderror
+            </div>
+
+            <div class="form-group full">
                 <label class="form-label">Description</label>
                 <textarea name="description" class="form-textarea" rows="4" required>{{ old('description', $product->description) }}</textarea>
                 @error('description')<p class="form-error">{{ $message }}</p>@enderror

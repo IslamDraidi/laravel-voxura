@@ -22,6 +22,7 @@ use App\Models\User;
 use App\Services\Payment\RefundService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class AdminController extends Controller
@@ -124,7 +125,7 @@ class AdminController extends Controller
             $request->image->move(public_path('images'), $imageName);
         }
 
-        unset($validated['image'], $validated['gallery'], $validated['gallery.*'], $validated['size_guide_rows'], $validated['color_swatches_rows']);
+        unset($validated['image'], $validated['gallery'], $validated['gallery.*'], $validated['size_guide_rows'], $validated['color_swatches_rows'], $validated['model3d'], $validated['remove_3d_model']);
 
         $product = Product::create(array_merge($validated, [
             'slug' => Str::slug($request->name),
@@ -137,6 +138,13 @@ class AdminController extends Controller
                 $file->move(public_path('images'), $name);
                 ProductImage::create(['product_id' => $product->id, 'image' => $name, 'sort_order' => $i]);
             }
+        }
+
+        if ($request->hasFile('model3d')) {
+            $modelFile = $request->file('model3d');
+            $modelName = 'model.' . $modelFile->getClientOriginalExtension();
+            $modelFile->storeAs("public/models/{$product->id}", $modelName);
+            $product->update(['model3d_path' => $modelName, 'has_3d_model' => true]);
         }
 
         return redirect('/admin')->with('success', 'Product added successfully!');
@@ -161,12 +169,29 @@ class AdminController extends Controller
             $product->image = $imageName;
         }
 
-        unset($validated['image'], $validated['gallery'], $validated['gallery.*'], $validated['remove_images'], $validated['size_guide_rows'], $validated['color_swatches_rows']);
+        unset($validated['image'], $validated['gallery'], $validated['gallery.*'], $validated['remove_images'], $validated['size_guide_rows'], $validated['color_swatches_rows'], $validated['model3d'], $validated['remove_3d_model']);
 
         $product->update(array_merge($validated, [
             'slug' => Str::slug($request->name),
             'image' => $product->image,
         ]));
+
+        // Handle 3D model removal
+        if ($request->boolean('remove_3d_model') && $product->model3d_path) {
+            Storage::delete("public/models/{$product->id}/{$product->model3d_path}");
+            $product->update(['model3d_path' => null, 'has_3d_model' => false]);
+        }
+
+        // Handle 3D model upload
+        if ($request->hasFile('model3d')) {
+            if ($product->model3d_path) {
+                Storage::delete("public/models/{$product->id}/{$product->model3d_path}");
+            }
+            $modelFile = $request->file('model3d');
+            $modelName = 'model.' . $modelFile->getClientOriginalExtension();
+            $modelFile->storeAs("public/models/{$product->id}", $modelName);
+            $product->update(['model3d_path' => $modelName, 'has_3d_model' => true]);
+        }
 
         if ($request->hasFile('gallery')) {
             $sortStart = $product->images()->max('sort_order') + 1;
