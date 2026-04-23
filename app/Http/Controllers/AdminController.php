@@ -33,7 +33,7 @@ class AdminController extends Controller
         // ── Overall Details ──────────────────────────────────────────────
         $totalSales = Order::whereNotIn('status', ['cancelled'])->sum('total_amount');
         $totalOrders = Order::count();
-        $totalCustomers = User::where('is_admin', false)->count();
+        $totalCustomers = User::where('role', '!=', 'admin')->count();
         $avgOrderSale = Order::whereNotIn('status', ['cancelled'])->avg('total_amount') ?? 0;
         $unpaidInvoices = Order::where('status', 'pending')->count();
 
@@ -41,7 +41,7 @@ class AdminController extends Controller
         $todaySales = Order::whereDate('created_at', $today)
             ->whereNotIn('status', ['cancelled'])->sum('total_amount');
         $todayOrders = Order::whereDate('created_at', $today)->count();
-        $todayCustomers = User::where('is_admin', false)->whereDate('created_at', $today)->count();
+        $todayCustomers = User::where('role', '!=', 'admin')->whereDate('created_at', $today)->count();
 
         // ── Top Selling Products (by units sold) ─────────────────────────
         $topProducts = DB::table('order_items')
@@ -772,7 +772,7 @@ class AdminController extends Controller
 
         $revenue = Order::where('created_at', '>=', $from)->where('status', '!=', 'cancelled')->sum('total_amount');
         $ordersCount = Order::where('created_at', '>=', $from)->count();
-        $newCustomers = User::where('is_admin', false)->where('created_at', '>=', $from)->count();
+        $newCustomers = User::where('role', '!=', 'admin')->where('created_at', '>=', $from)->count();
         $avgOrder = $ordersCount > 0 ? $revenue / $ordersCount : 0;
 
         // Daily revenue for chart (last N days)
@@ -986,7 +986,7 @@ class AdminController extends Controller
 
     public function gdpr()
     {
-        $users = User::where('is_admin', false)
+        $users = User::where('role', '!=', 'admin')
             ->withCount('orders')
             ->latest()
             ->get();
@@ -1028,12 +1028,12 @@ class AdminController extends Controller
         };
         $from = now()->subDays($days)->startOfDay();
 
-        $newCustomers = User::where('is_admin', false)->where('created_at', '>=', $from)->count();
-        $totalCustomers = User::where('is_admin', false)->count();
-        $activeCustomers = User::where('is_admin', false)
+        $newCustomers = User::where('role', '!=', 'admin')->where('created_at', '>=', $from)->count();
+        $totalCustomers = User::where('role', '!=', 'admin')->count();
+        $activeCustomers = User::where('role', '!=', 'admin')
             ->whereHas('orders', fn ($q) => $q->where('created_at', '>=', $from))->count();
 
-        $topCustomers = User::where('is_admin', false)
+        $topCustomers = User::where('role', '!=', 'admin')
             ->withCount('orders')
             ->withSum('orders', 'total_amount')
             ->having('orders_count', '>', 0)
@@ -1041,7 +1041,7 @@ class AdminController extends Controller
             ->limit(10)
             ->get();
 
-        $signupData = User::where('is_admin', false)
+        $signupData = User::where('role', '!=', 'admin')
             ->where('created_at', '>=', $from)
             ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
             ->groupBy('date')
