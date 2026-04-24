@@ -6,6 +6,7 @@ use App\Http\Requests\Admin\ShippingMethodRequest;
 use App\Http\Requests\Admin\ShippingZoneRequest;
 use App\Http\Requests\Admin\TaxRateRequest;
 use App\Http\Requests\ProductRequest;
+use App\Jobs\Generate3DModelJob;
 use App\Models\Banner;
 use App\Models\Category;
 use App\Models\EmailTemplate;
@@ -20,8 +21,10 @@ use App\Models\TaxRate;
 use App\Models\Refund;
 use App\Models\User;
 use App\Services\Payment\RefundService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -128,7 +131,7 @@ class AdminController extends Controller
         unset($validated['image'], $validated['gallery'], $validated['gallery.*'], $validated['size_guide_rows'], $validated['color_swatches_rows'], $validated['model3d'], $validated['remove_3d_model']);
 
         $product = Product::create(array_merge($validated, [
-            'slug' => Str::slug($request->name),
+            'slug' => $this->uniqueSlug($request->name),
             'image' => $imageName,
         ]));
 
@@ -144,7 +147,9 @@ class AdminController extends Controller
             $modelFile = $request->file('model3d');
             $modelName = 'model.' . $modelFile->getClientOriginalExtension();
             $modelFile->storeAs("public/models/{$product->id}", $modelName);
-            $product->update(['model3d_path' => $modelName, 'has_3d_model' => true]);
+            $product->update(['model3d_path' => $modelName, 'has_3d_model' => true, 'model3d_status' => 'ready', 'model3d_generated_at' => now()]);
+        } else {
+            $this->maybeDispatch3DGeneration($product);
         }
 
         return redirect('/admin')->with('success', 'Product added successfully!');
@@ -172,7 +177,7 @@ class AdminController extends Controller
         unset($validated['image'], $validated['gallery'], $validated['gallery.*'], $validated['remove_images'], $validated['size_guide_rows'], $validated['color_swatches_rows'], $validated['model3d'], $validated['remove_3d_model']);
 
         $product->update(array_merge($validated, [
-            'slug' => Str::slug($request->name),
+            'slug' => $this->uniqueSlug($request->name, $product->id),
             'image' => $product->image,
         ]));
 
@@ -190,16 +195,26 @@ class AdminController extends Controller
             $modelFile = $request->file('model3d');
             $modelName = 'model.' . $modelFile->getClientOriginalExtension();
             $modelFile->storeAs("public/models/{$product->id}", $modelName);
-            $product->update(['model3d_path' => $modelName, 'has_3d_model' => true]);
+            $product->update(['model3d_path' => $modelName, 'has_3d_model' => true, 'model3d_status' => 'ready', 'model3d_generated_at' => now()]);
         }
 
+        $galleryUploaded = false;
         if ($request->hasFile('gallery')) {
             $sortStart = $product->images()->max('sort_order') + 1;
             foreach ($request->file('gallery') as $i => $file) {
                 $name = time().'_g'.$i.'.'.$file->extension();
                 $file->move(public_path('images'), $name);
                 ProductImage::create(['product_id' => $product->id, 'image' => $name, 'sort_order' => $sortStart + $i]);
+                $galleryUploaded = true;
             }
+        }
+
+        if ($galleryUploaded && ! $request->hasFile('model3d')) {
+            $product->update([
+                'has_3d_model'  => false,
+                'model3d_error' => null,
+            ]);
+            $this->maybeDispatch3DGeneration($product);
         }
 
         // Remove individual gallery images if requested
@@ -1143,6 +1158,94 @@ class AdminController extends Controller
             'en' => $request->name_en ?: $request->name,
             'ar' => $request->name_ar,
         ]);
+    }
+
+    // ── 3D Model Generation ──────────────────────────────────────
+
+    public function get3DStatus(Product $product): JsonResponse
+    {
+        return response()->json([
+            'status'                 => $product->model3d_status,
+            'has_3d_model'           => (bool) $product->has_3d_model,
+            'model3d_queued_at'      => optional($product->model3d_queued_at)->toDateTimeString(),
+            'model3d_generated_at'   => optional($product->model3d_generated_at)->toDateTimeString(),
+            'model3d_error'          => $product->model3d_error,
+            'model3d_selected_image' => $product->model3d_selected_image
+                ? asset(str_replace(public_path().'/', '', $product->model3d_selected_image))
+                : null,
+            'model_url' => $product->is3DReady() ? $product->get3DModelUrl() : null,
+        ]);
+    }
+
+    public function regenerate3D(Product $product): JsonResponse
+    {
+        if (! config('model3d.enabled')) {
+            return response()->json(['success' => false, 'message' => '3D generation is disabled.'], 400);
+        }
+
+        if ($product->model3d_status === 'processing') {
+            return response()->json(['success' => false, 'message' => 'Generation already in progress.'], 409);
+        }
+
+        if (! $product->images()->exists()) {
+            return response()->json(['success' => false, 'message' => 'Product has no images.'], 400);
+        }
+
+        $product->update([
+            'model3d_status'    => 'queued',
+            'model3d_queued_at' => now(),
+            'model3d_error'     => null,
+            'has_3d_model'      => false,
+        ]);
+
+        Generate3DModelJob::dispatch($product)->delay(now()->addSeconds(3));
+
+        return response()->json(['success' => true, 'message' => 'Regeneration queued']);
+    }
+
+    private function uniqueSlug(string $name, ?int $excludeId = null): string
+    {
+        $base = Str::slug($name);
+        $slug = $base;
+        $i = 2;
+        while (Product::withTrashed()->where('slug', $slug)->when($excludeId, fn ($q) => $q->where('id', '!=', $excludeId))->exists()) {
+            $slug = "{$base}-{$i}";
+            $i++;
+        }
+        return $slug;
+    }
+
+    private function maybeDispatch3DGeneration(Product $product): void
+    {
+        try {
+            if (! config('model3d.enabled')) {
+                return;
+            }
+            if (! config('model3d.hf_token')) {
+                Log::critical('Skipping 3D generation: HF_API_TOKEN not configured.');
+                return;
+            }
+            if (! $product->images()->exists()) {
+                Log::info("Skipping 3D generation for product {$product->id}: no images.");
+                return;
+            }
+            if (in_array($product->model3d_status, ['queued', 'processing'], true)) {
+                return;
+            }
+
+            $product->update([
+                'model3d_status'    => 'queued',
+                'model3d_queued_at' => now(),
+                'model3d_error'     => null,
+            ]);
+
+            Generate3DModelJob::dispatch($product)->delay(now()->addSeconds(3));
+        } catch (\Throwable $e) {
+            Log::error('Failed to dispatch 3D generation job', [
+                'product_id' => $product->id,
+                'error'      => $e->getMessage(),
+            ]);
+        }
     }
 
     private function buildZoneMethodPivot(Request $request): array
