@@ -183,10 +183,28 @@
                 @unless(\App\Http\Middleware\AdminPreviewMode::isActive())
                 <button class="btn-wishlist" id="wishlistBtn" onclick="toggleWishlist({{ $product->id }})">♥</button>
                 @endunless
-                <button class="btn-3d-view" onclick="toggle3DViewer(true)">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-                    View in 3D
-                </button>
+                @php
+                    $m3dState = $product->model3d_status ?? 'idle';
+                    $m3dReady = $product->is3DReady();
+                    $m3dBusy  = $product->is3DProcessing();
+                @endphp
+                @if($m3dReady)
+                    <button class="btn-3d-view" onclick="toggle3DViewer(true)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                        View in 3D
+                    </button>
+                @elseif($m3dBusy)
+                    <button class="btn-3d-view" style="background:#d97706;opacity:0.85;cursor:not-allowed;" disabled title="Your 3D model is being generated. Check back soon!">
+                        <span style="width:12px;height:12px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;display:inline-block;animation:m3dStoreSpin 0.8s linear infinite;"></span>
+                        Generating 3D…
+                    </button>
+                @else
+                    <button class="btn-3d-view" onclick="toggle3DViewer(true)" style="background:transparent;color:#1A1A1A;border:1.5px solid #d1d5db;" title="Demo preview — real 3D model coming soon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                        View in 3D (Demo)
+                    </button>
+                @endif
+                <style>@keyframes m3dStoreSpin { to { transform: rotate(360deg); } }</style>
             </div>
 
             {{-- 3D Viewer Container --}}
@@ -602,7 +620,8 @@ document.getElementById('qty')?.addEventListener('change', () => {
 });
 
 // 3D Viewer toggle
-const product3dModelPath = "{{ $product->has_3d_model && $product->model3d_path ? asset('storage/models/' . $product->id . '/' . $product->model3d_path) : asset('models/placeholder.glb') }}";
+const product3dModelPath = "{{ $product->is3DReady() && $product->model3d_path ? asset('storage/models/' . $product->id . '/' . $product->model3d_path) : asset('models/placeholder.glb') }}";
+const product3dIsDemo = {{ $product->is3DReady() ? 'false' : 'true' }};
 let viewerInitialized = false;
 
 function toggle3DViewer(show) {
