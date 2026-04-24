@@ -60,6 +60,7 @@
                     <th>Category</th>
                     <th>Price</th>
                     <th>Stock</th>
+                    <th title="3D Model Status">3D</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -103,6 +104,20 @@
                         @endif
                     </td>
                     <td>
+                        @php
+                            $m3dStatus = $product->model3d_status ?? 'idle';
+                            $m3dMap = [
+                                'idle'       => ['color' => '#9ca3af', 'label' => 'No 3D model', 'spin' => false],
+                                'queued'     => ['color' => '#f59e0b', 'label' => 'Queued',      'spin' => false],
+                                'processing' => ['color' => '#ea580c', 'label' => 'Processing',  'spin' => true],
+                                'ready'      => ['color' => '#16a34a', 'label' => 'Ready',       'spin' => false],
+                                'failed'     => ['color' => '#dc2626', 'label' => 'Failed',      'spin' => false],
+                            ];
+                            $m3d = $m3dMap[$m3dStatus] ?? $m3dMap['idle'];
+                        @endphp
+                        <span title="{{ $m3d['label'] }}" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:{{ $m3d['color'] }};{{ $m3d['spin'] ? 'animation:m3dIndexSpin 1s linear infinite;box-shadow:0 0 0 2px rgba(234,88,12,0.18);' : '' }}"></span>
+                    </td>
+                    <td>
                         <div style="display:flex;gap:6px;">
                             <a href="/product/{{ $product->slug }}" target="_blank" class="act-btn" style="text-decoration:none;">View</a>
                             <a href="/admin/products/{{ $product->id }}/edit" class="act-btn" style="text-decoration:none;">Edit</a>
@@ -120,4 +135,5 @@
     @endif
 </div>
 
+<style>@keyframes m3dIndexSpin { to { transform: rotate(360deg); } }</style>
 </x-admin-layout>
