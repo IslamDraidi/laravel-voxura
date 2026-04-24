@@ -334,6 +334,13 @@
         background:var(--white);
     }
     .form-input:focus,.form-select:focus{border-color:var(--orange)}
+    .form-input:-webkit-autofill,
+    .form-input:-webkit-autofill:hover,
+    .form-input:-webkit-autofill:focus{
+        -webkit-box-shadow:0 0 0px 1000px #fff inset !important;
+        -webkit-text-fill-color:#1a1a1a !important;
+        caret-color:#1a1a1a;
+    }
     .form-textarea{
         padding:8px 10px;border:1px solid var(--border);
         border-radius:8px;font-size:13px;
