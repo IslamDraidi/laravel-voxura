@@ -124,23 +124,135 @@
                 @error('gallery.*')<p class="form-error">{{ $message }}</p>@enderror
             </div>
 
+
+            {{-- ═══ AI 3D Generation Status ═══ --}}
             <div class="form-group full">
-                <label class="form-label">3D Model</label>
-                @if($product->has_3d_model && $product->model3d_path)
-                    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem;padding:0.6rem 0.8rem;background:var(--gray-100);border-radius:0.5rem;">
-                        <span style="font-size:0.85rem;font-weight:600;">&#x25A6; {{ $product->model3d_path }}</span>
-                        <label style="font-size:0.78rem;color:#ef4444;cursor:pointer;margin-left:auto;">
-                            <input type="checkbox" name="remove_3d_model" value="1" style="margin-right:0.25rem;" onchange="this.closest('.form-group').querySelector('.remove-hint').style.display=this.checked?'block':'none'">
-                            Remove
-                        </label>
+                <label class="form-label">AI 3D Generation Status</label>
+                <div id="m3d-card" style="padding:1rem;background:var(--gray-50,#f9fafb);border:1px solid var(--gray-200);border-radius:0.75rem;">
+                    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.6rem;">
+                        <span id="m3d-badge" class="m3d-badge"></span>
                     </div>
-                    <p class="remove-hint" style="display:none;font-size:0.78rem;color:#ef4444;margin-bottom:0.5rem;">Model will be removed on save.</p>
-                    <p style="font-size:0.78rem;color:var(--muted);margin-bottom:0.5rem;">Upload a new file below to replace the current model.</p>
-                @endif
-                <input type="file" name="model3d" class="form-input" accept=".glb,.gltf">
-                <p style="font-size:0.78rem;color:var(--muted);margin-top:0.25rem;">Upload a .glb or .gltf file for the 3D viewer. Max 50MB.</p>
-                @error('model3d')<p class="form-error">{{ $message }}</p>@enderror
+                    <div id="m3d-body"></div>
+                    <div id="m3d-actions" style="margin-top:0.75rem;display:flex;gap:0.5rem;flex-wrap:wrap;"></div>
+                </div>
             </div>
+
+            <style>
+                @@keyframes m3dPulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+                @@keyframes m3dSpin { to { transform: rotate(360deg); } }
+                .m3d-badge { padding:0.3rem 0.8rem;border-radius:999px;font-size:0.78rem;font-weight:700;display:inline-flex;align-items:center;gap:0.4rem; }
+                .m3d-dot { width:8px;height:8px;border-radius:50%;background:#f59e0b;animation:m3dPulse 1.2s infinite; }
+                .m3d-spinner { width:12px;height:12px;border:2px solid #E8621A;border-top-color:transparent;border-radius:50%;animation:m3dSpin 0.8s linear infinite; }
+            </style>
+
+            @php
+                $m3dInitialState = [
+                    'status'               => $product->model3d_status ?? 'idle',
+                    'has_3d_model'         => (bool) $product->has_3d_model,
+                    'model3d_queued_at'    => optional($product->model3d_queued_at)->toDateTimeString(),
+                    'model3d_generated_at' => optional($product->model3d_generated_at)->toDateTimeString(),
+                    'model3d_error'        => $product->model3d_error,
+                    'model3d_selected_image' => $product->model3d_selected_image ? asset('images/' . basename($product->model3d_selected_image)) : null,
+                    'model_url'            => $product->is3DReady() ? $product->get3DModelUrl() : null,
+                ];
+            @endphp
+            <script>
+            (function() {
+                const statusUrl = @json(route('admin.products.3d-status', $product));
+                const regenUrl = @json(route('admin.products.regenerate-3d', $product));
+                const csrf = @json(csrf_token());
+                let state = @json($m3dInitialState);
+                let poller = null;
+
+                const badge = document.getElementById('m3d-badge');
+                const body = document.getElementById('m3d-body');
+                const actions = document.getElementById('m3d-actions');
+
+                function escapeHtml(s) { return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+                function render() {
+                    const s = state.status || 'idle';
+                    const badges = {
+                        idle:       { text: 'No 3D Model', bg: '#e5e7eb', color: '#374151', prefix: '' },
+                        queued:     { text: 'Queued',      bg: '#fef3c7', color: '#92400e', prefix: '<span class="m3d-dot"></span>' },
+                        processing: { text: 'Processing',  bg: '#dbeafe', color: '#1e40af', prefix: '<span class="m3d-spinner"></span>' },
+                        ready:      { text: '✓ Ready',     bg: '#d1fae5', color: '#065f46', prefix: '' },
+                        failed:     { text: '✕ Failed',    bg: '#fee2e2', color: '#991b1b', prefix: '' },
+                    };
+                    const b = badges[s] || badges.idle;
+                    badge.style.background = b.bg;
+                    badge.style.color = b.color;
+                    badge.innerHTML = b.prefix + escapeHtml(b.text);
+
+                    let html = '', actionHtml = '';
+
+                    if (s === 'idle') {
+                        html = '<p style="font-size:0.85rem;color:var(--muted);margin:0;">Upload product images to auto-generate a 3D model.</p>';
+                    } else if (s === 'queued') {
+                        html = '<p style="font-size:0.85rem;color:var(--muted);margin:0 0 0.3rem;">3D generation is queued. Processing will begin shortly.</p>'
+                            + (state.model3d_queued_at ? '<p style="font-size:0.75rem;color:var(--muted);margin:0;">Queued at: ' + escapeHtml(state.model3d_queued_at) + '</p>' : '')
+                            + '<p style="font-size:0.75rem;color:#92400e;margin-top:0.4rem;">If status stays "Queued" for more than 2 minutes, make sure the queue worker is running: <code>php artisan queue:work</code></p>';
+                    } else if (s === 'processing') {
+                        html = '<p style="font-size:0.85rem;color:var(--muted);margin:0 0 0.5rem;">AI is analyzing images and generating your 3D model…</p>'
+                            + '<ul style="list-style:none;padding:0;margin:0;font-size:0.8rem;color:var(--gray-600);">'
+                            + '<li>✓ Images uploaded</li>'
+                            + '<li>⟳ Analyzing with Qwen-VL (selecting best image)</li>'
+                            + '<li>○ Generating 3D with TRELLIS</li>'
+                            + '<li>○ Saving model</li></ul>';
+                    } else if (s === 'ready') {
+                        html = '<p style="font-size:0.85rem;color:#065f46;margin:0 0 0.5rem;">3D model generated successfully.</p>'
+                            + (state.model3d_generated_at ? '<p style="font-size:0.75rem;color:var(--muted);margin:0 0 0.6rem;">Generated at: ' + escapeHtml(state.model3d_generated_at) + '</p>' : '')
+                            + (state.model3d_selected_image ? '<div style="display:flex;align-items:center;gap:0.75rem;"><span style="font-size:0.75rem;color:var(--muted);">Selected image:</span><img src="' + escapeHtml(state.model3d_selected_image) + '" style="width:56px;height:56px;object-fit:cover;border-radius:0.4rem;border:1px solid var(--gray-200);"></div>' : '');
+                        if (state.model_url) actionHtml += '<a href="' + escapeHtml(state.model_url) + '" target="_blank" class="add-btn" style="text-decoration:none;">Download .glb</a>';
+                        actionHtml += '<button type="button" class="act-btn" onclick="window._m3dRegen()">Re-generate</button>';
+                    } else if (s === 'failed') {
+                        html = '<p style="font-size:0.85rem;color:#991b1b;margin:0 0 0.5rem;">3D generation failed.</p>';
+                        if (state.model3d_error) {
+                            html += '<details style="margin-bottom:0.6rem;"><summary style="font-size:0.78rem;cursor:pointer;color:var(--gray-600);">Error details</summary>'
+                                + '<pre style="font-size:0.72rem;background:#fef2f2;padding:0.5rem;border-radius:0.4rem;margin-top:0.4rem;white-space:pre-wrap;color:#991b1b;">' + escapeHtml(state.model3d_error) + '</pre></details>';
+                        }
+                        actionHtml = '<button type="button" class="add-btn" style="background:#ef4444;" onclick="window._m3dRegen()">Try Again</button>';
+                    }
+
+                    body.innerHTML = html;
+                    actions.innerHTML = actionHtml;
+                }
+
+                function startPolling() {
+                    if (poller) return;
+                    poller = setInterval(fetchStatus, 5000);
+                }
+                function stopPolling() {
+                    if (poller) { clearInterval(poller); poller = null; }
+                }
+                async function fetchStatus() {
+                    try {
+                        const res = await fetch(statusUrl, { headers: { 'Accept': 'application/json' }});
+                        if (!res.ok) return;
+                        state = await res.json();
+                        render();
+                        if (['ready','failed','idle'].includes(state.status)) stopPolling();
+                    } catch (_) {}
+                }
+                window._m3dRegen = async function() {
+                    try {
+                        const res = await fetch(regenUrl, {
+                            method: 'POST',
+                            headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' },
+                        });
+                        if (res.ok) {
+                            state.status = 'queued';
+                            state.model3d_error = null;
+                            render();
+                            startPolling();
+                        }
+                    } catch (_) {}
+                };
+
+                render();
+                if (['queued','processing'].includes(state.status)) startPolling();
+            })();
+            </script>
 
             <div class="form-group full">
                 <label class="form-label">Description</label>
