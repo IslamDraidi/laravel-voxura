@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php -l app/Services/AI/TrellisService.php)",
+      "Bash(php -l /home/islamdriadi/voxura/app/Services/AI/QwenVLService.php)",
+      "Bash(php -l /home/islamdriadi/voxura/app/Services/AI/TrellisService.php)",
+      "Bash(curl -s \"https://trellis-community-trellis.hf.space/gradio_api/info\")",
+      "Bash(python3 -m json.tool)",
+      "Bash(python3 -c \" import json, sys data = json.load\\(sys.stdin\\) for name, info in data.get\\('named_endpoints', {}\\).items\\(\\): print\\(f'=== {name} ==='\\) for i, p in enumerate\\(info.get\\('parameters', []\\)\\): print\\(f' [{i}] {p.get\\(\\\\\"parameter_name\\\\\",\\\\\"?\\\\\"\\)} : {p.get\\(\\\\\"python_type\\\\\",{}\\).get\\(\\\\\"type\\\\\",\\\\\"?\\\\\"\\)}'\\) print\\(\\) \")",
+      "Bash(curl -s --max-time 10 \"https://trellis-community-trellis.hf.space/gradio_api/info\")",
+      "Bash(python3 -c \" import json, sys data = json.load\\(sys.stdin\\) ep = data.get\\('named_endpoints', {}\\) for name, info in ep.items\\(\\): params = info.get\\('parameters', []\\) returns = info.get\\('returns', []\\) print\\(f'{name}: {len\\(params\\)} params, {len\\(returns\\)} returns'\\) \")",
+      "Bash(curl -s --max-time 15 \"https://trellis-community-trellis.hf.space/config\")",
+      "Bash(python3 -c \" import json, sys data = json.load\\(sys.stdin\\) deps = data.get\\('dependencies', []\\) print\\(f'Total deps: {len\\(deps\\)}'\\) for i, d in enumerate\\(deps[:20]\\): api = d.get\\('api_name'\\) or d.get\\('id'\\) or '?' trig = d.get\\('trigger', '?'\\) print\\(f' [{i}] api_name={api} trigger={trig}'\\) \")"
+    ]
+  }
+}
