@@ -94,6 +94,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/products/{product}/edit', [AdminController::class, 'edit'])->name('admin.products.edit');
     Route::put('/products/{product}', [AdminController::class, 'update'])->name('admin.products.update');
     Route::delete('/products/{product}', [AdminController::class, 'destroy'])->name('admin.products.delete');
+    Route::get('/products/{product}/3d-status', [AdminController::class, 'get3DStatus'])->name('admin.products.3d-status');
+    Route::post('/products/{product}/regenerate-3d', [AdminController::class, 'regenerate3D'])->name('admin.products.regenerate-3d');
     Route::get('/archive', [AdminController::class, 'archive'])->name('admin.archive');
     Route::post('/products/{product}/variants', [AdminController::class, 'addVariant'])->name('admin.variants.store');
     Route::delete('/products/{product}/variants/{variant}', [AdminController::class, 'removeVariant'])->name('admin.variants.destroy');
