@@ -124,8 +124,7 @@ class AdminController extends Controller
 
         $imageName = null;
         if ($request->hasFile('image')) {
-            $imageName = time().'.'.$request->image->extension();
-            $request->image->move(public_path('images'), $imageName);
+            $imageName = $this->saveUploadedImage($request->file('image'));
         }
 
         unset($validated['image'], $validated['gallery'], $validated['gallery.*'], $validated['size_guide_rows'], $validated['color_swatches_rows'], $validated['model3d'], $validated['remove_3d_model']);
@@ -137,8 +136,7 @@ class AdminController extends Controller
 
         if ($request->hasFile('gallery')) {
             foreach ($request->file('gallery') as $i => $file) {
-                $name = time().'_g'.$i.'.'.$file->extension();
-                $file->move(public_path('images'), $name);
+                $name = $this->saveUploadedImage($file, 'g'.$i);
                 ProductImage::create(['product_id' => $product->id, 'image' => $name, 'sort_order' => $i]);
             }
         }
@@ -169,9 +167,7 @@ class AdminController extends Controller
         $validated = $request->validated();
 
         if ($request->hasFile('image')) {
-            $imageName = time().'.'.$request->image->extension();
-            $request->image->move(public_path('images'), $imageName);
-            $product->image = $imageName;
+            $product->image = $this->saveUploadedImage($request->file('image'));
         }
 
         unset($validated['image'], $validated['gallery'], $validated['gallery.*'], $validated['remove_images'], $validated['size_guide_rows'], $validated['color_swatches_rows'], $validated['model3d'], $validated['remove_3d_model']);
@@ -202,8 +198,7 @@ class AdminController extends Controller
         if ($request->hasFile('gallery')) {
             $sortStart = $product->images()->max('sort_order') + 1;
             foreach ($request->file('gallery') as $i => $file) {
-                $name = time().'_g'.$i.'.'.$file->extension();
-                $file->move(public_path('images'), $name);
+                $name = $this->saveUploadedImage($file, 'g'.$i);
                 ProductImage::create(['product_id' => $product->id, 'image' => $name, 'sort_order' => $sortStart + $i]);
                 $galleryUploaded = true;
             }
@@ -460,8 +455,7 @@ class AdminController extends Controller
 
         $imageName = null;
         if ($request->hasFile('image')) {
-            $imageName = 'banner_'.time().'.'.$request->image->extension();
-            $request->image->move(public_path('images'), $imageName);
+            $imageName = $this->saveUploadedImage($request->file('image'), 'banner');
         }
 
         Banner::create([
@@ -1201,6 +1195,28 @@ class AdminController extends Controller
         Generate3DModelJob::dispatch($product)->delay(now()->addSeconds(3));
 
         return response()->json(['success' => true, 'message' => 'Regeneration queued']);
+    }
+
+    private function saveUploadedImage(\Illuminate\Http\UploadedFile $file, string $prefix = ''): string
+    {
+        if (! $file->isValid()) {
+            throw new \RuntimeException('Uploaded file is invalid: '.$file->getErrorMessage());
+        }
+
+        $dir = public_path('images');
+        if (! is_dir($dir)) {
+            @mkdir($dir, 0755, true);
+        }
+        if (! is_writable($dir)) {
+            throw new \RuntimeException("Upload directory not writable: {$dir}");
+        }
+
+        $ext = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'jpg');
+        $name = ($prefix ? $prefix.'_' : '').time().'_'.bin2hex(random_bytes(4)).'.'.$ext;
+
+        $file->move($dir, $name);
+
+        return $name;
     }
 
     private function uniqueSlug(string $name, ?int $excludeId = null): string
