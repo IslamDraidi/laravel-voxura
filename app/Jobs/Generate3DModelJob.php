@@ -18,7 +18,7 @@ class Generate3DModelJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public int $tries = 3;
-    public int $timeout = 180;
+    public int $timeout = 600;
     public int $backoff = 30;
 
     public function __construct(public Product $product)
