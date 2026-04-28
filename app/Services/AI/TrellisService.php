@@ -27,20 +27,21 @@ class TrellisService
         }
 
         $token = config('model3d.replicate_token');
-        $version = config('model3d.replicate_version');
-        $model = config('model3d.replicate_model');
         $timeout = (int) config('model3d.timeout', 300);
         $maxRetries = (int) config('model3d.max_retries', 3);
+        $provider = config('model3d.provider', 'trellis');
 
         if (! $token) {
             throw new Model3DGenerationException('REPLICATE_API_TOKEN not configured.');
         }
+
+        [$version, $input] = $this->resolveProvider($provider, $imagePath);
+
         if (! $version) {
-            throw new Model3DGenerationException('REPLICATE_TRELLIS_VERSION not configured. Pin a version from replicate.com/'.$model.'.');
+            throw new Model3DGenerationException("Provider '{$provider}' has no version configured. Set the matching *_VERSION env var.");
         }
 
-        $mime = mime_content_type($imagePath) ?: 'image/jpeg';
-        $dataUrl = 'data:'.$mime.';base64,'.base64_encode(file_get_contents($imagePath));
+        Log::info('3D generation provider', ['provider' => $provider, 'version' => $version]);
 
         $attempt = 0;
         $lastError = null;
@@ -49,15 +50,16 @@ class TrellisService
             $attempt++;
 
             try {
-                $glbUrl = $this->runPrediction($token, $version, $dataUrl, $timeout);
+                $glbUrl = $this->runPrediction($token, $version, $input, $timeout);
                 return $this->saveGlb($glbUrl, $productId, $timeout);
             } catch (Model3DTimeoutException $e) {
                 throw $e;
             } catch (\Throwable $e) {
                 $lastError = $e;
-                Log::warning('Replicate TRELLIS attempt failed', [
-                    'attempt' => $attempt,
-                    'error'   => $e->getMessage(),
+                Log::warning('Replicate 3D attempt failed', [
+                    'provider' => $provider,
+                    'attempt'  => $attempt,
+                    'error'    => $e->getMessage(),
                 ]);
                 if (str_contains($e->getMessage(), 'insufficient credit')) {
                     throw $e;
@@ -74,7 +76,75 @@ class TrellisService
         );
     }
 
-    private function runPrediction(string $token, string $version, string $dataUrl, int $timeout): string
+    private function resolveProvider(string $provider, string $imagePath): array
+    {
+        $mime = mime_content_type($imagePath) ?: 'image/jpeg';
+        $dataUrl = 'data:'.$mime.';base64,'.base64_encode(file_get_contents($imagePath));
+
+        switch ($provider) {
+            case 'hunyuan':
+                return [
+                    config('model3d.hunyuan_version'),
+                    [
+                        'image'         => $dataUrl,
+                        'enable_pbr'    => true,
+                        'face_count'    => 500000,
+                        'generate_type' => 'Normal',
+                    ],
+                ];
+
+            case 'rodin':
+                return [
+                    config('model3d.rodin_version'),
+                    [
+                        'images'               => [$dataUrl],
+                        'tier'                 => 'Gen-2',
+                        'quality'              => 'medium',
+                        'material'             => 'PBR',
+                        'mesh_mode'            => 'Quad',
+                        'geometry_file_format' => 'glb',
+                    ],
+                ];
+
+            case 'trellis2':
+                return [
+                    config('model3d.trellis2_version'),
+                    [
+                        'image'                => $dataUrl,
+                        'texture_size'         => 4096,
+                        'pipeline_type'        => '1024_cascade',
+                        'generate_model'       => true,
+                        'generate_video'       => false,
+                        'preprocess_image'     => true,
+                        'return_no_background' => true,
+                        'randomize_seed'       => true,
+                    ],
+                ];
+
+            case 'trellis':
+            default:
+                return [
+                    config('model3d.replicate_version'),
+                    [
+                        'images'                 => [$dataUrl],
+                        'generate_model'         => true,
+                        'generate_color'         => true,
+                        'generate_normal'        => false,
+                        'save_gaussian_ply'      => false,
+                        'return_no_background'   => true,
+                        'mesh_simplify'          => 0.95,
+                        'texture_size'           => 2048,
+                        'ss_sampling_steps'      => 25,
+                        'slat_sampling_steps'    => 25,
+                        'ss_guidance_strength'   => 7.5,
+                        'slat_guidance_strength' => 3.0,
+                        'randomize_seed'         => true,
+                    ],
+                ];
+        }
+    }
+
+    private function runPrediction(string $token, string $version, array $input, int $timeout): string
     {
         $deadline = microtime(true) + $timeout;
 
@@ -86,9 +156,7 @@ class TrellisService
             ->timeout(70)
             ->post(self::API, [
                 'version' => $version,
-                'input'   => [
-                    'images' => [$dataUrl],
-                ],
+                'input'   => $input,
             ]);
 
         if ($response->status() === 402) {
@@ -152,13 +220,14 @@ class TrellisService
 
     private function extractGlbUrl(mixed $output): string
     {
-        if (is_string($output) && str_contains(strtolower($output), '.glb')) {
+        // Hunyuan/Rodin return a plain string URL (may not contain .glb in URL path).
+        if (is_string($output) && (str_contains(strtolower($output), '.glb') || preg_match('#^https?://#', $output))) {
             return $output;
         }
 
         if (is_array($output)) {
-            foreach (['model_file', 'glb', 'model', 'mesh', 'output'] as $key) {
-                if (isset($output[$key]) && is_string($output[$key]) && str_contains(strtolower($output[$key]), '.glb')) {
+            foreach (['model_file', 'glb', 'model', 'mesh', 'output', 'mesh_url', 'glb_url'] as $key) {
+                if (isset($output[$key]) && is_string($output[$key]) && (str_contains(strtolower($output[$key]), '.glb') || preg_match('#^https?://#', $output[$key]))) {
                     return $output[$key];
                 }
             }
@@ -186,7 +255,7 @@ class TrellisService
         }
 
         $filename = 'model.glb';
-        Storage::put("public/models/{$productId}/{$filename}", $bytes);
+        Storage::disk('public')->put("models/{$productId}/{$filename}", $bytes);
 
         return $filename;
     }
