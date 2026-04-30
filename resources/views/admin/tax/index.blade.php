@@ -75,7 +75,7 @@
                     </td>
                     <td>
                         <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
-                            <a href="/admin/tax/{{ $rate->id }}/edit" class="act-btn">Edit</a>
+                            <button type="button" class="act-btn" onclick="adminNavigate('/admin/tax/{{ $rate->id }}/edit')">Edit</button>
                             <form method="POST" action="/admin/tax/{{ $rate->id }}/toggle" style="display:inline;">
                                 @csrf
                                 <button type="submit" class="act-btn {{ $rate->is_active ? 'green' : '' }}">
