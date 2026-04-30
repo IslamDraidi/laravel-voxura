@@ -71,7 +71,9 @@
                         };
                     @endphp
                     <tr>
-                        <td style="font-weight:700;">#{{ $order->id }}</td>
+                        <td style="font-weight:700;cursor:pointer;color:var(--orange);"
+                            onclick="adminNavigate('/admin/orders/{{ $order->id }}')"
+                            title="View order details">#{{ $order->id }}</td>
                         <td>
                             <div style="font-weight:600;">{{ $order->user->name }}</div>
                             <div style="font-size:0.75rem;color:var(--muted);">{{ $order->user->email }}</div>
@@ -95,21 +97,25 @@
                             </div>
                         </td>
                         <td style="font-weight:700;">₪{{ number_format($order->total_amount) }}</td>
-                        <td><span class="badge {{ $statusBadge }}">{{ ucfirst($order->status) }}</span></td>
                         <td>
-                            <form method="POST" action="/admin/orders/{{ $order->id }}/status"
-                                  style="display:flex;gap:6px;align-items:center;">
-                                @csrf @method('PATCH')
-                                <select name="status" class="form-select" style="padding:0.3rem 0.5rem;font-size:0.82rem;">
+                            <span class="badge {{ $statusBadge }}" id="order-status-badge-{{ $order->id }}">
+                                {{ ucfirst(str_replace('_', ' ', $order->status)) }}
+                            </span>
+                        </td>
+                        <td>
+                            <div style="display:flex;gap:6px;align-items:center;">
+                                <select id="order-status-select-{{ $order->id }}" class="form-select" style="padding:0.3rem 0.5rem;font-size:0.82rem;">
                                     @foreach(['pending','paid','processing','shipped','delivered','cancelled','payment_blocked','refunded','partially_refunded'] as $s)
                                         <option value="{{ $s }}" {{ $order->status === $s ? 'selected' : '' }}>
                                             {{ ucfirst(str_replace('_', ' ', $s)) }}
                                         </option>
                                     @endforeach
                                 </select>
-                                <button type="submit" class="act-btn">Update</button>
-                                <a href="/admin/orders/{{ $order->id }}" class="act-btn" style="text-decoration:none;">View</a>
-                            </form>
+                                <button type="button" class="act-btn"
+                                        onclick="updateOrderStatus({{ $order->id }})">Update</button>
+                                <button type="button" class="act-btn"
+                                        onclick="adminNavigate('/admin/orders/{{ $order->id }}')">View</button>
+                            </div>
                         </td>
                     </tr>
                     @endforeach
@@ -117,5 +123,44 @@
             </table>
         </div>
     @endif
+
+    <script>
+    // AJAX order status update
+    window.updateOrderStatus = async function (orderId) {
+        var select = document.getElementById('order-status-select-' + orderId);
+        if (!select) return;
+        var status = select.value;
+        try {
+            var fd = new FormData();
+            fd.append('_method', 'PATCH');
+            fd.append('_token', document.querySelector('meta[name=csrf-token]')?.content || '');
+            fd.append('status', status);
+            var res = await fetch('/admin/orders/' + orderId + '/status', {
+                method: 'POST', body: fd,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            var data = await res.json().catch(function () { return {}; });
+            if (res.ok) {
+                // Update badge
+                var badge = document.getElementById('order-status-badge-' + orderId);
+                if (badge) {
+                    var badgeMap = {
+                        pending:'badge-amber', processing:'badge-amber', shipped:'badge-blue',
+                        delivered:'badge-green', paid:'badge-green', cancelled:'badge-red',
+                        payment_blocked:'badge-red', refunded:'badge-blue',
+                        partially_refunded:'badge-orange'
+                    };
+                    badge.className = 'badge ' + (badgeMap[status] || 'badge-gray');
+                    badge.textContent = status.replace(/_/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+                }
+                if (typeof showToast === 'function') showToast(data.message || 'Status updated.', 'success');
+            } else {
+                if (typeof showToast === 'function') showToast(data.message || 'Update failed.', 'error');
+            }
+        } catch (e) {
+            if (typeof showToast === 'function') showToast('Request failed.', 'error');
+        }
+    };
+    </script>
 
 </x-admin-layout>

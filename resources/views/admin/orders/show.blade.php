@@ -78,7 +78,7 @@
 }
 </style>
 
-<a href="/admin/orders" style="font-size:0.82rem;color:var(--muted);text-decoration:none;margin-bottom:1rem;display:inline-block;">← Back to Orders</a>
+<a href="/admin/orders" onclick="event.preventDefault();adminNavigate('/admin/orders')" style="font-size:0.82rem;color:var(--muted);text-decoration:none;margin-bottom:1rem;display:inline-block;">← Back to Orders</a>
 
 <div class="order-detail">
 
