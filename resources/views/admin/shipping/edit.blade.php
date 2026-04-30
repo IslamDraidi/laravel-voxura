@@ -1,12 +1,13 @@
 <x-admin-layout title="Edit Shipping Method" section="configure" active="shipping">
 
 <div style="margin-bottom:1rem;">
-    <a href="/admin/shipping/methods" style="color:var(--orange);font-size:13px;text-decoration:none;font-weight:600;">&larr; Back to Shipping Methods</a>
+    <a href="/admin/shipping/methods" onclick="event.preventDefault();adminNavigate('/admin/shipping/methods')"
+       style="color:var(--orange);font-size:13px;text-decoration:none;font-weight:600;">&larr; Back to Shipping Methods</a>
 </div>
 
-<div class="card" x-data="{ type: '{{ old('type', $method->type) }}' }">
+<div class="card">
     <p class="section-title">Edit: {{ $method->name }}</p>
-    <form method="POST" action="/admin/shipping/methods/{{ $method->id }}">
+    <form id="shipping-edit-form" method="POST" action="/admin/shipping/methods/{{ $method->id }}">
         @csrf @method('PUT')
 
         <div class="form-grid" style="margin-bottom:1rem;">
@@ -28,12 +29,12 @@
 
             <div class="form-group">
                 <label class="form-label">Type *</label>
-                <select name="type" class="form-select" x-model="type">
-                    <option value="flat">Flat Rate</option>
-                    <option value="per_unit">Per Unit</option>
-                    <option value="weight_based">Weight Based</option>
-                    <option value="free">Free</option>
-                    <option value="custom">Custom (API)</option>
+                <select name="type" id="shipping-type-select" class="form-select" onchange="shippingTypeChange(this.value)">
+                    <option value="flat"         {{ old('type', $method->type) === 'flat'         ? 'selected' : '' }}>Flat Rate</option>
+                    <option value="per_unit"     {{ old('type', $method->type) === 'per_unit'     ? 'selected' : '' }}>Per Unit</option>
+                    <option value="weight_based" {{ old('type', $method->type) === 'weight_based' ? 'selected' : '' }}>Weight Based</option>
+                    <option value="free"         {{ old('type', $method->type) === 'free'         ? 'selected' : '' }}>Free</option>
+                    <option value="custom"       {{ old('type', $method->type) === 'custom'       ? 'selected' : '' }}>Custom (API)</option>
                 </select>
             </div>
 
@@ -43,17 +44,17 @@
                 @error('base_rate')<p class="form-error">{{ $message }}</p>@enderror
             </div>
 
-            <div class="form-group" x-show="type === 'per_unit'" x-cloak>
+            <div class="form-group" id="field-per-unit-rate">
                 <label class="form-label">Per Unit Rate ($)</label>
                 <input type="number" name="per_unit_rate" class="form-input" step="0.01" min="0" value="{{ old('per_unit_rate', $method->per_unit_rate) }}">
             </div>
 
-            <div class="form-group" x-show="type === 'weight_based'" x-cloak>
+            <div class="form-group" id="field-weight-rate">
                 <label class="form-label">Weight Rate ($)</label>
                 <input type="number" name="weight_rate" class="form-input" step="0.0001" min="0" value="{{ old('weight_rate', $method->weight_rate) }}">
             </div>
 
-            <div class="form-group" x-show="type === 'weight_based'" x-cloak>
+            <div class="form-group" id="field-weight-unit">
                 <label class="form-label">Weight Unit</label>
                 <select name="weight_unit" class="form-select">
                     <option value="kg" {{ old('weight_unit', $method->weight_unit) === 'kg' ? 'selected' : '' }}>kg</option>
@@ -61,7 +62,7 @@
                 </select>
             </div>
 
-            <div class="form-group" x-show="type !== 'free'" x-cloak>
+            <div class="form-group" id="field-free-above">
                 <label class="form-label">Free Above ($)</label>
                 <input type="number" name="free_above" class="form-input" step="0.01" min="0" value="{{ old('free_above', $method->free_above) }}">
             </div>
@@ -76,7 +77,7 @@
                 <input type="number" name="max_order_amount" class="form-input" step="0.01" min="0" value="{{ old('max_order_amount', $method->max_order_amount) }}">
             </div>
 
-            <div class="form-group" x-show="type === 'weight_based'" x-cloak>
+            <div class="form-group" id="field-max-weight">
                 <label class="form-label">Max Weight</label>
                 <input type="number" name="max_weight" class="form-input" step="0.01" min="0" value="{{ old('max_weight', $method->max_weight) }}">
             </div>
@@ -85,9 +86,9 @@
                 <label class="form-label">Channel</label>
                 <select name="channel" class="form-select">
                     <option value="">All Channels</option>
-                    <option value="web" {{ old('channel', $method->channel) === 'web' ? 'selected' : '' }}>Web</option>
+                    <option value="web"    {{ old('channel', $method->channel) === 'web'    ? 'selected' : '' }}>Web</option>
                     <option value="mobile" {{ old('channel', $method->channel) === 'mobile' ? 'selected' : '' }}>Mobile</option>
-                    <option value="api" {{ old('channel', $method->channel) === 'api' ? 'selected' : '' }}>API</option>
+                    <option value="api"    {{ old('channel', $method->channel) === 'api'    ? 'selected' : '' }}>API</option>
                 </select>
             </div>
 
@@ -107,7 +108,7 @@
             </div>
         </div>
 
-        <div class="form-group" x-show="type === 'custom'" x-cloak style="margin-bottom:1rem;">
+        <div class="form-group" id="field-metadata" style="margin-bottom:1rem;">
             <label class="form-label">Metadata (JSON)</label>
             <textarea name="metadata" class="form-textarea" rows="4">{{ old('metadata', $method->metadata ? json_encode($method->metadata, JSON_PRETTY_PRINT) : '') }}</textarea>
             @error('metadata')<p class="form-error">{{ $message }}</p>@enderror
@@ -117,6 +118,30 @@
     </form>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js" defer></script>
-<style>[x-cloak]{display:none!important}</style>
+<script>
+function shippingTypeChange(type) {
+    document.getElementById('field-per-unit-rate').style.display = type === 'per_unit'     ? '' : 'none';
+    document.getElementById('field-weight-rate').style.display   = type === 'weight_based' ? '' : 'none';
+    document.getElementById('field-weight-unit').style.display   = type === 'weight_based' ? '' : 'none';
+    document.getElementById('field-max-weight').style.display    = type === 'weight_based' ? '' : 'none';
+    document.getElementById('field-free-above').style.display    = type === 'free'         ? 'none' : '';
+    document.getElementById('field-metadata').style.display      = type === 'custom'       ? '' : 'none';
+}
+(function () {
+    var sel = document.getElementById('shipping-type-select');
+    if (sel) shippingTypeChange(sel.value);
+
+    var form = document.getElementById('shipping-edit-form');
+    if (!form) return;
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        if (typeof submitForm === 'function') {
+            await submitForm(form, function () {
+                if (typeof adminNavigate === 'function') adminNavigate('/admin/shipping/methods');
+                else window.location.href = '/admin/shipping/methods';
+            });
+        }
+    });
+}());
+</script>
 </x-admin-layout>
