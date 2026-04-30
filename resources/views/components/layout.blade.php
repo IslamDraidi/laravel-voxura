@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ isset($title) ? $title . ' — Voxura' : 'Voxura' }}</title>
 
     <meta property="og:title" content="Voxura" />
@@ -412,10 +413,6 @@
                 <a href="/#contact">Contact</a>
                 @auth
                     <a href="/orders">My Orders</a>
-                    @if(auth()->user()->isAdmin())
-                        <a href="/admin">Admin</a>
-                        <a href="/admin/orders">Orders</a>
-                    @endif
                 @endauth
             </div>
 
@@ -445,9 +442,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round"
                                   d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                         </svg>
-                        @if($cartCount > 0)
-                            <span class="nav-badge">{{ $cartCount > 99 ? '99+' : $cartCount }}</span>
-                        @endif
+                        <span class="nav-badge" id="nav-cart-badge" style="{{ $cartCount < 1 ? 'display:none' : '' }}">{{ $cartCount > 99 ? '99+' : $cartCount }}</span>
                     </a>
 
                     {{-- Settings --}}
@@ -568,9 +563,6 @@
             <a href="/orders">My Orders</a>
             <a href="/profile">Settings</a>
             @auth
-                @if(auth()->user()->isAdmin())
-                    <a href="/admin">Admin</a>
-                @endif
                 <div style="border-top:1px solid #e5e7eb;margin-top:1rem;padding-top:1rem;">
                     <div style="font-size:0.85rem;font-weight:600;color:#111;margin-bottom:0.5rem;">
                         {{ auth()->user()->name }}
