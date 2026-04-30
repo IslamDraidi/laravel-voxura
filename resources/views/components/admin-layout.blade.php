@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title }} — Voxura Admin</title>
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -378,6 +379,99 @@
     .sidebar-nav::-webkit-scrollbar{width:4px}
     .sidebar-nav::-webkit-scrollbar-track{background:#1a1a1a}
     .sidebar-nav::-webkit-scrollbar-thumb{background:#333}
+
+    /* ── TOAST ── */
+    #toast-container{
+        position:fixed;top:20px;right:20px;z-index:9999;
+        display:flex;flex-direction:column;gap:8px;pointer-events:none;
+    }
+    @keyframes slideInToast{
+        from{transform:translateX(20px);opacity:0}
+        to{transform:translateX(0);opacity:1}
+    }
+
+    /* ── DRAWER ── */
+    #admin-drawer-overlay{
+        display:none;position:fixed;inset:0;
+        background:rgba(0,0,0,0.4);z-index:200;
+    }
+    #admin-drawer{
+        display:none;position:fixed;top:0;right:0;
+        height:100vh;width:520px;max-width:100vw;
+        background:#fff;z-index:201;overflow-y:auto;
+        box-shadow:-4px 0 24px rgba(0,0,0,0.12);
+        transform:translateX(100%);
+        transition:transform 0.25s ease;
+    }
+    @media(max-width:600px){#admin-drawer{width:100vw}}
+    #admin-drawer-header{
+        display:flex;align-items:center;justify-content:space-between;
+        padding:16px 20px;border-bottom:1px solid var(--border);
+        position:sticky;top:0;background:#fff;z-index:5;
+    }
+    #admin-drawer-title{font-size:15px;font-weight:700;color:var(--dark)}
+    #admin-drawer-close{
+        background:none;border:none;cursor:pointer;
+        font-size:20px;color:var(--muted);line-height:1;padding:4px;
+    }
+    #admin-drawer-close:hover{color:var(--dark)}
+    #admin-drawer-body{padding:20px}
+
+    /* ── CONFIRM MODAL ── */
+    #confirm-modal{
+        display:none;position:fixed;inset:0;
+        background:rgba(0,0,0,0.5);z-index:8000;
+        align-items:center;justify-content:center;
+    }
+    .confirm-card{
+        background:#fff;border-radius:14px;padding:28px 28px 24px;
+        max-width:400px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.2);
+    }
+    .confirm-icon{font-size:28px;margin-bottom:10px}
+    .confirm-title{font-size:16px;font-weight:700;color:var(--dark);margin-bottom:8px}
+    .confirm-body{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.5}
+    .confirm-actions{display:flex;gap:10px;justify-content:flex-end}
+    .confirm-cancel{
+        background:transparent;color:var(--muted);
+        border:1px solid var(--border);border-radius:8px;
+        padding:8px 18px;font-size:13px;font-weight:600;
+        cursor:pointer;font-family:'DM Sans',sans-serif;
+        transition:all .15s;
+    }
+    .confirm-cancel:hover{border-color:var(--dark);color:var(--dark)}
+    .confirm-ok{
+        background:#DC2626;color:#fff;
+        border:none;border-radius:8px;
+        padding:8px 18px;font-size:13px;font-weight:600;
+        cursor:pointer;font-family:'DM Sans',sans-serif;
+        transition:background .15s;
+    }
+    .confirm-ok:hover{background:#b91c1c}
+
+    /* ── PREVIEW MODAL ── */
+    #preview-modal{
+        display:none;position:fixed;inset:0;
+        background:rgba(0,0,0,0.7);z-index:8000;
+        align-items:center;justify-content:center;
+        padding:20px;
+    }
+    #preview-modal .pm-inner{
+        background:#fff;border-radius:14px;
+        width:100%;max-width:960px;height:80vh;
+        display:flex;flex-direction:column;overflow:hidden;
+        box-shadow:0 20px 60px rgba(0,0,0,0.3);
+    }
+    #preview-modal .pm-header{
+        display:flex;align-items:center;justify-content:space-between;
+        padding:12px 16px;border-bottom:1px solid var(--border);
+        background:#fff;
+    }
+    #preview-modal .pm-title{font-size:13px;font-weight:600;color:var(--muted)}
+    #preview-modal .pm-close{
+        background:none;border:none;cursor:pointer;
+        font-size:20px;color:var(--muted);line-height:1;
+    }
+    #preview-iframe{flex:1;border:none;width:100%}
     </style>
 </head>
 <body>
@@ -419,69 +513,443 @@
         </div>
     </div>
 
-    {{-- Sub-nav tabs --}}
-    @if($section === 'sales')
-    <div class="admin-subnav">
-        <a href="/admin/orders"       class="subnav-tab {{ $active === 'orders'       ? 'active' : '' }}"><span class="tab-icon">🛒</span> Orders</a>
-        <a href="/admin/shipments"    class="subnav-tab {{ $active === 'shipments'    ? 'active' : '' }}"><span class="tab-icon">📬</span> Shipments</a>
-        <a href="/admin/invoices"     class="subnav-tab {{ $active === 'invoices'     ? 'active' : '' }}"><span class="tab-icon">🧾</span> Invoices</a>
-        <a href="/admin/refunds"      class="subnav-tab {{ $active === 'refunds'      ? 'active' : '' }}"><span class="tab-icon">🔄</span> Refunds</a>
-        <a href="/admin/transactions" class="subnav-tab {{ $active === 'transactions' ? 'active' : '' }}"><span class="tab-icon">💳</span> Transactions</a>
-        <a href="/admin/rma"          class="subnav-tab {{ $active === 'rma'          ? 'active' : '' }}"><span class="tab-icon">↩️</span> RMA</a>
-    </div>
-    @elseif($section === 'catalog')
-    <div class="admin-subnav">
-        <a href="/admin/products"            class="subnav-tab {{ $active === 'products'    ? 'active' : '' }}"><span class="tab-icon">📦</span> Products</a>
-        <a href="/admin/categories"         class="subnav-tab {{ $active === 'categories'  ? 'active' : '' }}"><span class="tab-icon">🗂️</span> Categories</a>
-        <a href="/admin/attributes"         class="subnav-tab {{ $active === 'attributes'  ? 'active' : '' }}"><span class="tab-icon">✏️</span> Attributes</a>
-        <a href="/admin/attribute-families" class="subnav-tab {{ $active === 'attr-families' ? 'active' : '' }}"><span class="tab-icon">🗃️</span> Attribute Families</a>
-    </div>
-    @elseif($section === 'customers')
-    <div class="admin-subnav">
-        <a href="/admin/customers"     class="subnav-tab {{ $active === 'customers' ? 'active' : '' }}"><span class="tab-icon">👥</span> Customers</a>
-        <a href="/admin/customer-groups" class="subnav-tab {{ $active === 'groups'  ? 'active' : '' }}"><span class="tab-icon">👪</span> Groups</a>
-        <a href="/admin/reviews"       class="subnav-tab {{ $active === 'reviews'   ? 'active' : '' }}"><span class="tab-icon">⭐</span> Reviews</a>
-        <a href="/admin/gdpr"          class="subnav-tab {{ $active === 'gdpr'      ? 'active' : '' }}"><span class="tab-icon">🔒</span> GDPR Data Requests</a>
-    </div>
-    @elseif($section === 'marketing')
-    <div class="admin-subnav">
-        <a href="/admin/coupons"         class="subnav-tab {{ $active === 'promotions'     ? 'active' : '' }}"><span class="tab-icon">🏷️</span> Promotions</a>
-        <a href="/admin/seo"             class="subnav-tab {{ $active === 'seo'            ? 'active' : '' }}"><span class="tab-icon">🔍</span> Search &amp; SEO</a>
-    </div>
-    @elseif($section === 'cms')
-    <div class="admin-subnav">
-        <a href="/admin/cms/pages"        class="subnav-tab {{ $active === 'pages'   ? 'active' : '' }}"><span class="tab-icon">📄</span> Pages</a>
-        <a href="/admin/banners"          class="subnav-tab {{ $active === 'banners' ? 'active' : '' }}"><span class="tab-icon">🖼️</span> Banners</a>
-        <a href="/admin/email-templates"  class="subnav-tab {{ $active === 'emails'  ? 'active' : '' }}"><span class="tab-icon">📧</span> Email Templates</a>
-    </div>
-    @elseif($section === 'reporting')
-    <div class="admin-subnav">
-        <a href="/admin/reports"           class="subnav-tab {{ $active === 'sales'     ? 'active' : '' }}"><span class="tab-icon">📈</span> Sales</a>
-        <a href="/admin/reports/customers" class="subnav-tab {{ $active === 'customers' ? 'active' : '' }}"><span class="tab-icon">👥</span> Customers</a>
-        <a href="/admin/reports/products"  class="subnav-tab {{ $active === 'products'  ? 'active' : '' }}"><span class="tab-icon">📦</span> Products</a>
-    </div>
-    @elseif($section === 'configure')
-    <div class="admin-subnav">
-        <a href="/admin/shipping/methods" class="subnav-tab {{ $active === 'shipping' ? 'active' : '' }}"><span class="tab-icon">🚚</span> Shipping Methods</a>
-        <a href="/admin/shipping/zones"   class="subnav-tab {{ $active === 'zones'    ? 'active' : '' }}"><span class="tab-icon">🌍</span> Shipping Zones</a>
-        <a href="/admin/tax"              class="subnav-tab {{ $active === 'tax'      ? 'active' : '' }}"><span class="tab-icon">🧾</span> Tax Rates</a>
-    </div>
-    @endif
+    {{-- Dynamic page body (replaced on AJAX nav) --}}
+    <div id="admin-page-body">
 
-    {{-- Alerts --}}
-    @if(session('success'))
-        <div class="admin-alert admin-alert-success">✓ {{ session('success') }}</div>
-    @endif
-    @if(session('error'))
-        <div class="admin-alert admin-alert-error">✕ {{ session('error') }}</div>
-    @endif
+        {{-- Sub-nav tabs --}}
+        @if($section === 'sales')
+        <div class="admin-subnav">
+            <a href="/admin/orders"       class="subnav-tab {{ $active === 'orders'       ? 'active' : '' }}"><span class="tab-icon">🛒</span> Orders</a>
+            <a href="/admin/shipments"    class="subnav-tab {{ $active === 'shipments'    ? 'active' : '' }}"><span class="tab-icon">📬</span> Shipments</a>
+            <a href="/admin/invoices"     class="subnav-tab {{ $active === 'invoices'     ? 'active' : '' }}"><span class="tab-icon">🧾</span> Invoices</a>
+            <a href="/admin/refunds"      class="subnav-tab {{ $active === 'refunds'      ? 'active' : '' }}"><span class="tab-icon">🔄</span> Refunds</a>
+            <a href="/admin/transactions" class="subnav-tab {{ $active === 'transactions' ? 'active' : '' }}"><span class="tab-icon">💳</span> Transactions</a>
+            <a href="/admin/rma"          class="subnav-tab {{ $active === 'rma'          ? 'active' : '' }}"><span class="tab-icon">↩️</span> RMA</a>
+        </div>
+        @elseif($section === 'catalog')
+        <div class="admin-subnav">
+            <a href="/admin/products"            class="subnav-tab {{ $active === 'products'    ? 'active' : '' }}"><span class="tab-icon">📦</span> Products</a>
+            <a href="/admin/categories"         class="subnav-tab {{ $active === 'categories'  ? 'active' : '' }}"><span class="tab-icon">🗂️</span> Categories</a>
+            <a href="/admin/attributes"         class="subnav-tab {{ $active === 'attributes'  ? 'active' : '' }}"><span class="tab-icon">✏️</span> Attributes</a>
+            <a href="/admin/attribute-families" class="subnav-tab {{ $active === 'attr-families' ? 'active' : '' }}"><span class="tab-icon">🗃️</span> Attribute Families</a>
+        </div>
+        @elseif($section === 'customers')
+        <div class="admin-subnav">
+            <a href="/admin/customers"     class="subnav-tab {{ $active === 'customers' ? 'active' : '' }}"><span class="tab-icon">👥</span> Customers</a>
+            <a href="/admin/customer-groups" class="subnav-tab {{ $active === 'groups'  ? 'active' : '' }}"><span class="tab-icon">👪</span> Groups</a>
+            <a href="/admin/reviews"       class="subnav-tab {{ $active === 'reviews'   ? 'active' : '' }}"><span class="tab-icon">⭐</span> Reviews</a>
+            <a href="/admin/gdpr"          class="subnav-tab {{ $active === 'gdpr'      ? 'active' : '' }}"><span class="tab-icon">🔒</span> GDPR Data Requests</a>
+        </div>
+        @elseif($section === 'marketing')
+        <div class="admin-subnav">
+            <a href="/admin/coupons"         class="subnav-tab {{ $active === 'promotions'     ? 'active' : '' }}"><span class="tab-icon">🏷️</span> Promotions</a>
+            <a href="/admin/seo"             class="subnav-tab {{ $active === 'seo'            ? 'active' : '' }}"><span class="tab-icon">🔍</span> Search &amp; SEO</a>
+        </div>
+        @elseif($section === 'cms')
+        <div class="admin-subnav">
+            <a href="/admin/cms/pages"        class="subnav-tab {{ $active === 'pages'   ? 'active' : '' }}"><span class="tab-icon">📄</span> Pages</a>
+            <a href="/admin/banners"          class="subnav-tab {{ $active === 'banners' ? 'active' : '' }}"><span class="tab-icon">🖼️</span> Banners</a>
+            <a href="/admin/email-templates"  class="subnav-tab {{ $active === 'emails'  ? 'active' : '' }}"><span class="tab-icon">📧</span> Email Templates</a>
+        </div>
+        @elseif($section === 'reporting')
+        <div class="admin-subnav">
+            <a href="/admin/reports"           class="subnav-tab {{ $active === 'sales'     ? 'active' : '' }}"><span class="tab-icon">📈</span> Sales</a>
+            <a href="/admin/reports/customers" class="subnav-tab {{ $active === 'customers' ? 'active' : '' }}"><span class="tab-icon">👥</span> Customers</a>
+            <a href="/admin/reports/products"  class="subnav-tab {{ $active === 'products'  ? 'active' : '' }}"><span class="tab-icon">📦</span> Products</a>
+        </div>
+        @elseif($section === 'configure')
+        <div class="admin-subnav">
+            <a href="/admin/shipping/methods" class="subnav-tab {{ $active === 'shipping' ? 'active' : '' }}"><span class="tab-icon">🚚</span> Shipping Methods</a>
+            <a href="/admin/shipping/zones"   class="subnav-tab {{ $active === 'zones'    ? 'active' : '' }}"><span class="tab-icon">🌍</span> Shipping Zones</a>
+            <a href="/admin/tax"              class="subnav-tab {{ $active === 'tax'      ? 'active' : '' }}"><span class="tab-icon">🧾</span> Tax Rates</a>
+        </div>
+        @endif
 
-    {{-- Page Content --}}
-    <div class="admin-content">
-        {{ $slot }}
-    </div>
+        {{-- Alerts --}}
+        @if(session('success'))
+            <div class="admin-alert admin-alert-success">✓ {{ session('success') }}</div>
+        @endif
+        @if(session('error'))
+            <div class="admin-alert admin-alert-error">✕ {{ session('error') }}</div>
+        @endif
+
+        {{-- Page Content --}}
+        <div class="admin-content">
+            {{ $slot }}
+        </div>
+
+    </div>{{-- #admin-page-body --}}
 
 </div>
+
+{{-- ── TOAST CONTAINER ── --}}
+<div id="toast-container"></div>
+
+{{-- ── DRAWER ── --}}
+<div id="admin-drawer-overlay" onclick="closeDrawer()"></div>
+<div id="admin-drawer">
+    <div id="admin-drawer-header">
+        <span id="admin-drawer-title">Edit</span>
+        <button id="admin-drawer-close" onclick="closeDrawer()">×</button>
+    </div>
+    <div id="admin-drawer-body"></div>
+</div>
+
+{{-- ── CONFIRM MODAL ── --}}
+<div id="confirm-modal">
+    <div class="confirm-card">
+        <div class="confirm-icon">⚠️</div>
+        <div class="confirm-title" id="confirm-title">Are you sure?</div>
+        <div class="confirm-body" id="confirm-body"></div>
+        <div class="confirm-actions">
+            <button class="confirm-cancel" onclick="closeConfirm()">Cancel</button>
+            <button class="confirm-ok" id="confirm-ok">Confirm</button>
+        </div>
+    </div>
+</div>
+
+{{-- ── PREVIEW MODAL ── --}}
+<div id="preview-modal">
+    <div class="pm-inner">
+        <div class="pm-header">
+            <span class="pm-title">Product Preview</span>
+            <button class="pm-close" onclick="closePreview()">×</button>
+        </div>
+        <iframe id="preview-iframe" src="about:blank"></iframe>
+    </div>
+</div>
+
+<script>
+(function () {
+    'use strict';
+
+    // ── CSRF ──
+    function csrfToken() {
+        var m = document.querySelector('meta[name="csrf-token"]');
+        return m ? m.content : '';
+    }
+
+    // ── TOAST ──
+    window.showToast = function (message, type) {
+        type = type || 'success';
+        var map = {
+            success: { border: '#16A34A', bg: '#F0FDF4', icon: '✓' },
+            error:   { border: '#DC2626', bg: '#FEF2F2', icon: '✕' },
+            warning: { border: '#D97706', bg: '#FFFBEB', icon: '⚠' }
+        };
+        var c = map[type] || map.success;
+        var t = document.createElement('div');
+        t.style.cssText = 'background:' + c.bg + ';border-left:3px solid ' + c.border + ';border-radius:8px;padding:12px 16px;font-size:13px;color:#1A1A1A;box-shadow:0 4px 12px rgba(0,0,0,0.1);display:flex;align-items:center;gap:10px;min-width:260px;max-width:360px;pointer-events:auto;animation:slideInToast 0.2s ease;';
+        t.innerHTML = '<span style="color:' + c.border + ';font-weight:700;flex-shrink:0">' + c.icon + '</span><span>' + message + '</span>';
+        document.getElementById('toast-container').appendChild(t);
+        setTimeout(function () {
+            t.style.opacity = '0';
+            t.style.transition = 'opacity 0.3s';
+            setTimeout(function () { if (t.parentNode) t.remove(); }, 300);
+        }, 3500);
+    };
+
+    // ── CONFIRM MODAL ──
+    var _confirmCb = null;
+    window.confirmAction = function (title, body, cb) {
+        document.getElementById('confirm-title').textContent = title || 'Are you sure?';
+        document.getElementById('confirm-body').textContent  = body  || '';
+        _confirmCb = cb;
+        var m = document.getElementById('confirm-modal');
+        m.style.display = 'flex';
+    };
+    window.closeConfirm = function () {
+        document.getElementById('confirm-modal').style.display = 'none';
+        _confirmCb = null;
+    };
+    document.getElementById('confirm-ok').addEventListener('click', function () {
+        if (_confirmCb) _confirmCb();
+        closeConfirm();
+    });
+    document.getElementById('confirm-modal').addEventListener('click', function (e) {
+        if (e.target === this) closeConfirm();
+    });
+
+    // ── DRAWER ──
+    window.openDrawer = function (html, title) {
+        var drawer  = document.getElementById('admin-drawer');
+        var overlay = document.getElementById('admin-drawer-overlay');
+        var body    = document.getElementById('admin-drawer-body');
+        if (title) document.getElementById('admin-drawer-title').textContent = title;
+        body.innerHTML = html;
+        overlay.style.display = 'block';
+        drawer.style.display  = 'block';
+        // Execute any inline scripts
+        body.querySelectorAll('script').forEach(function (sc) {
+            var s = document.createElement('script');
+            s.textContent = sc.textContent;
+            document.body.appendChild(s);
+            document.body.removeChild(s);
+        });
+        setTimeout(function () { drawer.style.transform = 'translateX(0)'; }, 10);
+    };
+    window.closeDrawer = function () {
+        var drawer = document.getElementById('admin-drawer');
+        drawer.style.transform = 'translateX(100%)';
+        setTimeout(function () {
+            drawer.style.display = 'none';
+            document.getElementById('admin-drawer-overlay').style.display = 'none';
+            document.getElementById('admin-drawer-body').innerHTML = '';
+        }, 260);
+    };
+
+    // ── PREVIEW MODAL ──
+    window.previewProduct = function (slug) {
+        document.getElementById('preview-iframe').src = '/product/' + slug;
+        var m = document.getElementById('preview-modal');
+        m.style.display = 'flex';
+    };
+    window.closePreview = function () {
+        document.getElementById('preview-modal').style.display = 'none';
+        document.getElementById('preview-iframe').src = 'about:blank';
+    };
+    document.getElementById('preview-modal').addEventListener('click', function (e) {
+        if (e.target === this) closePreview();
+    });
+
+    // ── AJAX FORM HELPER ──
+    window.showInlineErrors = function (formEl, errors) {
+        formEl.querySelectorAll('.form-error-ajax').forEach(function (el) { el.remove(); });
+        Object.keys(errors).forEach(function (field) {
+            var input = formEl.querySelector('[name="' + field + '"]') ||
+                        formEl.querySelector('[name="' + field + '[]"]');
+            if (input) {
+                var err = document.createElement('p');
+                err.className = 'form-error form-error-ajax';
+                err.textContent = errors[field][0];
+                input.parentNode.insertBefore(err, input.nextSibling);
+            }
+        });
+        showToast('Please correct the highlighted errors.', 'error');
+    };
+
+    window.submitForm = async function (formEl, successCb) {
+        var btn = formEl.querySelector('[type="submit"]');
+        if (btn) { btn.disabled = true; btn.style.opacity = '0.65'; }
+        formEl.querySelectorAll('.form-error-ajax').forEach(function (el) { el.remove(); });
+        var fd = new FormData(formEl);
+        try {
+            var res = await fetch(formEl.action || formEl.getAttribute('action'), {
+                method: 'POST',
+                body: fd,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': csrfToken()
+                }
+            });
+            var data = await res.json().catch(function () { return {}; });
+            if (res.ok) {
+                showToast(data.message || 'Saved successfully', 'success');
+                if (successCb) successCb(data);
+            } else if (res.status === 422 && data.errors) {
+                showInlineErrors(formEl, data.errors);
+            } else {
+                showToast(data.message || 'Something went wrong.', 'error');
+            }
+        } catch (e) {
+            showToast('Request failed. Please try again.', 'error');
+        }
+        if (btn) { btn.disabled = false; btn.style.opacity = ''; }
+    };
+
+    // ── PRODUCT ACTIONS (used by products/index) ──
+    window.editProduct = async function (productId) {
+        openDrawer('<div style="padding:2rem;text-align:center;color:var(--muted);font-size:13px;">Loading…</div>', 'Edit Product');
+        try {
+            var res = await fetch('/admin/products/' + productId + '/edit', {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            if (!res.ok) throw new Error();
+            var html = await res.text();
+            var parser = new DOMParser();
+            var doc    = parser.parseFromString(html, 'text/html');
+            var inner  = doc.querySelector('.admin-content');
+            openDrawer(inner ? inner.innerHTML : html, 'Edit Product');
+
+            // Intercept form submit inside drawer
+            var form = document.getElementById('admin-drawer-body').querySelector('#cp-form');
+            if (form) {
+                form.addEventListener('submit', async function (e) {
+                    e.preventDefault();
+                    await submitForm(form, function () {
+                        closeDrawer();
+                        setTimeout(function () { location.reload(); }, 320);
+                    });
+                });
+            }
+        } catch (e) {
+            document.getElementById('admin-drawer-body').innerHTML =
+                '<div style="padding:2rem;color:#dc2626;font-size:13px;">Failed to load. <a href="/admin/products/' + productId + '/edit" style="color:var(--orange);">Open full page →</a></div>';
+        }
+    };
+
+    window.deleteProduct = function (productId, name) {
+        confirmAction(
+            'Delete product?',
+            'Move "' + name + '" to the archive. You can restore it later.',
+            async function () {
+                try {
+                    var fd = new FormData();
+                    fd.append('_method', 'DELETE');
+                    fd.append('_token', csrfToken());
+                    var res = await fetch('/admin/products/' + productId, {
+                        method: 'POST', body: fd,
+                        headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': csrfToken() }
+                    });
+                    if (!res.ok) throw new Error();
+                    var row = document.querySelector('tr[data-product-id="' + productId + '"]');
+                    if (row) {
+                        row.style.transition = 'opacity 0.3s';
+                        row.style.opacity = '0';
+                        setTimeout(function () { if (row.parentNode) row.remove(); }, 330);
+                    }
+                    showToast('Product moved to archive.', 'success');
+                } catch (e) {
+                    showToast('Delete failed. Please try again.', 'error');
+                }
+            }
+        );
+    };
+
+    // ── ORDER ACTIONS (used by orders/index) ──
+    window.openOrderDrawer = async function (orderId) {
+        openDrawer('<div style="padding:2rem;text-align:center;color:var(--muted);font-size:13px;">Loading…</div>', 'Order #' + orderId);
+        try {
+            var res = await fetch('/admin/orders/' + orderId, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            if (!res.ok) throw new Error();
+            var html = await res.text();
+            var parser = new DOMParser();
+            var doc    = parser.parseFromString(html, 'text/html');
+            var inner  = doc.querySelector('.admin-content');
+            openDrawer(inner ? inner.innerHTML : html, 'Order #' + orderId);
+        } catch (e) {
+            document.getElementById('admin-drawer-body').innerHTML =
+                '<div style="padding:2rem;color:#dc2626;font-size:13px;">Failed to load. <a href="/admin/orders/' + orderId + '" style="color:var(--orange);">Open full page →</a></div>';
+        }
+    };
+
+    // ── CMS PAGE PREVIEW ──
+    window.previewCmsPage = function (slug) {
+        document.getElementById('preview-iframe').src = '/pages/' + slug;
+        document.getElementById('preview-modal').style.display = 'flex';
+    };
+
+    // ── KEYBOARD ──
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            closeDrawer();
+            closeConfirm();
+            closePreview();
+        }
+    });
+
+    // ── AJAX SIDEBAR NAVIGATION ──
+    var _navBusy = false;
+    var _loadedExtScripts = new Set();
+
+    window.adminNavigate = async function (url) {
+        if (_navBusy) return;
+        _navBusy = true;
+        updateSidebarActive(url);
+        try {
+            var res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            if (!res.ok) { _navBusy = false; window.location.href = url; return; }
+            var html   = await res.text();
+            var parser = new DOMParser();
+            var doc    = parser.parseFromString(html, 'text/html');
+            var newPb  = doc.getElementById('admin-page-body');
+            if (!newPb) { _navBusy = false; window.location.href = url; return; }
+            var pb = document.getElementById('admin-page-body');
+            pb.innerHTML = newPb.innerHTML;
+            // Re-run inline scripts; load external ones once
+            pb.querySelectorAll('script').forEach(function (sc) {
+                if (sc.src) {
+                    if (!_loadedExtScripts.has(sc.src)) {
+                        _loadedExtScripts.add(sc.src);
+                        var s = document.createElement('script');
+                        s.src = sc.src;
+                        s.addEventListener('load', function () {
+                            if (window.Alpine) try { Alpine.initTree(pb); } catch (e) {}
+                        });
+                        document.body.appendChild(s);
+                    }
+                } else {
+                    var s = document.createElement('script');
+                    s.textContent = sc.textContent;
+                    document.body.appendChild(s);
+                    document.body.removeChild(s);
+                }
+            });
+            // Initialize Alpine.js components in new content if already loaded
+            if (window.Alpine) try { Alpine.initTree(pb); } catch (e) {}
+            history.pushState({ url: url }, '', url);
+            window.scrollTo(0, 0);
+        } catch (e) {
+            window.location.href = url;
+        }
+        _navBusy = false;
+    };
+
+    function updateSidebarActive(url) {
+        var u;
+        try { u = new URL(url, window.location.origin).pathname; } catch (e) { u = url; }
+        var map = [
+            ['/admin/orders','/admin/orders'],['/admin/shipments','/admin/orders'],
+            ['/admin/invoices','/admin/orders'],['/admin/refunds','/admin/orders'],
+            ['/admin/transactions','/admin/orders'],['/admin/rma','/admin/orders'],
+            ['/admin/customers','/admin/customers'],['/admin/customer-groups','/admin/customers'],
+            ['/admin/reviews','/admin/customers'],['/admin/gdpr','/admin/customers'],
+            ['/admin/products','/admin/products'],['/admin/categories','/admin/products'],
+            ['/admin/attributes','/admin/products'],['/admin/attribute-families','/admin/products'],
+            ['/admin/archive','/admin/products'],
+            ['/admin/cms','/admin/cms/pages'],['/admin/banners','/admin/cms/pages'],
+            ['/admin/email-templates','/admin/cms/pages'],
+            ['/admin/coupons','/admin/coupons'],['/admin/seo','/admin/coupons'],
+            ['/admin/communications','/admin/coupons'],
+            ['/admin/reports','/admin/reports'],
+            ['/admin/shipping','/admin/shipping'],['/admin/tax','/admin/shipping'],
+        ];
+        var navHref = '/admin';
+        for (var i = 0; i < map.length; i++) {
+            if (u.startsWith(map[i][0])) { navHref = map[i][1]; break; }
+        }
+        document.querySelectorAll('.sidebar .nav-item').forEach(function (item) {
+            item.classList.remove('active');
+            if (item.getAttribute('href') === navHref) item.classList.add('active');
+        });
+    }
+
+    // Sidebar link intercept
+    document.querySelectorAll('.sidebar .nav-item').forEach(function (link) {
+        link.addEventListener('click', function (e) {
+            if (e.ctrlKey || e.metaKey || e.shiftKey) return;
+            e.preventDefault();
+            adminNavigate(this.getAttribute('href'));
+        });
+    });
+
+    // Subnav/sub-btn intercept (capture phase so it works on dynamically loaded content)
+    document.addEventListener('click', function (e) {
+        var el = e.target.closest('.subnav-tab, .sub-btn');
+        if (el && el.href && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
+            e.preventDefault();
+            adminNavigate(el.href);
+        }
+    }, true);
+
+    window.addEventListener('popstate', function (e) {
+        if (e.state && e.state.url) adminNavigate(e.state.url);
+    });
+
+}());
+</script>
 
 </body>
 </html>
