@@ -3,7 +3,7 @@
     <div style="max-width:820px;">
         <div class="card">
             <p class="section-title">New CMS Page</p>
-            <form method="POST" action="{{ route('admin.cms.pages.store') }}">
+            <form id="cms-create-form" method="POST" action="{{ route('admin.cms.pages.store') }}">
                 @csrf
 
                 <div class="form-grid" style="margin-bottom:14px;">
@@ -67,10 +67,26 @@
 
                 <div style="display:flex;gap:8px;">
                     <button type="submit" class="add-btn">+ Create Page</button>
-                    <a href="{{ route('admin.cms.pages.index') }}" class="topbar-ghost">Cancel</a>
+                    <button type="button" class="topbar-ghost" onclick="adminNavigate('{{ route('admin.cms.pages.index') }}')">Cancel</button>
                 </div>
             </form>
         </div>
     </div>
 
+
+<script>
+(function () {
+    var form = document.getElementById('cms-create-form');
+    if (!form) return;
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        if (typeof submitForm === 'function') {
+            await submitForm(form, function () {
+                if (typeof adminNavigate === 'function') adminNavigate('{{ route('admin.cms.pages.index') }}');
+                else window.location.href = '{{ route('admin.cms.pages.index') }}';
+            });
+        }
+    });
+}());
+</script>
 </x-admin-layout>

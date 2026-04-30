@@ -1,7 +1,7 @@
 <x-admin-layout title="CMS Pages" section="cms" active="pages">
 
     <div style="margin-bottom:1.25rem;">
-        <a href="{{ route('admin.cms.pages.create') }}" class="add-btn">+ Add Page</a>
+        <button type="button" class="add-btn" onclick="adminNavigate('{{ route('admin.cms.pages.create') }}')">+ Add Page</button>
     </div>
 
     @if($pages->isEmpty())
@@ -24,7 +24,7 @@
                         <td style="color:var(--muted);font-size:13px;">{{ $page->id }}</td>
                         <td>
                             <span style="color:var(--orange);font-weight:500;cursor:pointer;"
-                                  onclick="window.location='{{ route('admin.cms.pages.edit', $page) }}'">
+                                  onclick="adminNavigate('{{ route('admin.cms.pages.edit', $page) }}')">
                                 {{ $page->title }}
                             </span>
                         </td>
@@ -38,10 +38,10 @@
                         </td>
                         <td>
                             <div style="display:flex;gap:6px;align-items:center;">
-                                <a href="{{ route('pages.show', $page->slug) }}" target="_blank" class="act-btn">
+                                <button type="button" class="act-btn" onclick="previewCmsPage('{{ $page->slug }}')">
                                     👁 View
-                                </a>
-                                <a href="{{ route('admin.cms.pages.edit', $page) }}" class="act-btn">Edit</a>
+                                </button>
+                                <button type="button" class="act-btn" onclick="adminNavigate('{{ route('admin.cms.pages.edit', $page) }}')">Edit</button>
                                 <form method="POST" action="{{ route('admin.cms.pages.destroy', $page) }}"
                                       onsubmit="return confirm('Delete &quot;{{ $page->title }}&quot;?')">
                                     @csrf @method('DELETE')

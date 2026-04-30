@@ -7,7 +7,7 @@
                 <a href="{{ route('pages.show', $page->slug) }}" target="_blank" class="act-btn">👁 View Live</a>
             </div>
 
-            <form method="POST" action="{{ route('admin.cms.pages.update', $page) }}">
+            <form id="cms-edit-form" method="POST" action="{{ route('admin.cms.pages.update', $page) }}">
                 @csrf @method('PUT')
 
                 <div class="form-grid" style="margin-bottom:14px;">
@@ -68,10 +68,26 @@
 
                 <div style="display:flex;gap:8px;">
                     <button type="submit" class="add-btn">Save Changes</button>
-                    <a href="{{ route('admin.cms.pages.index') }}" class="topbar-ghost">Cancel</a>
+                    <button type="button" class="topbar-ghost" onclick="adminNavigate('{{ route('admin.cms.pages.index') }}')">Cancel</button>
                 </div>
             </form>
         </div>
     </div>
 
+
+<script>
+(function () {
+    var form = document.getElementById('cms-edit-form');
+    if (!form) return;
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        if (typeof submitForm === 'function') {
+            await submitForm(form, function () {
+                if (typeof adminNavigate === 'function') adminNavigate('{{ route('admin.cms.pages.index') }}');
+                else window.location.href = '{{ route('admin.cms.pages.index') }}';
+            });
+        }
+    });
+}());
+</script>
 </x-admin-layout>
