@@ -233,7 +233,14 @@
 
         clock = new THREE.Clock();
 
-        loadModel(container, modelPath);
+        if (modelPath) {
+            loadModel(container, modelPath);
+        } else {
+            var demo = document.createElement('div');
+            demo.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;color:#fff;font-family:DM Sans,sans-serif;text-align:center;padding:1.5rem;';
+            demo.innerHTML = '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" style="margin-bottom:1rem"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg><p style="font-size:0.95rem;font-weight:700;margin-bottom:0.4rem;opacity:0.9">No 3D model yet</p><p style="font-size:0.78rem;opacity:0.5;line-height:1.5">Generate one from the admin panel<br>to enable the full 3D viewer.</p>';
+            container.appendChild(demo);
+        }
 
         function animate() {
             animFrameId = requestAnimationFrame(animate);

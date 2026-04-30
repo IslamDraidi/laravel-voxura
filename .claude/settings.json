@@ -10,7 +10,24 @@
       "Bash(curl -s --max-time 10 \"https://trellis-community-trellis.hf.space/gradio_api/info\")",
       "Bash(python3 -c \" import json, sys data = json.load\\(sys.stdin\\) ep = data.get\\('named_endpoints', {}\\) for name, info in ep.items\\(\\): params = info.get\\('parameters', []\\) returns = info.get\\('returns', []\\) print\\(f'{name}: {len\\(params\\)} params, {len\\(returns\\)} returns'\\) \")",
       "Bash(curl -s --max-time 15 \"https://trellis-community-trellis.hf.space/config\")",
-      "Bash(python3 -c \" import json, sys data = json.load\\(sys.stdin\\) deps = data.get\\('dependencies', []\\) print\\(f'Total deps: {len\\(deps\\)}'\\) for i, d in enumerate\\(deps[:20]\\): api = d.get\\('api_name'\\) or d.get\\('id'\\) or '?' trig = d.get\\('trigger', '?'\\) print\\(f' [{i}] api_name={api} trigger={trig}'\\) \")"
+      "Bash(python3 -c \" import json, sys data = json.load\\(sys.stdin\\) deps = data.get\\('dependencies', []\\) print\\(f'Total deps: {len\\(deps\\)}'\\) for i, d in enumerate\\(deps[:20]\\): api = d.get\\('api_name'\\) or d.get\\('id'\\) or '?' trig = d.get\\('trigger', '?'\\) print\\(f' [{i}] api_name={api} trigger={trig}'\\) \")",
+      "Bash(sudo chgrp *)",
+      "Bash(sudo chmod *)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); s=d['openapi_schema']['components']['schemas']['Input']; [print\\(k, '->', v.get\\('type'\\), 'default=', v.get\\('default'\\)\\) for k,v in s['properties'].items\\(\\)]\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"http://localhost:8000/storage/models/15/model.glb\")",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); v=d.get\\('latest_version',{}\\); print\\('VERSION:', v.get\\('id'\\)\\); s=v.get\\('openapi_schema',{}\\).get\\('components',{}\\).get\\('schemas',{}\\).get\\('Input',{}\\); [print\\(k, '->', val.get\\('type'\\), 'default=', val.get\\('default'\\)\\) for k,val in s.get\\('properties',{}\\).items\\(\\)]\")",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); [print\\(m.get\\('owner','?'\\)+'/'+m.get\\('name','?'\\), '-', \\(m.get\\('description'\\) or ''\\)[:80]\\) for m in d.get\\('models',[]\\)[:25]]\")",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); [print\\(c.get\\('slug'\\)\\) for c in d.get\\('results',[]\\)]\")",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); [print\\(m.get\\('owner','?'\\)+'/'+m.get\\('name','?'\\), '|', \\(m.get\\('description'\\) or ''\\)[:90]\\) for m in d.get\\('models',[]\\)]\")",
+      "Bash(git commit -m ' *)",
+      "Bash(php -r ' *)",
+      "Bash(php -l /home/islamdriadi/voxura/public/js/viewer3d.js)",
+      "Bash(php -l app/Http/Controllers/AdminController.php)",
+      "Bash(php -l app/Http/Controllers/CategoryController.php)",
+      "Bash(php -l app/Http/Controllers/CouponController.php)",
+      "Bash(php -l app/Http/Controllers/CartController.php)",
+      "Bash(php -l app/Http/Controllers/LikeController.php)",
+      "Bash(php -l /home/islamdriadi/voxura/app/Http/Controllers/CmsPageController.php)"
     ]
   }
 }
