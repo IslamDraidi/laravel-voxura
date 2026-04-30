@@ -66,7 +66,7 @@
             </thead>
             <tbody>
                 @foreach($products as $product)
-                <tr>
+                <tr data-product-id="{{ $product->id }}">
                     <td>
                         <div style="display:flex;align-items:center;gap:10px;">
                             @if($product->image)
@@ -119,13 +119,9 @@
                     </td>
                     <td>
                         <div style="display:flex;gap:6px;">
-                            <a href="/product/{{ $product->slug }}" target="_blank" class="act-btn" style="text-decoration:none;">View</a>
-                            <a href="/admin/products/{{ $product->id }}/edit" class="act-btn" style="text-decoration:none;">Edit</a>
-                            <form method="POST" action="/admin/products/{{ $product->id }}" style="display:inline;"
-                                  onsubmit="return confirm('Delete \'{{ addslashes($product->name) }}\'?')">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="act-btn red">Delete</button>
-                            </form>
+                            <button type="button" class="act-btn" onclick="previewProduct({{ $product->id }})">View</button>
+                            <button type="button" class="act-btn" onclick="adminNavigate('/admin/products/{{ $product->id }}/edit')">Edit</button>
+                            <button type="button" class="act-btn red" onclick="deleteProduct({{ $product->id }}, '{{ addslashes($product->name) }}')">Delete</button>
                         </div>
                     </td>
                 </tr>
