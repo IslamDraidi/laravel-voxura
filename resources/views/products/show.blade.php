@@ -199,7 +199,8 @@
                         Generating 3D…
                     </button>
                 @else
-                    <button class="btn-3d-view" onclick="toggle3DViewer(true)" style="background:transparent;color:#1A1A1A;border:1.5px solid #d1d5db;" title="Demo preview — real 3D model coming soon">
+                    <button class="btn-3d-view" onclick="toggle3DViewer(true)"
+                            style="background:transparent;color:#6B6B6B;border:1.5px solid #E8E0D8;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
                         View in 3D (Demo)
                     </button>
@@ -353,11 +354,11 @@
             {{-- CTA Buttons ──--}}
             @unless(\App\Http\Middleware\AdminPreviewMode::isActive())
             <div class="cta-row">
-                <form method="POST" action="/cart/add" style="flex: 1;">
+                <form id="add-to-cart-form" method="POST" action="/cart/add" style="flex: 1;">
                     @csrf
                     <input type="hidden" name="product_id" value="{{ $product->id }}">
                     <input type="hidden" name="quantity" id="cartQty" value="1">
-                    <button type="submit" class="btn-buy" @if($product->stock === 0) disabled @endif>
+                    <button type="submit" id="add-to-cart-btn" class="btn-buy" @if($product->stock === 0) disabled @endif>
                         🛒 Add to Cart
                     </button>
                 </form>
@@ -585,9 +586,61 @@ function checkDelivery() {
     res.textContent = available ? '✓ Delivery available — Est. 3–5 days' : '✕ Not available in this area';
 }
 
+// AJAX: Add to Cart
+(function () {
+    var form = document.getElementById('add-to-cart-form');
+    var btn  = document.getElementById('add-to-cart-btn');
+    if (!form || !btn) return;
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        if (btn.disabled) return;
+        btn.disabled = true;
+        var fd = new FormData(form);
+        try {
+            var res  = await fetch('/cart/add', {
+                method: 'POST', body: fd,
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' }
+            });
+            var data = await res.json().catch(function () { return {}; });
+            if (res.ok && data.success) {
+                // Button feedback
+                var orig = btn.innerHTML;
+                btn.innerHTML = '✓ Added';
+                btn.style.background = '#16a34a';
+                // Update cart count badge
+                var badge = document.getElementById('nav-cart-badge');
+                if (badge && data.cartCount !== undefined) {
+                    badge.textContent = data.cartCount > 99 ? '99+' : data.cartCount;
+                    badge.style.display = data.cartCount > 0 ? '' : 'none';
+                }
+                setTimeout(function () {
+                    btn.innerHTML = orig;
+                    btn.style.background = '';
+                    btn.disabled = false;
+                }, 2000);
+            } else {
+                btn.disabled = false;
+                alert(data.message || (data.errors && Object.values(data.errors)[0]?.[0]) || 'Could not add to cart.');
+            }
+        } catch (e) {
+            btn.disabled = false;
+        }
+    });
+}());
+
 function toggleWishlist(id) {
-    fetch(`/likes/${id}/toggle`, { method: 'POST', headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content } })
-        .then(() => document.getElementById('wishlistBtn')?.classList.toggle('active'));
+    var csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+    fetch('/likes/' + id + '/toggle', { method: 'POST', headers: { 'X-CSRF-TOKEN': csrf, 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(function (r) { return r.json().catch(function () { return {}; }); })
+        .then(function (data) {
+            document.querySelectorAll('.btn-wishlist, .gallery-wishlist').forEach(function (el) {
+                if (data.liked !== undefined) {
+                    el.classList.toggle('active', data.liked);
+                } else {
+                    el.classList.toggle('active');
+                }
+            });
+        });
 }
 
 function copyLink() {
@@ -620,7 +673,7 @@ document.getElementById('qty')?.addEventListener('change', () => {
 });
 
 // 3D Viewer toggle
-const product3dModelPath = "{{ $product->is3DReady() && $product->model3d_path ? asset('storage/models/' . $product->id . '/' . $product->model3d_path) : asset('models/placeholder.glb') }}";
+const product3dModelPath = @json($product->is3DReady() && $product->model3d_path ? asset('storage/models/' . $product->id . '/' . $product->model3d_path) : null);
 const product3dIsDemo = {{ $product->is3DReady() ? 'false' : 'true' }};
 let viewerInitialized = false;
 
