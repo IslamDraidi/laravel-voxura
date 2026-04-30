@@ -26,7 +26,7 @@ class CouponController extends Controller
             'expires_at' => 'nullable|date|after:today',
         ]);
 
-        Coupon::create([
+        $coupon = Coupon::create([
             'code' => strtoupper($request->code),
             'type' => $request->type,
             'value' => $request->value,
@@ -36,22 +36,35 @@ class CouponController extends Controller
             'is_active' => true,
         ]);
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Coupon created successfully!', 'coupon' => $coupon]);
+        }
+
         return redirect()->route('admin.coupons.index')->with('success', 'Coupon created successfully!');
     }
 
-    public function toggleActive(Coupon $coupon)
+    public function toggleActive(Request $request, Coupon $coupon)
     {
         $coupon->update(['is_active' => ! $coupon->is_active]);
         $status = $coupon->is_active ? 'activated' : 'deactivated';
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => "Coupon \"{$coupon->code}\" {$status}.", 'is_active' => $coupon->is_active]);
+        }
+
         return back()->with('success', "Coupon \"{$coupon->code}\" {$status}.");
     }
 
-    public function destroy(Coupon $coupon)
+    public function destroy(Request $request, Coupon $coupon)
     {
+        $code = $coupon->code;
         $coupon->delete();
 
-        return back()->with('success', "Coupon \"{$coupon->code}\" deleted.");
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => "Coupon \"{$code}\" deleted."]);
+        }
+
+        return back()->with('success', "Coupon \"{$code}\" deleted.");
     }
 
     // ── Storefront: validate & apply coupon (AJAX/JSON) ──────────

@@ -61,7 +61,17 @@ class CartController extends Controller
         $item->increment('quantity', $qty);
 
         if ($request->boolean('buy_now')) {
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'redirect' => route('checkout')]);
+            }
+
             return redirect()->route('checkout')->with('success', 'Item added to your cart.');
+        }
+
+        if ($request->ajax()) {
+            $cartCount = auth()->user()->cartCount();
+
+            return response()->json(['success' => true, 'message' => "\"{$product->name}\" added to your cart!", 'cartCount' => $cartCount]);
         }
 
         return back()->with('success', "\"{$product->name}\" added to your cart!");

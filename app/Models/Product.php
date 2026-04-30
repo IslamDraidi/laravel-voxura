@@ -37,7 +37,7 @@ class Product extends Model
 
     public function is3DReady(): bool
     {
-        return $this->has_3d_model && $this->model3d_status === 'ready';
+        return $this->model3d_status === 'ready' && !empty($this->model3d_path);
     }
 
     public function is3DProcessing(): bool

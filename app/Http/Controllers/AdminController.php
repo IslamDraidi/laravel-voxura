@@ -150,6 +150,10 @@ class AdminController extends Controller
             $this->maybeDispatch3DGeneration($product);
         }
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Product created successfully!', 'redirect' => '/admin/products']);
+        }
+
         return redirect('/admin')->with('success', 'Product added successfully!');
     }
 
@@ -228,12 +232,20 @@ class AdminController extends Controller
 
         $redirectTo = $request->input('redirect_to') === 'archive' ? '/admin/archive' : '/admin';
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Product updated successfully!']);
+        }
+
         return redirect($redirectTo)->with('success', 'Product updated successfully!');
     }
 
-    public function destroy(Product $product)
+    public function destroy(Request $request, Product $product)
     {
         $product->delete();
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Product moved to archive.']);
+        }
 
         return redirect('/admin')->with('success', 'Product moved to archive.');
     }
@@ -304,6 +316,10 @@ class AdminController extends Controller
         ]);
 
         $order->update(['status' => $request->status]);
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => "Order #{$order->id} status updated.", 'status' => $request->status]);
+        }
 
         return back()->with('success', "Order #{$order->id} status updated to ".ucfirst($request->status).'.');
     }
@@ -376,19 +392,31 @@ class AdminController extends Controller
         return view('admin.customers.index', compact('admins', 'customers'));
     }
 
-    public function blockCustomer(User $user)
+    public function blockCustomer(Request $request, User $user)
     {
         if ($user->id === auth()->id()) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'You cannot block yourself.'], 422);
+            }
+
             return back()->with('error', 'You cannot block yourself.');
         }
         $user->update(['is_blocked' => true]);
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => "{$user->name} has been blocked."]);
+        }
+
         return back()->with('success', "{$user->name} has been blocked.");
     }
 
-    public function unblockCustomer(User $user)
+    public function unblockCustomer(Request $request, User $user)
     {
         $user->update(['is_blocked' => false]);
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => "{$user->name} has been unblocked."]);
+        }
 
         return back()->with('success', "{$user->name} has been unblocked.");
     }
@@ -574,6 +602,10 @@ class AdminController extends Controller
             'valid_to' => $request->valid_to,
         ]);
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Tax rate updated.']);
+        }
+
         return redirect('/admin/tax')->with('success', 'Tax rate updated.');
     }
 
@@ -663,6 +695,10 @@ class AdminController extends Controller
             'sort_order' => $request->sort_order ?? 0,
             'metadata' => $request->metadata ? json_decode($request->metadata, true) : null,
         ]);
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Shipping method updated.']);
+        }
 
         return redirect('/admin/shipping/methods')->with('success', 'Shipping method updated.');
     }

@@ -28,10 +28,20 @@ class CategoryController extends Controller
             'parent_id' => 'nullable|exists:categories,id',
         ]);
 
-        Category::create([
+        $category = Category::create([
             'name'      => $request->name,
             'parent_id' => $request->parent_id ?: null,
         ]);
+
+        if ($request->ajax()) {
+            $category->loadCount('products');
+
+            return response()->json([
+                'success'  => true,
+                'message'  => "Category \"{$request->name}\" created!",
+                'category' => $category,
+            ]);
+        }
 
         return redirect('/admin/categories')->with('success', "Category \"{$request->name}\" created!");
     }
@@ -53,20 +63,37 @@ class CategoryController extends Controller
             'parent_id' => $parentId,
         ]);
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Category updated!', 'name' => $request->name]);
+        }
+
         return redirect('/admin/categories')->with('success', 'Category updated!');
     }
 
-    public function destroy(Category $category)
+    public function destroy(Request $request, Category $category)
     {
         if ($category->products()->count() > 0) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => "Cannot delete \"{$category->name}\" — it has products assigned to it."], 422);
+            }
+
             return redirect('/admin/categories')->with('error', "Cannot delete \"{$category->name}\" — it has products assigned to it.");
         }
 
         if ($category->children()->count() > 0) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => "Cannot delete \"{$category->name}\" — it has subcategories."], 422);
+            }
+
             return redirect('/admin/categories')->with('error', "Cannot delete \"{$category->name}\" — it has subcategories. Delete or reassign them first.");
         }
 
         $category->delete();
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => "Category \"{$category->name}\" deleted."]);
+        }
+
         return redirect('/admin/categories')->with('success', "Category \"{$category->name}\" deleted.");
     }
 }

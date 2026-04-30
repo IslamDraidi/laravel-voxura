@@ -42,6 +42,10 @@ class CmsPageController extends Controller
             'sort_order' => $request->sort_order ?? 0,
         ]);
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Page created successfully.']);
+        }
+
         return redirect()->route('admin.cms.pages.index')->with('success', 'Page created successfully.');
     }
 
@@ -71,6 +75,10 @@ class CmsPageController extends Controller
             'meta_description' => $request->meta_description,
             'sort_order' => $request->sort_order ?? 0,
         ]);
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => '"'.$page->title.'" updated successfully.']);
+        }
 
         return redirect()->route('admin.cms.pages.index')->with('success', '"'.$page->title.'" updated successfully.');
     }
