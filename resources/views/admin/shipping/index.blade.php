@@ -50,7 +50,7 @@
                     </td>
                     <td>
                         <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
-                            <a href="/admin/shipping/methods/{{ $method->id }}/edit" class="act-btn">Edit</a>
+                            <button type="button" class="act-btn" onclick="adminNavigate('/admin/shipping/methods/{{ $method->id }}/edit')">Edit</button>
                             <form method="POST" action="/admin/shipping/methods/{{ $method->id }}/toggle" style="display:inline;">
                                 @csrf
                                 <button type="submit" class="act-btn {{ $method->is_active ? 'green' : '' }}">
