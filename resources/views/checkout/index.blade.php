@@ -231,6 +231,20 @@
 
         {{-- ── Form ── --}}
         <div class="checkout-card">
+            @guest
+            <div style="background:#fff7ed;border:1.5px solid #fed7aa;border-radius:0.5rem;padding:1rem 1.25rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:0.75rem;">
+                <span style="font-size:1.25rem;">👤</span>
+                <div>
+                    <p style="font-weight:700;font-size:0.9rem;color:#9a3412;margin-bottom:0.2rem;">Checking out as guest</p>
+                    <p style="font-size:0.82rem;color:#c2410c;">
+                        <a href="/login" style="color:#ea580c;font-weight:600;text-decoration:underline;">Sign in</a> or
+                        <a href="{{ route('register') }}" style="color:#ea580c;font-weight:600;text-decoration:underline;">create an account</a>
+                        to track your orders. Your order confirmation will be sent to the email below.
+                    </p>
+                </div>
+            </div>
+            @endguest
+
             <form method="POST" action="/checkout">
                 @csrf
 
@@ -242,7 +256,7 @@
                         <label class="form-label">Full Name</label>
                         <input type="text" name="full_name" class="form-input"
                                placeholder="John Doe"
-                               value="{{ old('full_name', auth()->user()->name) }}" required>
+                               value="{{ old('full_name', auth()->user()?->name) }}" required>
                         @error('full_name')<p class="form-error">{{ $message }}</p>@enderror
                     </div>
 
@@ -250,7 +264,7 @@
                         <label class="form-label">Email</label>
                         <input type="email" name="email" class="form-input"
                                placeholder="john@example.com"
-                               value="{{ old('email', auth()->user()->email) }}" required>
+                               value="{{ old('email', auth()->user()?->email) }}" required>
                         @error('email')<p class="form-error">{{ $message }}</p>@enderror
                     </div>
 
