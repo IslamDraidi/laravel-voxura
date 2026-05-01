@@ -38,7 +38,7 @@
                         </td>
                         <td>
                             <div style="display:flex;gap:6px;align-items:center;">
-                                <button type="button" class="act-btn" onclick="previewCmsPage('{{ $page->slug }}')">
+                                <button type="button" class="act-btn" onclick="previewCmsPage({{ $page->id }})">
                                     👁 View
                                 </button>
                                 <button type="button" class="act-btn" onclick="adminNavigate('{{ route('admin.cms.pages.edit', $page) }}')">Edit</button>
