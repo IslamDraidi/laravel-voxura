@@ -4,7 +4,7 @@
         <div class="card">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
                 <p class="section-title" style="margin-bottom:0;">Edit: {{ $page->title }}</p>
-                <a href="{{ route('pages.show', $page->slug) }}" target="_blank" class="act-btn">👁 View Live</a>
+                <a href="{{ route('admin.cms.pages.preview', $page) }}" target="_blank" class="act-btn">👁 View Live</a>
             </div>
 
             <form id="cms-edit-form" method="POST" action="{{ route('admin.cms.pages.update', $page) }}">
