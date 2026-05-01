@@ -97,4 +97,10 @@ class CmsPageController extends Controller
 
         return view('pages.show', compact('page'));
     }
+
+    // Admin preview — no status filter
+    public function preview(CmsPage $page)
+    {
+        return view('pages.show', compact('page'));
+    }
 }
