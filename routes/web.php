@@ -42,21 +42,32 @@ Route::get('/logout', Logout::class)->middleware('auth');
 Route::view('/login', 'auth.login')->middleware('guest')->name('login');
 Route::post('/login', [Login::class, 'store'])->middleware('guest');
 
-Route::middleware('auth')->group(function () {
-    // Cart
-    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-    Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
-    Route::patch('/cart/items/{item}', [CartController::class, 'update'])->name('cart.update');
-    Route::delete('/cart/items/{item}', [CartController::class, 'remove'])->name('cart.remove');
-    Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+// Cart & Checkout — accessible to both guests and authenticated users
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+Route::patch('/cart/items/{item}', [CartController::class, 'update'])->name('cart.update');
+Route::delete('/cart/items/{item}', [CartController::class, 'remove'])->name('cart.remove');
+Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 
+Route::get('/checkout', [OrderController::class, 'checkout'])->name('checkout');
+Route::post('/checkout', [OrderController::class, 'place'])->name('checkout.place');
+Route::post('/checkout/calculate', [OrderController::class, 'calculateTotals'])->name('checkout.calculate');
+Route::post('/coupon/apply', [CouponController::class, 'apply'])->name('coupon.apply');
+
+// Payment flow — guest-accessible (order lookup by ID, authorization handled in controller)
+Route::get('/payment/{order}', [PaymentController::class, 'showMethods'])->name('payment.methods');
+Route::post('/payment/{order}', [PaymentController::class, 'processPayment'])->name('payment.process');
+Route::get('/payment/{order}/callback', [PaymentController::class, 'callback'])->name('payment.callback');
+Route::get('/payment/{order}/cancel', [PaymentController::class, 'cancel'])->name('payment.cancel');
+Route::get('/payment/{order}/retry', [PaymentController::class, 'retry'])->name('payment.retry')->middleware('throttle:10,1');
+Route::get('/payment/{order}/failed', [PaymentController::class, 'failed'])->name('payment.failed');
+
+Route::middleware('auth')->group(function () {
     // Wishlist
     Route::get('/wishlist', [LikeController::class, 'index'])->name('wishlist.index');
     Route::post('/likes/{product}/toggle', [LikeController::class, 'toggle'])->name('likes.toggle');
 
-    // Checkout & Orders
-    Route::get('/checkout', [OrderController::class, 'checkout'])->name('checkout');
-    Route::post('/checkout', [OrderController::class, 'place'])->name('checkout.place');
+    // Orders (auth-only history)
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 
@@ -74,20 +85,6 @@ Route::middleware('auth')->group(function () {
     // Reviews
     Route::post('/products/{product}/reviews', [FeedbackController::class, 'store'])->name('reviews.store');
     Route::delete('/reviews/{feedback}', [FeedbackController::class, 'destroy'])->name('reviews.destroy');
-
-    // Coupon apply (AJAX)
-    Route::post('/coupon/apply', [CouponController::class, 'apply'])->name('coupon.apply');
-
-    // Checkout AJAX — calculate totals on shipping method change
-    Route::post('/checkout/calculate', [OrderController::class, 'calculateTotals'])->name('checkout.calculate');
-
-    // Payment flow
-    Route::get('/payment/{order}', [PaymentController::class, 'showMethods'])->name('payment.methods');
-    Route::post('/payment/{order}', [PaymentController::class, 'processPayment'])->name('payment.process');
-    Route::get('/payment/{order}/callback', [PaymentController::class, 'callback'])->name('payment.callback');
-    Route::get('/payment/{order}/cancel', [PaymentController::class, 'cancel'])->name('payment.cancel');
-    Route::get('/payment/{order}/retry', [PaymentController::class, 'retry'])->name('payment.retry')->middleware('throttle:10,1');
-    Route::get('/payment/{order}/failed', [PaymentController::class, 'failed'])->name('payment.failed');
 });
 
 // Payment gateway webhooks (no auth, CSRF exempted in bootstrap/app.php)
