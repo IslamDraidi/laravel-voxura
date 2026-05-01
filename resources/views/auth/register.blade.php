@@ -15,40 +15,13 @@
 
         /* ── Override layout body for register page only ── */
         body {
-            background: linear-gradient(135deg, #fff7ed 0%, #ffffff 50%, #f9fafb 100%) !important;
+            background: #ffffff !important;
             display: flex !important;
             flex-direction: column !important;
             min-height: 100vh !important;
             font-family: 'DM Sans', sans-serif;
             padding: 0 !important;
         }
-
-        /* Animated blobs */
-        body::before,
-        body::after {
-            content: '';
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.35;
-            pointer-events: none;
-            z-index: 0;
-        }
-        body::before {
-            width: 520px; height: 520px;
-            background: radial-gradient(circle, #fdba74, #fb923c);
-            top: -160px; left: -160px;
-            animation: blob1 8s ease-in-out infinite alternate;
-        }
-        body::after {
-            width: 400px; height: 400px;
-            background: radial-gradient(circle, #fed7aa, #fbbf24);
-            bottom: -120px; right: -120px;
-            animation: blob2 10s ease-in-out infinite alternate;
-        }
-
-        @keyframes blob1 { to { transform: translate(40px, 30px) scale(1.08); } }
-        @keyframes blob2 { to { transform: translate(-30px, -20px) scale(1.05); } }
 
         /* ── Wrapper ── */
         .register-wrapper {
