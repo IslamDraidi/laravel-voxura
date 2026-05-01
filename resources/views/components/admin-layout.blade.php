@@ -836,8 +836,8 @@
     };
 
     // ── CMS PAGE PREVIEW ──
-    window.previewCmsPage = function (slug) {
-        document.getElementById('preview-iframe').src = '/pages/' + slug;
+    window.previewCmsPage = function (id) {
+        document.getElementById('preview-iframe').src = '/admin/cms/pages/' + id + '/preview';
         document.getElementById('preview-modal').style.display = 'flex';
     };
 
