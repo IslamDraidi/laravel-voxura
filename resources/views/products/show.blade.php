@@ -208,6 +208,191 @@
                 <style>@keyframes m3dStoreSpin { to { transform: rotate(360deg); } }</style>
             </div>
 
+            {{-- Virtual Try-On --}}
+            @if($m3dReady || true)
+                @auth
+                    <button id="tryon-btn" type="button" onclick="openTryOnModal()"
+                            style="background:var(--orange,#E8621A);color:#fff;border:none;border-radius:12px;padding:12px 20px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;width:100%;justify-content:center;margin-top:10px">
+                        <span style="font-size:18px">👗</span>
+                        Virtual Try-On
+                        <span style="font-size:11px;font-weight:400;opacity:.8">— See how it fits on you</span>
+                    </button>
+                @else
+                    <a href="{{ route('login') }}"
+                       style="background:transparent;color:#6B6B6B;border:1.5px solid #E8E0D8;border-radius:12px;padding:12px 20px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;width:100%;justify-content:center;margin-top:10px;text-decoration:none">
+                        🔒 Login to virtually try this on
+                    </a>
+                @endauth
+            @endif
+
+            @auth
+            @if($m3dReady || true)
+            {{-- Try-On Modal --}}
+            <div id="tryon-modal-overlay"
+                 style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(26,26,26,0.6);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px">
+                <div id="tryon-modal"
+                     style="background:#fff;border-radius:24px;border:1px solid #E8E0D8;width:100%;max-width:560px;max-height:92vh;overflow:auto;box-shadow:0 20px 60px rgba(232,98,26,0.2)">
+
+                    {{-- HEADER --}}
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid #F2EDE6">
+                        <div>
+                            <div id="tryon-modal-title" style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#1A1A1A">Virtual Try-On</div>
+                            <div id="tryon-modal-subtitle" style="font-size:13px;color:#6B6B6B;margin-top:2px">See how {{ $product->name }} fits on you</div>
+                        </div>
+                        <button type="button" onclick="closeTryOnModal()" aria-label="Close"
+                                style="background:none;border:none;font-size:28px;line-height:1;color:#6B6B6B;cursor:pointer">&times;</button>
+                    </div>
+
+                    {{-- STEP INDICATOR --}}
+                    <div style="display:flex;gap:8px;padding:14px 24px;background:#FBF7F1;font-size:12px;color:#6B6B6B">
+                        <span id="tryon-pill-1" style="padding:4px 10px;border-radius:999px;background:#fff;border:1px solid #E8E0D8;font-weight:600">1. Upload</span>
+                        <span id="tryon-pill-2" style="padding:4px 10px;border-radius:999px;background:#fff;border:1px solid #E8E0D8">2. Process</span>
+                        <span id="tryon-pill-3" style="padding:4px 10px;border-radius:999px;background:#fff;border:1px solid #E8E0D8">3. Result</span>
+                    </div>
+
+                    {{-- STATE 1: UPLOAD --}}
+                    <div id="tryon-upload-state" style="padding:24px">
+                        <label for="tryon-photo"
+                               id="tryon-drop-zone"
+                               style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:28px;border:2px dashed #E8621A;border-radius:16px;background:#FFF8F2;cursor:pointer;text-align:center">
+                            <div style="font-size:42px">🧍</div>
+                            <div style="font-weight:700;color:#1A1A1A">Upload a full-body photo</div>
+                            <div style="font-size:12px;color:#6B6B6B">Stand straight, facing camera, plain background preferred</div>
+                            <div style="font-size:11px;color:#9A9A9A">JPG or PNG · Max 10MB</div>
+                            <input id="tryon-photo" name="photo" type="file" accept="image/jpeg,image/png" hidden>
+                        </label>
+
+                        <img id="tryon-photo-preview" alt="Preview"
+                             style="display:none;margin-top:12px;width:100%;max-height:240px;object-fit:contain;border-radius:12px;border:1px solid #E8E0D8;background:#1A1A1A">
+
+                        <div style="margin-top:18px">
+                            <label for="tryon-height" style="display:block;font-size:13px;font-weight:600;color:#1A1A1A;margin-bottom:6px">
+                                Your height <span style="color:#9A9A9A;font-weight:400">(optional — improves accuracy)</span>
+                            </label>
+                            <div style="display:flex;align-items:center;gap:8px">
+                                <input id="tryon-height" name="height_cm" type="number" min="100" max="250" placeholder="e.g. 175"
+                                       style="flex:1;padding:10px 12px;border:1px solid #E8E0D8;border-radius:10px;font-size:14px">
+                                <span style="color:#6B6B6B;font-size:13px">cm</span>
+                            </div>
+                        </div>
+
+                        <div style="margin-top:18px;display:flex;flex-direction:column;gap:10px">
+                            <label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:#1A1A1A;cursor:pointer">
+                                <input id="tryon-save-body" type="checkbox" checked style="margin-top:3px">
+                                <span>Save my body model for future try-ons <span style="color:#9A9A9A">(faster next time)</span></span>
+                            </label>
+                            <label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:#1A1A1A;cursor:pointer">
+                                <input id="tryon-consent-photo" type="checkbox" style="margin-top:3px">
+                                <span>Keep my photo on file <span style="color:#9A9A9A">(otherwise deleted after 24h)</span></span>
+                            </label>
+                            <div style="font-size:11px;color:#9A9A9A;line-height:1.5">
+                                Your photo is processed securely and never shared with other users.
+                            </div>
+                        </div>
+
+                        <button id="tryon-submit-btn" type="button" onclick="submitTryOn()"
+                                style="margin-top:20px;width:100%;background:var(--orange,#E8621A);color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer">
+                            Generate My Try-On
+                        </button>
+                    </div>
+
+                    {{-- STATE 2: PROCESSING --}}
+                    <div id="tryon-processing-state" style="display:none;padding:24px">
+                        <div style="display:flex;justify-content:center;margin-bottom:18px">
+                            <div id="tryon-blob" aria-hidden="true"
+                                 style="width:120px;height:120px;border-radius:50%;background:radial-gradient(circle at 30% 30%, #F5A673, #E8621A 70%);box-shadow:0 0 60px rgba(232,98,26,0.4);animation:tryonBlobPulse 2.4s ease-in-out infinite"></div>
+                        </div>
+
+                        <div style="text-align:center;font-weight:700;color:#1A1A1A;margin-bottom:14px">Creating your virtual fitting…</div>
+
+                        <ol style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;font-size:13px">
+                            <li id="tryon-step-1" data-status="active"
+                                style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#FBF7F1;border-radius:10px">
+                                <span class="tryon-step-dot"></span><span>Uploading photo</span>
+                            </li>
+                            <li id="tryon-step-2" data-status="pending"
+                                style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#FBF7F1;border-radius:10px">
+                                <span class="tryon-step-dot"></span><span>Analyzing body shape with SAM 3D</span>
+                            </li>
+                            <li id="tryon-step-3" data-status="pending"
+                                style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#FBF7F1;border-radius:10px">
+                                <span class="tryon-step-dot"></span><span>Fitting {{ $product->name }} to your body</span>
+                            </li>
+                            <li id="tryon-step-4" data-status="pending"
+                                style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#FBF7F1;border-radius:10px">
+                                <span class="tryon-step-dot"></span><span>Finalizing your try-on</span>
+                            </li>
+                        </ol>
+
+                        <div style="margin-top:18px">
+                            <div style="display:flex;justify-content:space-between;font-size:12px;color:#6B6B6B;margin-bottom:6px">
+                                <span id="tryon-est">Starting…</span>
+                                <span id="tryon-pct">0%</span>
+                            </div>
+                            <div style="height:8px;background:#F2EDE6;border-radius:999px;overflow:hidden">
+                                <div id="tryon-bar" style="height:100%;width:0;background:linear-gradient(90deg,#ea580c,#F5A673);transition:width .6s ease"></div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top:18px;font-size:12px;color:#6B6B6B;text-align:center;line-height:1.5">
+                            This takes 1–3 minutes. You can close this window — we'll email you when it's ready.
+                        </div>
+
+                        <button type="button" onclick="closeTryOnModal()"
+                                style="margin-top:14px;width:100%;background:transparent;color:#6B6B6B;border:1.5px solid #E8E0D8;border-radius:12px;padding:12px;font-size:14px;font-weight:600;cursor:pointer">
+                            Continue Shopping
+                        </button>
+                    </div>
+
+                    {{-- STATE 3: RESULT --}}
+                    <div id="tryon-result-state" style="display:none;padding:20px 24px 24px">
+                        <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#1A1A1A;margin-bottom:12px">Your Try-On is Ready! 🎉</div>
+
+                        <div id="tryon-viewer"
+                             style="height:350px;background:#1A1A1A;border-radius:14px;position:relative;overflow:hidden"></div>
+
+                        <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+                            <button type="button" onclick="closeTryOnModal()"
+                                    style="flex:1;min-width:140px;background:var(--orange,#E8621A);color:#fff;border:none;border-radius:10px;padding:12px;font-weight:700;cursor:pointer">
+                                Close
+                            </button>
+                            <button type="button" onclick="resetTryOnToUpload()"
+                                    style="flex:1;min-width:140px;background:transparent;color:#1A1A1A;border:1.5px solid #E8E0D8;border-radius:10px;padding:12px;font-weight:600;cursor:pointer">
+                                Try Again
+                            </button>
+                            <button type="button" onclick="deleteCurrentTryOn()"
+                                    style="flex:1;min-width:140px;background:transparent;color:#B91C1C;border:1.5px solid #FECACA;border-radius:10px;padding:12px;font-weight:600;cursor:pointer">
+                                Delete Try-On
+                            </button>
+                        </div>
+
+                        <div style="margin-top:12px;font-size:11px;color:#9A9A9A;text-align:center">
+                            3D fitting is approximate. Actual fit may vary slightly.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <style>
+                #tryon-modal-overlay.is-open { display:flex !important; }
+                @keyframes tryonBlobPulse {
+                    0%, 100% { transform: scale(1); filter: blur(0); }
+                    50%      { transform: scale(1.06); filter: blur(1px); }
+                }
+                @keyframes tryonStepBlink { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+                .tryon-step-dot {
+                    width:10px;height:10px;border-radius:50%;background:#E8E0D8;flex-shrink:0;
+                }
+                #tryon-upload-state #tryon-step-1 .tryon-step-dot,
+                #tryon-processing-state [data-status="done"] .tryon-step-dot { background:#16A34A; }
+                #tryon-processing-state [data-status="active"] .tryon-step-dot {
+                    background:#E8621A; animation: tryonStepBlink 1s ease-in-out infinite;
+                }
+                #tryon-processing-state [data-status="active"] { background:#FFF8F2 !important; }
+            </style>
+            @endif
+            @endauth
+
             {{-- 3D Viewer Container --}}
             <div id="viewer-3d">
                 <button class="btn-close-3d" onclick="toggle3DViewer(false)">&times; Close</button>
@@ -713,4 +898,249 @@ function toggle3DViewer(show) {
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="{{ asset('js/viewer3d.js') }}?v={{ filemtime(public_path('js/viewer3d.js')) }}"></script>
+
+@auth
+@if($product->is3DReady() || true)
+<script>
+(function () {
+    const TRYON_PRODUCT_ID = {{ $product->id }};
+    const USER_ID          = {{ auth()->id() }};
+    const STORAGE_KEY      = `tryon_${TRYON_PRODUCT_ID}_${USER_ID}`;
+    const csrfToken        = document.querySelector('meta[name="csrf-token"]').content;
+
+    let pollTimer   = null;
+    let currentTryonId = null;
+    let viewerInited = false;
+    let estTimer = null;
+    let estStart = 0;
+
+    const $ = id => document.getElementById(id);
+
+    function showState(state) {
+        ['tryon-upload-state', 'tryon-processing-state', 'tryon-result-state']
+            .forEach(s => { const el = $(s); if (el) el.style.display = (s === state) ? 'block' : 'none'; });
+    }
+
+    window.openTryOnModal = function () {
+        $('tryon-modal-overlay').classList.add('is-open');
+        document.body.style.overflow = 'hidden';
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+            currentTryonId = parseInt(saved, 10);
+            checkStatus(true);
+        } else {
+            showState('tryon-upload-state');
+        }
+    };
+
+    window.closeTryOnModal = function () {
+        $('tryon-modal-overlay').classList.remove('is-open');
+        document.body.style.overflow = '';
+        if (pollTimer) { clearTimeout(pollTimer); pollTimer = null; }
+        if (estTimer)  { clearInterval(estTimer); estTimer = null; }
+    };
+
+    // Photo preview
+    const photoInput = $('tryon-photo');
+    const preview    = $('tryon-photo-preview');
+    if (photoInput) {
+        photoInput.addEventListener('change', e => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = ev => {
+                if (preview) {
+                    preview.src = ev.target.result;
+                    preview.style.display = 'block';
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    window.submitTryOn = async function () {
+        const photo = photoInput.files[0];
+        if (!photo) {
+            window.showToast('Please choose a full-body photo first.', 'error');
+            return;
+        }
+
+        const fd = new FormData();
+        fd.append('photo', photo);
+        const h = $('tryon-height')?.value;
+        if (h) fd.append('height_cm', h);
+        fd.append('photo_consent', $('tryon-consent-photo')?.checked ? '1' : '0');
+        fd.append('save_body',     $('tryon-save-body')?.checked     ? '1' : '0');
+
+        const btn = $('tryon-submit-btn');
+        if (btn) { btn.disabled = true; btn.textContent = 'Submitting…'; }
+
+        try {
+            const res = await fetch(`/products/${TRYON_PRODUCT_ID}/tryon`, {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
+                body: fd,
+            });
+            const data = await res.json();
+            if (!res.ok || !data.success) {
+                window.showToast(data.message || 'Could not start the try-on.', 'error');
+                if (btn) { btn.disabled = false; btn.textContent = 'Generate Try-On'; }
+                return;
+            }
+            currentTryonId = data.tryon_id;
+            localStorage.setItem(STORAGE_KEY, String(currentTryonId));
+            startProcessing();
+        } catch (err) {
+            window.showToast('Network error. Please try again.', 'error');
+            if (btn) { btn.disabled = false; btn.textContent = 'Generate Try-On'; }
+        }
+    };
+
+    function startProcessing() {
+        showState('tryon-processing-state');
+        setStep(1, 'done');
+        setStep(2, 'active');
+        setStep(3, 'pending');
+        setStep(4, 'pending');
+        startEst();
+        pollNow();
+    }
+
+    function setStep(n, status) {
+        const li = $(`tryon-step-${n}`);
+        if (li) li.dataset.status = status;
+    }
+
+    function startEst() {
+        estStart = Date.now();
+        const total = 90;
+        if (estTimer) clearInterval(estTimer);
+        estTimer = setInterval(() => {
+            const elapsed = (Date.now() - estStart) / 1000;
+            const pct = Math.min(95, Math.round((elapsed / total) * 100));
+            const bar = $('tryon-bar'); if (bar) bar.style.width = pct + '%';
+            const pctEl = $('tryon-pct'); if (pctEl) pctEl.textContent = pct + '%';
+            const remaining = Math.max(0, Math.round(total - elapsed));
+            const est = $('tryon-est'); if (est) est.textContent = `≈ ${remaining}s remaining`;
+        }, 500);
+    }
+
+    function pollNow() {
+        if (pollTimer) clearTimeout(pollTimer);
+        checkStatus(false);
+    }
+
+    async function checkStatus(reopen) {
+        if (!currentTryonId) { showState('tryon-upload-state'); return; }
+        try {
+            const res = await fetch(`/tryon/${currentTryonId}/status`, {
+                headers: { 'Accept': 'application/json' },
+            });
+            if (res.status === 403 || res.status === 404) {
+                localStorage.removeItem(STORAGE_KEY);
+                currentTryonId = null;
+                showState('tryon-upload-state');
+                return;
+            }
+            const data = await res.json();
+            handleStatus(data, reopen);
+        } catch (e) {
+            pollTimer = setTimeout(pollNow, 5000);
+        }
+    }
+
+    function handleStatus(data, reopen) {
+        if (data.status === 'pending' || data.status === 'processing_body') {
+            if (reopen) showState('tryon-processing-state');
+            if (!estTimer) startEst();
+            setStep(1, 'done');
+            setStep(2, 'active');
+            setStep(3, 'pending');
+            setStep(4, 'pending');
+            pollTimer = setTimeout(pollNow, 5000);
+        } else if (data.status === 'processing_fit') {
+            if (reopen) showState('tryon-processing-state');
+            if (!estTimer) startEst();
+            setStep(1, 'done');
+            setStep(2, 'done');
+            setStep(3, 'active');
+            setStep(4, 'pending');
+            pollTimer = setTimeout(pollNow, 5000);
+        } else if (data.status === 'ready') {
+            if (estTimer) { clearInterval(estTimer); estTimer = null; }
+            setStep(1, 'done'); setStep(2, 'done'); setStep(3, 'done'); setStep(4, 'done');
+            const bar = $('tryon-bar'); if (bar) bar.style.width = '100%';
+            const pctEl = $('tryon-pct'); if (pctEl) pctEl.textContent = '100%';
+            loadResult(data.result_url);
+        } else if (data.status === 'failed') {
+            if (estTimer) { clearInterval(estTimer); estTimer = null; }
+            window.showToast(data.error_message || 'Try-on failed. Please try again.', 'error');
+            localStorage.removeItem(STORAGE_KEY);
+            currentTryonId = null;
+            const btn = $('tryon-submit-btn');
+            if (btn) { btn.disabled = false; btn.textContent = 'Generate Try-On'; }
+            showState('tryon-upload-state');
+        }
+    }
+
+    function loadResult(resultUrl) {
+        showState('tryon-result-state');
+        if (resultUrl && typeof window.initViewer3D === 'function' && !viewerInited) {
+            window.initViewer3D('tryon-viewer', resultUrl);
+            viewerInited = true;
+        }
+    }
+
+    window.resetTryOnToUpload = function () {
+        if (pollTimer) { clearTimeout(pollTimer); pollTimer = null; }
+        if (estTimer)  { clearInterval(estTimer); estTimer = null; }
+        if (viewerInited && typeof window.disposeViewer3D === 'function') {
+            window.disposeViewer3D();
+            viewerInited = false;
+        }
+        currentTryonId = null;
+        localStorage.removeItem(STORAGE_KEY);
+        if (photoInput) photoInput.value = '';
+        if (preview) { preview.src = ''; preview.style.display = 'none'; }
+        const btn = $('tryon-submit-btn');
+        if (btn) { btn.disabled = false; btn.textContent = 'Generate Try-On'; }
+        showState('tryon-upload-state');
+    };
+
+    window.deleteCurrentTryOn = async function () {
+        if (!currentTryonId) { window.resetTryOnToUpload(); return; }
+        if (!confirm('Delete this try-on? This cannot be undone.')) return;
+        try {
+            const res = await fetch(`/tryon/${currentTryonId}`, {
+                method: 'DELETE',
+                headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
+            });
+            if (res.ok) {
+                window.showToast('Try-on deleted.', 'success');
+                window.resetTryOnToUpload();
+            } else {
+                window.showToast('Could not delete try-on.', 'error');
+            }
+        } catch (e) {
+            window.showToast('Network error.', 'error');
+        }
+    };
+
+    // Resume on page load if a try-on is in progress
+    document.addEventListener('DOMContentLoaded', () => {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+            currentTryonId = parseInt(saved, 10);
+            fetch(`/tryon/${currentTryonId}/status`, { headers: { 'Accept': 'application/json' } })
+                .then(r => r.ok ? r.json() : null)
+                .then(d => {
+                    if (!d) { localStorage.removeItem(STORAGE_KEY); return; }
+                    if (d.status === 'ready' || d.status === 'failed') return;
+                });
+        }
+    });
+})();
+</script>
+@endif
+@endauth
 </x-layout>

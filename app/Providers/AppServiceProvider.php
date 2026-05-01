@@ -3,12 +3,22 @@
 namespace App\Providers;
 
 use App\Models\Category;
+use App\Services\AI\Contracts\TryOnBodyProvider;
+use App\Services\AI\Sam3DBodyFalService;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    public function register(): void {}
+    public function register(): void
+    {
+        $this->app->bind(TryOnBodyProvider::class, function () {
+            return match (config('model3d.tryon.body_provider', 'fal')) {
+                'fal'   => new Sam3DBodyFalService(),
+                default => new Sam3DBodyFalService(),
+            };
+        });
+    }
 
     public function boot(): void
     {

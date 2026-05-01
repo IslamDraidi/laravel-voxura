@@ -17,6 +17,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TryOnController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -63,6 +64,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile/info', [ProfileController::class, 'updateInfo'])->name('profile.info');
     Route::patch('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+
+    // Virtual Try-On
+    Route::post('/products/{product}/tryon', [TryOnController::class, 'initiate'])->name('tryon.initiate');
+    Route::get('/tryon/{tryon}/status',      [TryOnController::class, 'status'])->name('tryon.status');
+    Route::delete('/tryon/{tryon}',          [TryOnController::class, 'delete'])->name('tryon.delete');
+    Route::get('/profile/tryons',            [TryOnController::class, 'history'])->name('tryon.history');
 
     // Reviews
     Route::post('/products/{product}/reviews', [FeedbackController::class, 'store'])->name('reviews.store');

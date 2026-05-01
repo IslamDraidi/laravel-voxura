@@ -206,6 +206,23 @@
         </div>
     </div>
 
+    {{-- ── Try-Ons ── --}}
+    <div class="profile-card">
+        <div class="profile-card-header">
+            <span>👗</span>
+            <p class="profile-card-title">My Virtual Try-Ons</p>
+        </div>
+        <div class="profile-card-body">
+            <p style="color:#6B6B6B;font-size:0.92rem;margin-bottom:1rem;line-height:1.5;">
+                Browse your past virtual try-ons, view them in 3D, or remove ones you no longer want.
+            </p>
+            <a href="{{ route('tryon.history') }}" class="btn-save"
+               style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;width:auto;">
+                View My Try-Ons →
+            </a>
+        </div>
+    </div>
+
     {{-- ── Danger Zone ── --}}
     <div class="danger-zone">
         <div class="danger-zone-info">

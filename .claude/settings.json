@@ -27,7 +27,12 @@
       "Bash(php -l app/Http/Controllers/CouponController.php)",
       "Bash(php -l app/Http/Controllers/CartController.php)",
       "Bash(php -l app/Http/Controllers/LikeController.php)",
-      "Bash(php -l /home/islamdriadi/voxura/app/Http/Controllers/CmsPageController.php)"
+      "Bash(php -l /home/islamdriadi/voxura/app/Http/Controllers/CmsPageController.php)",
+      "Bash(grep -n \"^<script\\\\|^</script>\\\\|<script>\\\\s*$\\\\|</script>\\\\s*$\\\\|@push\\\\|@endpush\\\\|toggle3DViewer\\\\|initViewer3D\" /home/islamdriadi/voxura/resources/views/products/show.blade.php)",
+      "Bash(php -l bootstrap/app.php)",
+      "Bash(php -l app/Console/Commands/CleanExpiredTryOns.php)",
+      "Bash(xargs -0 -n 20 php -l)",
+      "Bash(php -r \"require '/home/islamdriadi/voxura/vendor/autoload.php';\")"
     ]
   }
 }

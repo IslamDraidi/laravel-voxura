@@ -25,4 +25,22 @@ return [
 
     // fishwowater/trellis2 (newer TRELLIS, 4096 textures)
     'trellis2_version'  => env('REPLICATE_TRELLIS2_VERSION', '52e1ad6852599ea10ce8e257635a3c11485cba51c181ea5173e34d9b2955b226'),
+
+    // ── Virtual Try-On ──────────────────────────────────────────
+    'tryon' => [
+        'enabled'           => env('TRYON_ENABLED', true),
+        'body_provider'     => env('TRYON_BODY_PROVIDER', 'fal'),
+        'fal_key'           => env('FAL_KEY'),
+        'fal_endpoint'      => env('FAL_SAM3D_ENDPOINT', 'fal-ai/sam-3/3d-body'),
+        'max_photo_size_mb' => 10,
+        'photo_storage'     => 'tryons',
+        'body_storage'      => 'bodies',
+        'result_storage'    => 'tryon_results',
+        'temp_expiry_hours' => 24,
+        'python_path'       => env('PYTHON_PATH', 'python3'),
+        'python_script'     => base_path('scripts/fit_garment.py'),
+        'fit_timeout'       => (int) env('TRYON_FIT_TIMEOUT', 90),
+        'max_retries'       => (int) env('TRYON_MAX_RETRIES', 3),
+        'request_timeout'   => (int) env('TRYON_REQUEST_TIMEOUT', 300),
+    ],
 ];

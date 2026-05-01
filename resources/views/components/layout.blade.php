@@ -726,6 +726,24 @@
             iconMenu.style.display  = menu.classList.contains('open') ? 'none'  : 'block';
             iconClose.style.display = menu.classList.contains('open') ? 'block' : 'none';
         }
+
+        // ── Global toast helper ──
+        window.showToast = function(message, type = 'info') {
+            const wrap = document.createElement('div');
+            wrap.className = 'toast-wrap';
+            const colors = {
+                success: { color: '#ea580c', border: 'rgba(234,88,12,0.3)' },
+                error:   { color: '#ef4444', border: 'rgba(239,68,68,0.3)' },
+                info:    { color: '#ea580c', border: 'rgba(234,88,12,0.3)' },
+            };
+            const c = colors[type] || colors.info;
+            const icon = type === 'error'
+                ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>'
+                : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+            wrap.innerHTML = `<div class="toast-alert" style="color:${c.color};border-color:${c.border};">${icon}${message}</div>`;
+            document.body.appendChild(wrap);
+            setTimeout(() => wrap.remove(), 4000);
+        };
     </script>
 
 </body>
