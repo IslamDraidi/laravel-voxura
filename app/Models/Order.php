@@ -11,7 +11,18 @@ class Order extends Model
         'total_amount', 'discount_amount', 'tax_amount', 'shipping_cost',
         'tax_breakdown', 'shipping_tax_amount', 'subtotal', 'grand_total',
         'currency', 'channel', 'coupon_code', 'status', 'shipping_address',
+        'guest_email', 'guest_name',
     ];
+
+    public function recipientEmail(): ?string
+    {
+        return $this->guest_email ?? $this->user?->email;
+    }
+
+    public function recipientName(): string
+    {
+        return $this->guest_name ?? $this->user?->name ?? 'Customer';
+    }
 
     protected $casts = [
         'tax_breakdown' => 'array',
