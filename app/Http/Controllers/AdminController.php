@@ -317,11 +317,45 @@ class AdminController extends Controller
 
         $order->update(['status' => $request->status]);
 
+        $this->sendOrderStatusEmail($order, $request->status);
+
         if ($request->ajax()) {
             return response()->json(['success' => true, 'message' => "Order #{$order->id} status updated.", 'status' => $request->status]);
         }
 
         return back()->with('success', "Order #{$order->id} status updated to ".ucfirst($request->status).'.');
+    }
+
+    private function sendOrderStatusEmail(Order $order, string $status): void
+    {
+        $keyMap = [
+            'shipped'   => 'shipping_notification',
+            'cancelled' => 'order_cancelled',
+        ];
+
+        if (! isset($keyMap[$status])) {
+            return;
+        }
+
+        $template = \App\Models\EmailTemplate::where('key', $keyMap[$status])->first();
+        if (! $template) {
+            return;
+        }
+
+        $order->loadMissing('user');
+        $recipientEmail = $order->recipientEmail();
+        if (! $recipientEmail) {
+            return;
+        }
+
+        $vars = [
+            'order_id'      => $order->id,
+            'customer_name' => $order->recipientName(),
+            'order_total'   => number_format((float) $order->grand_total, 2),
+        ];
+
+        \Illuminate\Support\Facades\Mail::to($recipientEmail)
+            ->send(new \App\Mail\TemplateMail($template, $vars));
     }
 
     public function showOrder(Order $order)
