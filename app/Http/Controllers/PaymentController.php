@@ -16,7 +16,7 @@ class PaymentController extends Controller
     /** GET /payment/{order} — choose payment method */
     public function showMethods(Order $order)
     {
-        abort_unless($order->user_id === auth()->id(), 403);
+        $this->authorizeOrder($order);
         abort_unless(in_array($order->status, ['pending', 'payment_blocked']), 404);
 
         $order->load('items.product', 'shippingMethod');
@@ -39,7 +39,7 @@ class PaymentController extends Controller
     /** POST /payment/{order} — initiate payment with chosen gateway */
     public function processPayment(Request $request, Order $order)
     {
-        abort_unless($order->user_id === auth()->id(), 403);
+        $this->authorizeOrder($order);
         abort_unless($order->status === 'pending', 403);
 
         $request->validate([
@@ -141,7 +141,7 @@ class PaymentController extends Controller
     /** GET /payment/{order}/callback — gateway returns customer here */
     public function callback(Request $request, Order $order)
     {
-        abort_unless($order->user_id === auth()->id(), 403);
+        $this->authorizeOrder($order);
 
         $payment = $order->payments()->latest()->firstOrFail();
         $gateway = app('payment.gateway', ['gateway' => $payment->gateway]);
@@ -213,7 +213,7 @@ class PaymentController extends Controller
     /** GET /payment/{order}/cancel — customer cancelled at gateway */
     public function cancel(Order $order)
     {
-        abort_unless($order->user_id === auth()->id(), 403);
+        $this->authorizeOrder($order);
 
         return redirect()->route('payment.methods', $order)
             ->with('payment_error', 'Payment was cancelled. You can try again or choose a different method.');
@@ -222,7 +222,7 @@ class PaymentController extends Controller
     /** GET /payment/{order}/retry — retry a failed payment */
     public function retry(Order $order)
     {
-        abort_unless($order->user_id === auth()->id(), 403);
+        $this->authorizeOrder($order);
         abort_unless(in_array($order->status, ['pending', 'payment_blocked']), 404);
 
         $payment = $order->payments()->latest()->first();
@@ -248,7 +248,7 @@ class PaymentController extends Controller
     /** GET /payment/{order}/failed — show failure page */
     public function failed(Order $order)
     {
-        abort_unless($order->user_id === auth()->id(), 403);
+        $this->authorizeOrder($order);
 
         $order->load('items.product', 'shippingMethod');
         $payment = $order->payments()->latest()->first();
@@ -338,6 +338,16 @@ class PaymentController extends Controller
                 ]);
                 $payment->order->update(['status' => 'paid']);
             }
+        }
+    }
+
+    private function authorizeOrder(Order $order): void
+    {
+        if (auth()->check()) {
+            $this->authorizeOrder($order);
+        } else {
+            // Guest — allow access only if they placed this order in the same session
+            abort_unless(session('guest_order_id') === $order->id, 403);
         }
     }
 }
