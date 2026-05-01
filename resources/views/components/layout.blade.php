@@ -15,7 +15,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&family=Playfair+Display:ital,wght@0,700;0,800;1,900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -28,6 +28,7 @@
             --orange:       #ea580c;
             --orange-dark:  #c2410c;
             --orange-light: #fff7ed;
+            --orange-pale:  #fff7ed;
             --orange-muted: #fed7aa;
             --gray-50:      #f9fafb;
             --gray-100:     #f3f4f6;
@@ -45,7 +46,7 @@
         }
 
         body {
-            background: linear-gradient(135deg, var(--orange-light) 0%, var(--white) 50%, var(--gray-50) 100%);
+            background: #ffffff;
             color: var(--gray-900);
             font-family: 'DM Sans', sans-serif;
             font-weight: 400;
@@ -53,31 +54,6 @@
             display: flex;
             flex-direction: column;
         }
-
-        body::before, body::after {
-            content: '';
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(90px);
-            opacity: 0.28;
-            pointer-events: none;
-            z-index: 0;
-        }
-        body::before {
-            width: 560px; height: 560px;
-            background: radial-gradient(circle, #fdba74, #fb923c);
-            top: -180px; left: -180px;
-            animation: blob1 9s ease-in-out infinite alternate;
-        }
-        body::after {
-            width: 420px; height: 420px;
-            background: radial-gradient(circle, #fed7aa, #fbbf24);
-            bottom: -130px; right: -130px;
-            animation: blob2 11s ease-in-out infinite alternate;
-        }
-
-        @keyframes blob1 { to { transform: translate(45px, 35px) scale(1.07); } }
-        @keyframes blob2 { to { transform: translate(-35px, -25px) scale(1.06); } }
 
         /* ── NAV ── */
         nav {
