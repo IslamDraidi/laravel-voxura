@@ -417,9 +417,24 @@
             </div>
 
             <div class="nav-end">
+                @php
+                    $cartCount = auth()->check()
+                        ? auth()->user()->cartCount()
+                        : (new \App\Services\GuestCart())->itemCount();
+                @endphp
+
+                {{-- Cart — always visible --}}
+                <a href="/cart" class="nav-icon-btn" title="Cart">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
+                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                    <span class="nav-badge" id="nav-cart-badge" style="{{ $cartCount < 1 ? 'display:none' : '' }}">{{ $cartCount > 99 ? '99+' : $cartCount }}</span>
+                </a>
+
                 @auth
                     @php
-                        $cartCount     = auth()->user()->cartCount();
                         $wishlistCount = auth()->user()->wishlistCount();
                     @endphp
 
@@ -433,16 +448,6 @@
                         @if($wishlistCount > 0)
                             <span class="nav-badge">{{ $wishlistCount > 99 ? '99+' : $wishlistCount }}</span>
                         @endif
-                    </a>
-
-                    {{-- Cart --}}
-                    <a href="/cart" class="nav-icon-btn" title="Cart">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
-                             viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
-                        </svg>
-                        <span class="nav-badge" id="nav-cart-badge" style="{{ $cartCount < 1 ? 'display:none' : '' }}">{{ $cartCount > 99 ? '99+' : $cartCount }}</span>
                     </a>
 
                     {{-- Settings --}}
@@ -558,10 +563,14 @@
             <a href="/#products">Products</a>
             <a href="/#about">About</a>
             <a href="/#contact">Contact</a>
-            <a href="/wishlist">Wishlist @auth @if(auth()->user()->wishlistCount() > 0)({{ auth()->user()->wishlistCount() }})@endif @endauth</a>
-            <a href="/cart">Cart @auth @if(auth()->user()->cartCount() > 0)({{ auth()->user()->cartCount() }})@endif @endauth</a>
+            @auth
+            <a href="/wishlist">Wishlist @if(auth()->user()->wishlistCount() > 0)({{ auth()->user()->wishlistCount() }})@endif</a>
+            @endauth
+            <a href="/cart">Cart @if($cartCount > 0)({{ $cartCount }})@endif</a>
+            @auth
             <a href="/orders">My Orders</a>
             <a href="/profile">Settings</a>
+            @endauth
             @auth
                 <div style="border-top:1px solid #e5e7eb;margin-top:1rem;padding-top:1rem;">
                     <div style="font-size:0.85rem;font-weight:600;color:#111;margin-bottom:0.5rem;">
