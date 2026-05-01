@@ -32,7 +32,13 @@
       "Bash(php -l bootstrap/app.php)",
       "Bash(php -l app/Console/Commands/CleanExpiredTryOns.php)",
       "Bash(xargs -0 -n 20 php -l)",
-      "Bash(php -r \"require '/home/islamdriadi/voxura/vendor/autoload.php';\")"
+      "Bash(php -r \"require '/home/islamdriadi/voxura/vendor/autoload.php';\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://voxura.local/product/1)",
+      "Bash(grep -n '$cart\\\\|$item\\\\|item->' /home/islamdriadi/voxura/resources/views/cart/index.blade.php)",
+      "Bash(grep -n '$cart\\\\.' /home/islamdriadi/voxura/resources/views/cart/index.blade.php)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://voxura.local/checkout)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://voxura.local/)",
+      "Bash(curl -s http://voxura.local/cart)"
     ]
   }
 }
