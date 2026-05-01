@@ -206,6 +206,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/cms/pages/create', [CmsPageController::class, 'create'])->name('admin.cms.pages.create');
     Route::post('/cms/pages', [CmsPageController::class, 'store'])->name('admin.cms.pages.store');
     Route::get('/cms/pages/{page}/edit', [CmsPageController::class, 'edit'])->name('admin.cms.pages.edit');
+    Route::get('/cms/pages/{page}/preview', [CmsPageController::class, 'preview'])->name('admin.cms.pages.preview');
     Route::put('/cms/pages/{page}', [CmsPageController::class, 'update'])->name('admin.cms.pages.update');
     Route::delete('/cms/pages/{page}', [CmsPageController::class, 'destroy'])->name('admin.cms.pages.destroy');
 });
