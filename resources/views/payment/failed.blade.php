@@ -1,4 +1,4 @@
-<x-layout title="Payment Failed — Order #{{ $order->id }}">
+<x-layout title="{{ $blocked ? __('general.payment_blocked_title') : __('general.payment_failed_title') }} — {{ __('general.order_number', ['number' => $order->id]) }}">
 <style>
 .failed-page { padding-top: 100px; padding-bottom: 4rem; max-width: 640px; margin: 0 auto; }
 
@@ -82,57 +82,62 @@
 
         @if($blocked)
             <div class="failed-icon blocked-icon">🚫</div>
-            <h1 class="failed-title">Payment Blocked</h1>
+            <h1 class="failed-title">{{ __('general.payment_blocked_title') }}</h1>
             <p class="failed-message">
-                You've reached the maximum number of payment attempts ({{ $maxAttempts }}) for this order.
-                Our team has been notified and will reach out to help.
+                {{ __('general.payment_blocked_long', ['max' => $maxAttempts]) }}
             </p>
         @else
             <div class="failed-icon">✕</div>
-            <h1 class="failed-title">Payment Failed</h1>
+            <h1 class="failed-title">{{ __('general.payment_failed_title') }}</h1>
             <p class="failed-message">{{ $errorMessage }}</p>
         @endif
 
         @if($payment)
         <div class="failed-details">
             <div class="failed-details-row">
-                <span>Order</span>
+                <span>{{ __('general.order_label') }}</span>
                 <span>#{{ $order->id }}</span>
             </div>
             <div class="failed-details-row">
-                <span>Amount</span>
+                <span>{{ __('general.amount_label') }}</span>
                 <span>₪{{ number_format($order->grand_total, 2) }}</span>
             </div>
             <div class="failed-details-row">
-                <span>Gateway</span>
+                <span>{{ __('general.gateway_label') }}</span>
                 <span>{{ ucfirst($payment->gateway) }}</span>
             </div>
             @if($payment->last_attempted_at)
             <div class="failed-details-row">
-                <span>Last Attempt</span>
+                <span>{{ __('general.last_attempt_label') }}</span>
                 <span>{{ $payment->last_attempted_at->format('M d, Y · g:i A') }}</span>
             </div>
             @endif
         </div>
 
         <div class="attempt-indicator">
-            Attempt {{ $attempts }} of {{ $maxAttempts }}
+            {{ __('general.payment_attempt', ['n' => $attempts, 'max' => $maxAttempts]) }}
         </div>
         @endif
 
         <div class="failed-actions">
             @if(!$blocked)
                 <a href="{{ route('payment.retry', $order) }}" class="btn-retry">
-                    Try Again →
+                    {{ __('general.try_again') }}
                 </a>
                 <a href="{{ route('payment.methods', $order) }}" class="btn-secondary">
-                    Choose Different Method
+                    {{ __('general.choose_different_method') }}
                 </a>
             @endif
+            @auth
             <a href="{{ route('orders.index') }}" class="btn-secondary">
-                View My Orders
+                {{ __('general.view_my_orders') }}
             </a>
-            <a href="/pages/contact" class="support-link">Need help? Contact Support</a>
+            @else
+            <a href="{{ route('login') }}" class="btn-secondary">
+                {{ __('general.sign_in') }}
+            </a>
+            @endauth
+            <a href="/pages/contact" class="support-link">{{ __('general.need_help') }}</a>
         </div>
 
     </div>

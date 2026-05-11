@@ -1,4 +1,4 @@
-<x-layout title="Compare Products">
+<x-layout title="{{ __('general.compare_title') }}">
 <style>
 .cmp-page { padding-top: 100px; padding-bottom: 5rem; }
 
@@ -198,7 +198,7 @@
 <div class="cmp-page">
 
     <h1 class="cmp-heading">Com<span class="accent">pare</span></h1>
-    <p class="cmp-sub">Compare products side by side to find the perfect fit.</p>
+    <p class="cmp-sub">{{ __('general.compare_subtitle') }}</p>
 
     @if($products->isEmpty())
         <div class="cmp-empty">
@@ -209,24 +209,24 @@
                           d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                 </svg>
             </div>
-            <p class="cmp-empty-title">Nothing to compare yet</p>
-            <p class="cmp-empty-sub">Add products using the "Compare" button on any product card.</p>
+            <p class="cmp-empty-title">{{ __('general.compare_empty_title') }}</p>
+            <p class="cmp-empty-sub">{{ __('general.compare_empty_hint') }}</p>
             <a href="/#products" class="btn btn-primary" style="font-size:0.95rem;padding:0.7rem 2rem;">
-                Browse Products
+                {{ __('general.browse_products_plain') }}
             </a>
         </div>
     @else
         <div class="cmp-actions">
-            <span class="cmp-hint">{{ $products->count() }} of 4 products selected</span>
+            <span class="cmp-hint">{{ __('general.compare_count', ['count' => $products->count()]) }}</span>
             <form method="POST" action="/compare">
                 @csrf @method('DELETE')
                 <button type="submit" class="btn-cmp-clear"
-                        onclick="return confirm('Clear compare list?')">
-                    Clear all
+                        onclick="return confirm('{{ __('general.compare_clear_confirm') }}')">
+                    {{ __('general.compare_clear') }}
                 </button>
             </form>
             <a href="/#products" class="btn btn-primary" style="font-size:0.82rem;padding:0.45rem 1.15rem;">
-                + Add more
+                {{ __('general.compare_add_more') }}
             </a>
         </div>
 
@@ -252,7 +252,7 @@
                                              fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                                         </svg>
-                                        Remove
+                                        {{ __('general.remove') }}
                                     </button>
                                 </form>
                             </th>
@@ -263,7 +263,7 @@
                 <tbody>
                     {{-- Price ── --}}
                     <tr>
-                        <td>Price</td>
+                        <td>{{ __('general.price') }}</td>
                         @foreach($products as $product)
                             <td><span class="cmp-price">₪{{ number_format($product->price, 2) }}</span></td>
                         @endforeach
@@ -271,7 +271,7 @@
 
                     {{-- Category ── --}}
                     <tr>
-                        <td>Category</td>
+                        <td>{{ __('general.category') }}</td>
                         @foreach($products as $product)
                             <td style="font-size:0.88rem;color:var(--orange);font-weight:600;">
                                 {{ $product->category->name }}
@@ -281,7 +281,7 @@
 
                     {{-- Stock ── --}}
                     <tr>
-                        <td>Availability</td>
+                        <td>{{ __('general.availability') }}</td>
                         @foreach($products as $product)
                             <td>
                                 @if($product->stock > 0)
@@ -289,14 +289,14 @@
                                         <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
                                             <circle cx="12" cy="12" r="6"/>
                                         </svg>
-                                        In Stock
+                                        {{ __('general.in_stock') }}
                                     </span>
                                 @else
                                     <span class="cmp-badge out">
                                         <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
                                             <circle cx="12" cy="12" r="6"/>
                                         </svg>
-                                        Out of Stock
+                                        {{ __('general.out_of_stock') }}
                                     </span>
                                 @endif
                             </td>
@@ -305,21 +305,21 @@
 
                     {{-- Stock quantity ── --}}
                     <tr>
-                        <td>Stock</td>
+                        <td>{{ __('general.stock') }}</td>
                         @foreach($products as $product)
                             <td style="font-size:0.88rem;color:var(--gray-600);">
-                                {{ $product->stock }} units
+                                {{ __('general.stock_units', ['count' => $product->stock]) }}
                             </td>
                         @endforeach
                     </tr>
 
                     {{-- Variants ── --}}
                     <tr>
-                        <td>Variants</td>
+                        <td>{{ __('general.variants') }}</td>
                         @foreach($products as $product)
                             <td>
                                 @if($product->variants->isEmpty())
-                                    <span style="font-size:0.82rem;color:var(--gray-400);">None</span>
+                                    <span style="font-size:0.82rem;color:var(--gray-400);">{{ __('general.none') }}</span>
                                 @else
                                     @php $grouped = $product->variants->groupBy('type'); @endphp
                                     @foreach($grouped as $type => $variants)
@@ -337,7 +337,7 @@
 
                     {{-- Description ── --}}
                     <tr>
-                        <td>Description</td>
+                        <td>{{ __('general.description') }}</td>
                         @foreach($products as $product)
                             <td>
                                 <p class="cmp-desc">{{ Str::limit($product->description, 120) }}</p>
@@ -347,7 +347,7 @@
 
                     {{-- Add to cart ── --}}
                     <tr>
-                        <td>Action</td>
+                        <td>{{ __('general.action') }}</td>
                         @foreach($products as $product)
                             <td>
                                 @if($product->stock > 0)
@@ -360,11 +360,11 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round"
                                                       d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                                             </svg>
-                                            Add to Cart
+                                            {{ __('general.add_to_cart') }}
                                         </button>
                                     </form>
                                 @else
-                                    <button class="btn-cmp-cart" disabled>Out of Stock</button>
+                                    <button class="btn-cmp-cart" disabled>{{ __('general.out_of_stock') }}</button>
                                 @endif
                             </td>
                         @endforeach

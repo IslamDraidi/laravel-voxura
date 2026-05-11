@@ -1,4 +1,4 @@
-<x-layout title="My Orders">
+<x-layout title="{{ __('general.my_orders') }}">
 <style>
 .orders-page { padding-top: 100px; padding-bottom: 4rem; }
 
@@ -140,7 +140,7 @@
 
 <div class="orders-page">
 
-    <h1 class="orders-heading">My <span class="accent">Orders</span></h1>
+    <h1 class="orders-heading">{{ __('general.my_orders') }}</h1>
 
     @if($orders->isEmpty())
         <div class="orders-empty">
@@ -151,15 +151,15 @@
                           d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                 </svg>
             </div>
-            <p class="empty-title">No orders yet</p>
-            <p class="empty-sub">Once you place an order, it'll show up here.</p>
+            <p class="empty-title">{{ __('general.no_orders') }}</p>
+            <p class="empty-sub">{{ __('general.no_orders_hint') }}</p>
             <a href="/#products" class="btn btn-primary" style="font-size:0.95rem;padding:0.7rem 2rem;">
-                Start Shopping
+                {{ __('general.start_shopping') }}
             </a>
         </div>
 
     @else
-        <p class="orders-sub">{{ $orders->count() }} {{ Str::plural('order', $orders->count()) }} placed</p>
+        <p class="orders-sub">{{ __('general.orders_count', ['count' => $orders->count()]) }}</p>
 
         <div class="orders-list">
             @foreach($orders as $order)
@@ -167,7 +167,7 @@
 
                     <div class="order-card-header">
                         <div>
-                            <p class="order-id">Order <span>#{{ $order->id }}</span></p>
+                            <p class="order-id">{{ __('general.order_number', ['number' => $order->id]) }}</p>
                             <p class="order-date">{{ $order->created_at->format('M d, Y · g:i A') }}</p>
                         </div>
                         <span class="status-badge"
@@ -199,9 +199,14 @@
                             <p class="order-total">₪{{ number_format($order->total_amount) }}</p>
                         </div>
 
-                        <a href="/orders/{{ $order->id }}" class="btn-view-order">
-                            View Details →
-                        </a>
+                        <div style="display:flex;gap:0.5rem;flex-shrink:0;">
+                            <a href="/orders/{{ $order->id }}/track" class="btn-view-order" style="border-color:var(--gray-300);color:var(--gray-600);">
+                                {{ __('general.track_order') }}
+                            </a>
+                            <a href="/orders/{{ $order->id }}" class="btn-view-order">
+                                {{ __('general.view_details') }}
+                            </a>
+                        </div>
 
                     </div>
                 </div>

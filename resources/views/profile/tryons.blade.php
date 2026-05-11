@@ -1,4 +1,4 @@
-<x-layout title="My Try-Ons">
+<x-layout title="{{ __('general.my_tryons_title') }}">
 
 <style>
 .tryons-page { max-width: 1100px; margin: 4rem auto; padding: 2rem 1.5rem; }
@@ -145,15 +145,15 @@
 </style>
 
 <div class="tryons-page">
-    <h1 class="tryons-heading">My Virtual <span class="accent">Try-Ons</span></h1>
-    <p class="tryons-sub">View, manage, and revisit your past virtual fittings.</p>
+    <h1 class="tryons-heading">{{ __('general.my_tryons_title') }}</h1>
+    <p class="tryons-sub">{{ __('general.my_tryons_subtitle') }}</p>
 
     @if($tryons->isEmpty())
         <div class="tryons-empty">
             <div class="tryons-empty-icon">👗</div>
-            <div class="tryons-empty-title">No try-ons yet</div>
-            <p class="tryons-empty-sub">Browse our products to virtually try one on.</p>
-            <a href="/#products" class="tryons-empty-btn">Browse Products →</a>
+            <div class="tryons-empty-title">{{ __('general.no_tryons') }}</div>
+            <p class="tryons-empty-sub">{{ __('general.no_tryons_hint') }}</p>
+            <a href="/#products" class="tryons-empty-btn">{{ __('general.browse_products') }}</a>
         </div>
     @else
         <div class="tryons-grid" id="tryons-grid">
@@ -168,16 +168,16 @@
                         default                => 'pending',
                     };
                     $statusLabels = [
-                        'ready'      => 'Ready',
-                        'failed'     => 'Failed',
-                        'processing' => 'Processing',
-                        'pending'    => 'Queued',
+                        'ready'      => __('general.tryon_status_ready'),
+                        'failed'     => __('general.tryon_status_failed'),
+                        'processing' => __('general.tryon_status_processing'),
+                        'pending'    => __('general.tryon_status_queued'),
                     ];
                 @endphp
                 <div class="tryon-card" id="tryon-card-{{ $tryon->id }}">
                     <a href="{{ $product ? route('products.show', $product->slug) : '#' }}" class="tryon-thumb">
                         @if($thumb)
-                            <img src="{{ $thumb }}" alt="{{ $product?->name }}">
+                            <img src="{{ $thumb }}" alt="{{ $product?->name ?? __('general.tryon_your_result') }}">
                         @else
                             <span style="font-size:2.5rem;">👗</span>
                         @endif
@@ -202,17 +202,17 @@
                                 <button type="button"
                                         class="tryon-btn tryon-btn--view"
                                         onclick="openHistoryViewer({{ $tryon->id }}, '{{ $tryon->getResultUrl() }}')">
-                                    View 3D
+                                    {{ __('general.tryon_view_3d') }}
                                 </button>
                             @else
                                 <button type="button" class="tryon-btn tryon-btn--view" disabled>
-                                    @if($tryon->isProcessing()) Processing… @else Unavailable @endif
+                                    @if($tryon->isProcessing()) {{ __('general.tryon_processing_msg') }} @else {{ __('general.tryon_unavailable') }} @endif
                                 </button>
                             @endif
                             <button type="button"
                                     class="tryon-btn tryon-btn--delete"
                                     onclick="deleteHistoryTryon({{ $tryon->id }})">
-                                Delete
+                                {{ __('general.tryon_delete') }}
                             </button>
                         </div>
                     </div>
@@ -230,7 +230,7 @@
 <div id="tryon-history-overlay" onclick="if (event.target === this) closeHistoryViewer()">
     <div id="tryon-history-modal">
         <div class="tryon-history-header">
-            <span class="tryon-history-header-title">Your Try-On</span>
+            <span class="tryon-history-header-title">{{ __('general.tryon_your_result') }}</span>
             <button type="button" class="tryon-history-close" onclick="closeHistoryViewer()">&times;</button>
         </div>
         <div id="tryon-history-viewer"></div>

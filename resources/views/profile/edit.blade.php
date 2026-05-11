@@ -1,4 +1,4 @@
-<x-layout title="Settings">
+<x-layout title="{{ __('general.settings') }}">
 <style>
 .profile-page { padding-top: 100px; padding-bottom: 4rem; max-width: 680px; margin: 0 auto; }
 
@@ -127,8 +127,8 @@
 
 <div class="profile-page">
 
-    <h1 class="profile-heading">Account <span class="accent">Settings</span></h1>
-    <p class="profile-sub">Manage your profile information and password.</p>
+    <h1 class="profile-heading">{{ __('general.account_settings') }}</h1>
+    <p class="profile-sub">{{ __('general.account_settings_subtitle') }}</p>
 
     {{-- Avatar --}}
     <div class="profile-avatar-wrap">
@@ -145,27 +145,27 @@
     <div class="profile-card">
         <div class="profile-card-header">
             <span>👤</span>
-            <p class="profile-card-title">Personal Information</p>
+            <p class="profile-card-title">{{ __('general.personal_info') }}</p>
         </div>
         <div class="profile-card-body">
             <form method="POST" action="/profile/info">
                 @csrf @method('PATCH')
 
                 <div class="form-group">
-                    <label class="form-label">Full Name</label>
+                    <label class="form-label">{{ __('general.full_name') }}</label>
                     <input type="text" name="name" class="form-input"
                            value="{{ old('name', auth()->user()->name) }}" required>
                     @error('name')<p class="form-error">{{ $message }}</p>@enderror
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Email Address</label>
+                    <label class="form-label">{{ __('general.email_address') }}</label>
                     <input type="email" name="email" class="form-input"
                            value="{{ old('email', auth()->user()->email) }}" required>
                     @error('email')<p class="form-error">{{ $message }}</p>@enderror
                 </div>
 
-                <button type="submit" class="btn-save">Save Changes</button>
+                <button type="submit" class="btn-save">{{ __('general.save_changes') }}</button>
             </form>
         </div>
     </div>
@@ -174,34 +174,34 @@
     <div class="profile-card">
         <div class="profile-card-header">
             <span>🔒</span>
-            <p class="profile-card-title">Change Password</p>
+            <p class="profile-card-title">{{ __('general.change_password') }}</p>
         </div>
         <div class="profile-card-body">
             <form method="POST" action="/profile/password">
                 @csrf @method('PATCH')
 
                 <div class="form-group">
-                    <label class="form-label">Current Password</label>
+                    <label class="form-label">{{ __('general.current_password') }}</label>
                     <input type="password" name="current_password" class="form-input"
-                           placeholder="Enter current password" required>
+                           placeholder="{{ __('general.current_pass_placeholder') }}" required>
                     @error('current_password')<p class="form-error">{{ $message }}</p>@enderror
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">New Password</label>
+                    <label class="form-label">{{ __('general.new_password') }}</label>
                     <input type="password" name="password" class="form-input"
-                           placeholder="At least 8 characters" required>
+                           placeholder="{{ __('general.new_pass_placeholder') }}" required>
                     @error('password')<p class="form-error">{{ $message }}</p>@enderror
-                    <p class="form-hint">Minimum 8 characters.</p>
+                    <p class="form-hint">{{ __('general.password_hint') }}</p>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Confirm New Password</label>
+                    <label class="form-label">{{ __('general.confirm_password') }}</label>
                     <input type="password" name="password_confirmation" class="form-input"
-                           placeholder="Repeat new password" required>
+                           placeholder="{{ __('general.confirm_pass_placeholder') }}" required>
                 </div>
 
-                <button type="submit" class="btn-save">Update Password</button>
+                <button type="submit" class="btn-save">{{ __('general.update_password') }}</button>
             </form>
         </div>
     </div>
@@ -210,28 +210,71 @@
     <div class="profile-card">
         <div class="profile-card-header">
             <span>👗</span>
-            <p class="profile-card-title">My Virtual Try-Ons</p>
+            <p class="profile-card-title">{{ __('general.my_virtual_tryons') }}</p>
         </div>
         <div class="profile-card-body">
             <p style="color:#6B6B6B;font-size:0.92rem;margin-bottom:1rem;line-height:1.5;">
-                Browse your past virtual try-ons, view them in 3D, or remove ones you no longer want.
+                {{ __('general.tryons_card_desc') }}
             </p>
             <a href="{{ route('tryon.history') }}" class="btn-save"
                style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;width:auto;">
-                View My Try-Ons →
+                {{ __('general.view_my_tryons') }}
             </a>
+        </div>
+    </div>
+
+    {{-- ── Language Preference ── --}}
+    <div class="profile-card">
+        <div class="profile-card-header">
+            <span>🌐</span>
+            <p class="profile-card-title">{{ __('general.language_preference') }}</p>
+        </div>
+        <div class="profile-card-body">
+            <p style="font-size:0.88rem;color:var(--gray-400);margin-bottom:1.25rem;line-height:1.5;">
+                {{ __('general.language_desc') }}
+            </p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                <form method="POST" action="{{ route('language.switch') }}">
+                    @csrf
+                    <input type="hidden" name="locale" value="en">
+                    <button type="submit" style="
+                        padding:10px 24px;border-radius:10px;
+                        font-size:14px;font-weight:600;cursor:pointer;
+                        border:1.5px solid {{ app()->getLocale() === 'en' ? 'var(--orange)' : 'var(--gray-200)' }};
+                        background:{{ app()->getLocale() === 'en' ? 'var(--orange-light)' : '#fff' }};
+                        color:{{ app()->getLocale() === 'en' ? 'var(--orange)' : 'var(--gray-500)' }};
+                        font-family:'DM Sans',sans-serif;
+                        transition:all 0.15s;">
+                        🇬🇧 English
+                    </button>
+                </form>
+                <form method="POST" action="{{ route('language.switch') }}">
+                    @csrf
+                    <input type="hidden" name="locale" value="ar">
+                    <button type="submit" style="
+                        padding:10px 24px;border-radius:10px;
+                        font-size:14px;font-weight:600;cursor:pointer;
+                        border:1.5px solid {{ app()->getLocale() === 'ar' ? 'var(--orange)' : 'var(--gray-200)' }};
+                        background:{{ app()->getLocale() === 'ar' ? 'var(--orange-light)' : '#fff' }};
+                        color:{{ app()->getLocale() === 'ar' ? 'var(--orange)' : 'var(--gray-500)' }};
+                        font-family:'Tajawal','DM Sans',sans-serif;
+                        transition:all 0.15s;">
+                        🇸🇦 العربية
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 
     {{-- ── Danger Zone ── --}}
     <div class="danger-zone">
         <div class="danger-zone-info">
-            <p>Sign out of your account</p>
-            <p>You'll need to sign in again to access your account.</p>
+            <p>{{ __('general.signout_title') }}</p>
+            <p>{{ __('general.signout_desc') }}</p>
         </div>
         <form method="POST" action="/logout">
             @csrf
-            <button type="submit" class="btn-danger">Sign Out</button>
+            <button type="submit" class="btn-danger">{{ __('general.sign_out') }}</button>
         </form>
     </div>
 

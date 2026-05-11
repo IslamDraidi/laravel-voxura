@@ -1,4 +1,4 @@
-<x-layout title="Your Wishlist">
+<x-layout title="{{ __('general.wishlist_title') }}">
 
 <style>
 /* ── Wishlist Page ── */
@@ -221,7 +221,7 @@
 
 <div class="wishlist-page">
 
-    <h1 class="wishlist-heading">Your <span class="accent">Wishlist</span></h1>
+    <h1 class="wishlist-heading">{{ __('general.wishlist_title') }}</h1>
 
     @if($likedProducts->isEmpty())
         {{-- ── Empty State ── --}}
@@ -233,16 +233,16 @@
                           d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z"/>
                 </svg>
             </div>
-            <p class="empty-title">Your wishlist is empty</p>
-            <p class="empty-sub">Hit the ♡ on any product to save it here.</p>
+            <p class="empty-title">{{ __('general.wishlist_empty') }}</p>
+            <p class="empty-sub">{{ __('general.wishlist_empty_hint') }}</p>
             <a href="/#products" class="btn btn-primary" style="font-size:0.95rem;padding:0.7rem 2rem;">
-                Browse Products
+                {{ __('general.browse_products_plain') }}
             </a>
         </div>
 
     @else
         <p class="wishlist-subheading">
-            {{ $likedProducts->count() }} {{ Str::plural('item', $likedProducts->count()) }} saved
+            {{ __('general.wishlist_items_saved', ['count' => $likedProducts->count()]) }}
         </p>
 
         <div class="wishlist-grid">
@@ -260,7 +260,7 @@
                         {{-- Remove from wishlist --}}
                         <form method="POST" action="/likes/{{ $product->id }}/toggle">
                             @csrf
-                            <button class="wish-unlike-btn" type="submit" title="Remove from wishlist">
+                            <button class="wish-unlike-btn" type="submit" title="{{ __('general.remove_from_wishlist') }}">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
                                      fill="currentColor">
                                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
@@ -281,7 +281,7 @@
                                         <circle cx="19" cy="21" r="1"/>
                                         <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
                                     </svg>
-                                    Add to Cart
+                                    {{ __('general.add_to_cart') }}
                                 </button>
                             </form>
                         </div>
@@ -295,7 +295,7 @@
                         </h3>
                         <div class="wish-card-footer">
                             <span class="wish-card-price">₪{{ number_format($product->price) }}</span>
-                            <a href="/product/{{ $product->id }}" class="wish-card-learn">View →</a>
+                            <a href="/product/{{ $product->id }}" class="wish-card-learn">{{ __('general.view_product') }}</a>
                         </div>
                     </div>
 

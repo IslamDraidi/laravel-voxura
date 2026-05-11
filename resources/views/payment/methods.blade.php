@@ -1,4 +1,4 @@
-<x-layout title="Payment — Order #{{ $order->id }}">
+<x-layout title="{{ __('general.payment_choose_method') }} — {{ __('general.order_number', ['number' => $order->id]) }}">
 <style>
 .payment-page { padding-top: 100px; padding-bottom: 4rem; }
 
@@ -131,16 +131,16 @@
 <div class="payment-page">
 
     <div class="payment-page-header">
-        <h1 class="payment-page-title">Choose <span>Payment Method</span></h1>
+        <h1 class="payment-page-title">{{ __('general.payment_choose_method') }}</h1>
     </div>
 
     @if($blocked)
         <div class="payment-alert blocked">
             <span class="payment-alert-icon">🚫</span>
             <div>
-                <strong>Payment blocked</strong><br>
-                Maximum payment attempts ({{ $maxAttempts }}) reached for this order.
-                Please <a href="/pages/contact" style="color:#991b1b;font-weight:700;">contact support</a> for assistance.
+                <strong>{{ __('general.payment_blocked') }}</strong><br>
+                {{ __('general.payment_blocked_msg', ['max' => $maxAttempts]) }}
+                Please <a href="/pages/contact" style="color:#991b1b;font-weight:700;">{{ __('general.contact_support') }}</a> for assistance.
             </div>
         </div>
     @else
@@ -155,21 +155,21 @@
         @if($attempts > 0 && !session('payment_error'))
             <div class="payment-alert warning">
                 <span class="payment-alert-icon">⚠️</span>
-                <div>Your previous payment attempt was unsuccessful. Please try again or choose a different method.</div>
+                <div>{{ __('general.payment_failed_prev') }}</div>
             </div>
         @endif
 
         @if($attempts > 0)
-            <span class="attempt-badge">Attempt {{ $attempts + 1 }} of {{ $maxAttempts }}</span>
+            <span class="attempt-badge">{{ __('general.payment_attempt', ['n' => $attempts + 1, 'max' => $maxAttempts]) }}</span>
         @endif
 
     @if(empty($enabledGateways))
         <div class="payment-alert warning">
             <span class="payment-alert-icon">⚠️</span>
             <div>
-                <strong>No payment methods available</strong><br>
+                <strong>{{ __('general.no_payment_methods') }}</strong><br>
                 We're currently updating our payment options. Please try again later or
-                <a href="/pages/contact" style="color:#92400e;font-weight:700;">contact support</a>.
+                <a href="/pages/contact" style="color:#92400e;font-weight:700;">{{ __('general.contact_support') }}</a>.
             </div>
         </div>
     @else
@@ -192,7 +192,7 @@
                         </svg>
                         <div class="gateway-info">
                             <p class="gateway-name">PayPal</p>
-                            <p class="gateway-desc">Pay securely with your PayPal account or card</p>
+                            <p class="gateway-desc">{{ __('general.paypal_desc') }}</p>
                         </div>
                     </div>
                     @endif
@@ -203,8 +203,8 @@
                         <div class="gateway-icon" style="display:flex;align-items:center;justify-content:center;background:#2dd36f;border-radius:6px;color:#fff;font-weight:800;font-size:0.75rem;letter-spacing:0.02em;">TAP</div>
                         <div class="gateway-info">
                             <p class="gateway-name">Tap Payments</p>
-                            <p class="gateway-desc">Credit / debit card via Tap Payments</p>
-                            <p style="font-size:0.72rem;color:var(--gray-400);margin-top:0.3rem;">Accepts Visa, Mastercard, and local payment methods</p>
+                            <p class="gateway-desc">{{ __('general.tap_desc') }}</p>
+                            <p style="font-size:0.72rem;color:var(--gray-400);margin-top:0.3rem;">{{ __('general.tap_cards') }}</p>
                         </div>
                     </div>
                     @endif
@@ -218,7 +218,7 @@
 
         {{-- Right: order summary --}}
         <div class="payment-sidebar">
-            <p class="sidebar-title">Order #{{ $order->id }}</p>
+            <p class="sidebar-title">{{ __('general.order_number', ['number' => $order->id]) }}</p>
 
             @foreach($order->items as $item)
                 @if($item->product)
@@ -232,27 +232,27 @@
 
             <div style="margin-top:1rem; padding-top:0.75rem; border-top:1.5px solid var(--gray-100);">
                 <div class="sidebar-row">
-                    <span>Subtotal</span>
+                    <span>{{ __('general.subtotal') }}</span>
                     <span>₪{{ number_format($order->subtotal ?: $order->total_amount, 2) }}</span>
                 </div>
                 @if($order->discount_amount > 0)
                 <div class="sidebar-row">
-                    <span style="color:#16a34a;font-weight:600;">Discount</span>
+                    <span style="color:#16a34a;font-weight:600;">{{ __('general.discount') }}</span>
                     <span style="color:#16a34a;font-weight:700;">−₪{{ number_format($order->discount_amount, 2) }}</span>
                 </div>
                 @endif
                 <div class="sidebar-row">
-                    <span>Shipping</span>
-                    <span>{{ (float)$order->shipping_cost == 0 ? 'Free' : '₪'.number_format($order->shipping_cost, 2) }}</span>
+                    <span>{{ __('general.shipping') }}</span>
+                    <span>{{ (float)$order->shipping_cost == 0 ? __('general.free') : '₪'.number_format($order->shipping_cost, 2) }}</span>
                 </div>
                 @if($order->tax_amount > 0 || $order->shipping_tax_amount > 0)
                 <div class="sidebar-row">
-                    <span>Tax</span>
+                    <span>{{ __('general.tax') }}</span>
                     <span>₪{{ number_format($order->tax_amount + $order->shipping_tax_amount, 2) }}</span>
                 </div>
                 @endif
                 <div class="sidebar-row total">
-                    <span>Total</span>
+                    <span>{{ __('general.total') }}</span>
                     <span>₪{{ number_format($order->grand_total ?: $order->grandTotal(), 2) }}</span>
                 </div>
             </div>

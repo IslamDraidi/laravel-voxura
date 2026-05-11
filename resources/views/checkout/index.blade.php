@@ -1,4 +1,4 @@
-<x-layout title="Checkout">
+<x-layout title="{{ __('general.checkout_title') }}">
 <style>
 .checkout-page { padding-top: 100px; padding-bottom: 4rem; }
 
@@ -224,8 +224,8 @@
 
 <div class="checkout-page">
 
-    <h1 class="checkout-heading">Check<span class="accent">out</span></h1>
-    <p class="checkout-sub">Almost there — fill in your details to place your order.</p>
+    <h1 class="checkout-heading">{{ __('general.checkout_title') }}</h1>
+    <p class="checkout-sub">{{ __('general.checkout_subtitle') }}</p>
 
     <div class="checkout-layout">
 
@@ -235,10 +235,10 @@
             <div style="background:#fff7ed;border:1.5px solid #fed7aa;border-radius:0.5rem;padding:1rem 1.25rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:0.75rem;">
                 <span style="font-size:1.25rem;">👤</span>
                 <div>
-                    <p style="font-weight:700;font-size:0.9rem;color:#9a3412;margin-bottom:0.2rem;">Checking out as guest</p>
+                    <p style="font-weight:700;font-size:0.9rem;color:#9a3412;margin-bottom:0.2rem;">{{ __('general.checkout_as_guest') }}</p>
                     <p style="font-size:0.82rem;color:#c2410c;">
-                        <a href="/login" style="color:#ea580c;font-weight:600;text-decoration:underline;">Sign in</a> or
-                        <a href="{{ route('register') }}" style="color:#ea580c;font-weight:600;text-decoration:underline;">create an account</a>
+                        <a href="/login" style="color:#ea580c;font-weight:600;text-decoration:underline;">{{ __('general.checkout_sign_in') }}</a> or
+                        <a href="{{ route('register') }}" style="color:#ea580c;font-weight:600;text-decoration:underline;">{{ __('general.checkout_create') }}</a>
                         to track your orders. Your order confirmation will be sent to the email below.
                     </p>
                 </div>
@@ -249,11 +249,11 @@
                 @csrf
 
                 {{-- Shipping Info ── --}}
-                <p class="checkout-section-title">📦 Shipping Information</p>
+                <p class="checkout-section-title">📦 {{ __('general.shipping_info') }}</p>
                 <div class="form-grid">
 
                     <div class="form-group full">
-                        <label class="form-label">Full Name</label>
+                        <label class="form-label">{{ __('general.full_name') }}</label>
                         <input type="text" name="full_name" class="form-input"
                                placeholder="John Doe"
                                value="{{ old('full_name', auth()->user()?->name) }}" required>
@@ -261,7 +261,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Email</label>
+                        <label class="form-label">{{ __('general.email') }}</label>
                         <input type="email" name="email" class="form-input"
                                placeholder="john@example.com"
                                value="{{ old('email', auth()->user()?->email) }}" required>
@@ -269,7 +269,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Phone</label>
+                        <label class="form-label">{{ __('general.phone') }}</label>
                         <input type="text" name="phone" class="form-input"
                                placeholder="+1 234 567 890"
                                value="{{ old('phone') }}" required>
@@ -277,7 +277,7 @@
                     </div>
 
                     <div class="form-group full">
-                        <label class="form-label">Address</label>
+                        <label class="form-label">{{ __('general.address') }}</label>
                         <input type="text" name="address" class="form-input"
                                placeholder="123 Main Street, Apt 4B"
                                value="{{ old('address') }}" required>
@@ -285,7 +285,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">City</label>
+                        <label class="form-label">{{ __('general.city') }}</label>
                         <input type="text" name="city" class="form-input"
                                placeholder="New York"
                                value="{{ old('city') }}" required>
@@ -293,7 +293,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Postal Code</label>
+                        <label class="form-label">{{ __('general.postal_code') }}</label>
                         <input type="text" name="postal_code" class="form-input"
                                placeholder="10001"
                                value="{{ old('postal_code') }}" required>
@@ -301,7 +301,7 @@
                     </div>
 
                     <div class="form-group full">
-                        <label class="form-label">Country</label>
+                        <label class="form-label">{{ __('general.country') }}</label>
                         <input type="text" name="country" class="form-input" id="countryInput"
                                placeholder="United States"
                                value="{{ old('country') }}" required>
@@ -312,7 +312,7 @@
 
                 {{-- Shipping Method ── --}}
                 @if($shippingMethods->isNotEmpty())
-                <p class="checkout-section-title" style="margin-top:1.5rem;">🚚 Shipping Method</p>
+                <p class="checkout-section-title" style="margin-top:1.5rem;">🚚 {{ __('general.shipping_method') }}</p>
                 <div style="display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1rem;" id="shippingOptions">
                     @foreach($shippingMethods as $sm)
                     @php
@@ -334,7 +334,7 @@
                             @endif
                         </div>
                         <span style="font-weight:700;font-size:0.95rem;color:{{ $isFree ? '#16a34a' : 'var(--gray-900)' }};">
-                            {{ $isFree ? 'Free' : '₪' . number_format($rate, 2) }}
+                            {{ $isFree ? __('general.free') : '₪' . number_format($rate, 2) }}
                         </span>
                     </label>
                     @endforeach
@@ -342,26 +342,26 @@
                 @endif
 
                 {{-- Payment ── --}}
-                <p class="checkout-section-title">💳 Payment</p>
+                <p class="checkout-section-title">💳 {{ __('general.payment_section') }}</p>
                 <div class="payment-placeholder">
                     <span style="font-size:2rem;">🔒</span>
                     <p style="font-weight:700;color:var(--gray-600);margin-top:0.5rem;">
-                        Secure payment on the next step
+                        {{ __('general.payment_next_step') }}
                     </p>
-                    <p>You'll choose your payment method after confirming your order details.</p>
+                    <p>{{ __('general.payment_choose') }}</p>
                 </div>
 
                 {{-- Coupon ── --}}
                 @unless(\App\Http\Middleware\AdminPreviewMode::isActive())
-                <p class="checkout-section-title" style="margin-top:1.5rem;">🏷️ Coupon Code</p>
+                <p class="checkout-section-title" style="margin-top:1.5rem;">🏷️ {{ __('general.coupon_code') }}</p>
                 <div id="couponSection">
                     <div style="display:flex;gap:0.6rem;margin-bottom:0.5rem;">
-                        <input type="text" id="couponInput" placeholder="Enter coupon code"
+                        <input type="text" id="couponInput" placeholder="{{ __('general.coupon_placeholder') }}"
                                style="flex:1;padding:0.65rem 0.9rem;border:1.5px solid var(--gray-200);border-radius:0.5rem;font-size:0.9rem;font-family:'DM Sans',sans-serif;outline:none;text-transform:uppercase;"
                                oninput="this.value=this.value.toUpperCase()">
                         <button type="button" onclick="applyCoupon()"
                                 style="background:var(--orange);color:#fff;border:none;padding:0.65rem 1.25rem;border-radius:0.5rem;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background 0.15s;"
-                                onmouseover="this.style.background='#c2410c'" onmouseout="this.style.background='#ea580c'">Apply</button>
+                                onmouseover="this.style.background='#c2410c'" onmouseout="this.style.background='#ea580c'">{{ __('general.apply') }}</button>
                     </div>
                     <div id="couponFeedback" style="font-size:0.82rem;min-height:1.2rem;"></div>
                     <input type="hidden" name="coupon_code" id="couponCode">
@@ -369,7 +369,7 @@
                 @endunless
 
                 <button type="submit" class="btn-place-order">
-                    Place Order →
+                    {{ __('general.place_order') }}
                 </button>
 
             </form>
@@ -377,7 +377,7 @@
 
         {{-- ── Summary ── --}}
         <div class="summary-card">
-            <p class="summary-title">Order Summary</p>
+            <p class="summary-title">{{ __('general.order_summary') }}</p>
 
             @foreach($cart->items as $item)
                 <div class="summary-item">
@@ -388,7 +388,7 @@
                         @if($item->variant)
                             <p style="font-size:0.75rem;color:var(--orange);font-weight:600;">{{ $item->variant->label() }}</p>
                         @endif
-                        <p class="summary-item-qty">Qty: {{ $item->quantity }}</p>
+                        <p class="summary-item-qty">{{ __('general.qty') }} {{ $item->quantity }}</p>
                     </div>
                     <span class="summary-item-price">₪{{ number_format($item->subtotal()) }}</span>
                 </div>
@@ -397,21 +397,21 @@
             <hr class="summary-divider">
 
             <div class="summary-row">
-                <span>Subtotal</span>
+                <span>{{ __('general.subtotal') }}</span>
                 <span id="summarySubtotal">₪{{ number_format($cart->total(), 2) }}</span>
             </div>
             <div class="summary-row" id="discountRow" style="display:none;">
-                <span id="discountLabel" style="color:#16a34a;font-weight:600;">Discount</span>
+                <span id="discountLabel" style="color:#16a34a;font-weight:600;">{{ __('general.discount') }}</span>
                 <span id="discountAmount" style="color:#16a34a;font-weight:700;"></span>
             </div>
             <div class="summary-row" id="shippingRow">
-                <span>Shipping</span>
+                <span>{{ __('general.shipping') }}</span>
                 @php
                     $firstRate = $shippingMethods->isNotEmpty() ? ($shippingMethods->first()->calculated_rate ?? (float)$shippingMethods->first()->price) : 0;
                     $firstFree = $firstRate == 0;
                 @endphp
                 <span id="shippingCost" style="font-weight:600;color:{{ $firstFree ? '#16a34a' : 'var(--gray-900)' }};">
-                    {{ $firstFree ? 'Free' : '₪' . number_format($firstRate, 2) }}
+                    {{ $firstFree ? __('general.free') : '₪' . number_format($firstRate, 2) }}
                 </span>
             </div>
             <div id="deliveryEstimate" class="delivery-estimate" style="text-align:right;margin-bottom:0.5rem;">
@@ -429,14 +429,14 @@
             <div id="taxBreakdownDetail" class="tax-breakdown-detail" style="text-align:right;"></div>
             @endif
             <div class="summary-row total">
-                <span>Total</span>
+                <span>{{ __('general.total') }}</span>
                 @php
                     $initialTotal = $cart->total() * (1 + $taxRate / 100) + $firstRate;
                 @endphp
                 <span id="summaryTotal">₪{{ number_format($initialTotal, 2) }}</span>
             </div>
 
-            <a href="/cart" class="back-link">← Edit cart</a>
+            <a href="/cart" class="back-link">← {{ __('general.edit_cart') }}</a>
         </div>
 
     </div>
@@ -582,7 +582,7 @@ async function applyCoupon() {
             document.getElementById('couponCode').value = data.coupon_code;
             document.getElementById('discountRow').style.display = 'flex';
             document.getElementById('discountLabel').textContent = 'Discount (' + data.coupon_code + ')';
-            document.getElementById('discountAmount').textContent = '-$' + data.discount.toFixed(2);
+            document.getElementById('discountAmount').textContent = '-₪' + data.discount.toFixed(2);
 
             currentDiscount = data.discount;
             fetchTotals();

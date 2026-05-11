@@ -1,4 +1,4 @@
-<x-layout title="Your Cart">
+<x-layout title="{{ __('general.your_cart') }}">
 
 <style>
 /* ── Cart Page ── */
@@ -315,7 +315,7 @@
 
 <div class="cart-page">
 
-    <h1 class="cart-heading">Your <span class="accent">Cart</span></h1>
+    <h1 class="cart-heading">{{ __('general.your_cart') }}</h1>
 
     @if($cart->items->isEmpty())
         {{-- ── Empty State ── --}}
@@ -327,15 +327,15 @@
                           d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                 </svg>
             </div>
-            <p class="empty-title">Your cart is empty</p>
-            <p class="empty-sub">Looks like you haven't added anything yet.</p>
+            <p class="empty-title">{{ __('general.cart_empty') }}</p>
+            <p class="empty-sub">{{ __('general.cart_empty_hint') }}</p>
             <a href="/#products" class="btn btn-primary" style="font-size:0.95rem;padding:0.7rem 2rem;">
-                Browse Products
+                {{ __('general.browse_products') }}
             </a>
         </div>
 
     @else
-        <p class="cart-subheading">{{ $cart->itemCount() }} {{ Str::plural('item', $cart->itemCount()) }} in your cart</p>
+        <p class="cart-subheading">{{ __('general.cart_item_count', ['count' => $cart->itemCount()]) }}</p>
 
         <div class="cart-layout">
 
@@ -359,7 +359,7 @@
                                         {{ $item->variant->label() }}
                                     </p>
                                 @endif
-                                <p class="cart-item-price">₪{{ number_format($item->unitPrice(), 2) }} each</p>
+                                <p class="cart-item-price">₪{{ number_format($item->unitPrice(), 2) }} {{ __('general.cart_item_each') }}</p>
                             </div>
 
                             {{-- Actions --}}
@@ -397,7 +397,7 @@
                                 {{-- Remove --}}
                                 <form method="POST" action="/cart/items/{{ $item->id }}">
                                     @csrf @method('DELETE')
-                                    <button class="btn-remove" type="submit" title="Remove">
+                                    <button class="btn-remove" type="submit" title="{{ __('general.remove') }}">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                              fill="none" viewBox="0 0 24 24"
                                              stroke="currentColor" stroke-width="2">
@@ -418,7 +418,7 @@
                         @csrf @method('DELETE')
                         <button class="btn-clear" type="submit"
                                 onclick="return confirm('Clear your entire cart?')">
-                            Clear cart
+                            {{ __('general.clear_cart') }}
                         </button>
                     </form>
                 </div>
@@ -426,31 +426,32 @@
 
             {{-- ── Summary ── --}}
             <div class="summary-card">
-                <p class="summary-title">Order Summary</p>
+                <p class="summary-title">{{ __('general.order_summary') }}</p>
 
                 <div class="summary-row">
-                    <span>Subtotal ({{ $cart->itemCount() }} items)</span>
+                    <span>{{ __('general.subtotal_items', ['count' => $cart->itemCount()]) }}</span>
                     <span>₪{{ number_format($cart->total()) }}</span>
                 </div>
                 <div class="summary-row">
-                    <span>Shipping</span>
-                    <span style="color:#22c55e;font-weight:600;">Free</span>
+                    <span>{{ __('general.shipping') }}</span>
+                    <span style="color:#22c55e;font-weight:600;">{{ __('general.free') }}</span>
                 </div>
+                @php $estTaxRate = \App\Models\TaxRate::effectiveRate(); @endphp
                 <div class="summary-row">
-                    <span>Tax (est.)</span>
-                    <span>₪{{ number_format($cart->total() * 0.08) }}</span>
+                    <span>{{ __('general.est_tax') }} ({{ round($estTaxRate * 100) }}%)</span>
+                    <span>₪{{ number_format($cart->total() * $estTaxRate) }}</span>
                 </div>
                 <div class="summary-row total">
-                    <span>Total</span>
-                    <span>₪{{ number_format($cart->total() * 1.08) }}</span>
+                    <span>{{ __('general.total') }}</span>
+                    <span>₪{{ number_format($cart->total() * (1 + $estTaxRate)) }}</span>
                 </div>
 
                 @if(\App\Http\Middleware\AdminPreviewMode::isActive())
-                <span class="btn-checkout" style="opacity:0.45;cursor:not-allowed;" title="Checkout disabled in preview mode">Proceed to Checkout →</span>
+                <span class="btn-checkout" style="opacity:0.45;cursor:not-allowed;" title="Checkout disabled in preview mode">{{ __('general.proceed_checkout') }}</span>
                 @else
-                <a href="/checkout" class="btn-checkout">Proceed to Checkout →</a>
+                <a href="/checkout" class="btn-checkout">{{ __('general.proceed_checkout') }}</a>
                 @endif
-                <a href="/#products" class="continue-link">← Continue shopping</a>
+                <a href="/#products" class="continue-link">← {{ __('general.continue_shopping_link') }}</a>
             </div>
 
         </div>

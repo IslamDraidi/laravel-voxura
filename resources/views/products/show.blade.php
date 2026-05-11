@@ -191,42 +191,42 @@
                 @if($m3dReady)
                     <button class="btn-3d-view" onclick="toggle3DViewer(true)">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-                        View in 3D
+                        {{ __('general.view_in_3d') }}
                     </button>
                 @elseif($m3dBusy)
                     <button class="btn-3d-view" style="background:#d97706;opacity:0.85;cursor:not-allowed;" disabled title="Your 3D model is being generated. Check back soon!">
                         <span style="width:12px;height:12px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;display:inline-block;animation:m3dStoreSpin 0.8s linear infinite;"></span>
-                        Generating 3D…
+                        {{ __('general.generating_3d') }}
                     </button>
                 @else
                     <button class="btn-3d-view" onclick="toggle3DViewer(true)"
                             style="background:transparent;color:#6B6B6B;border:1.5px solid #E8E0D8;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-                        View in 3D (Demo)
+                        {{ __('general.view_in_3d_demo') }}
                     </button>
                 @endif
                 <style>@keyframes m3dStoreSpin { to { transform: rotate(360deg); } }</style>
             </div>
 
             {{-- Virtual Try-On --}}
-            @if($m3dReady || true)
+            @if($m3dReady && config('model3d.tryon.enabled', false))
                 @auth
                     <button id="tryon-btn" type="button" onclick="openTryOnModal()"
                             style="background:var(--orange,#E8621A);color:#fff;border:none;border-radius:12px;padding:12px 20px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;width:100%;justify-content:center;margin-top:10px">
                         <span style="font-size:18px">👗</span>
-                        Virtual Try-On
-                        <span style="font-size:11px;font-weight:400;opacity:.8">— See how it fits on you</span>
+                        {{ __('general.virtual_tryon') }}
+                        <span style="font-size:11px;font-weight:400;opacity:.8">— {{ __('general.tryon_subtitle') }}</span>
                     </button>
                 @else
                     <a href="{{ route('login') }}"
                        style="background:transparent;color:#6B6B6B;border:1.5px solid #E8E0D8;border-radius:12px;padding:12px 20px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;width:100%;justify-content:center;margin-top:10px;text-decoration:none">
-                        🔒 Login to virtually try this on
+                        🔒 {{ __('general.tryon_login_prompt') }}
                     </a>
                 @endauth
             @endif
 
             @auth
-            @if($m3dReady || true)
+            @if($m3dReady && config('model3d.tryon.enabled', false))
             {{-- Try-On Modal --}}
             <div id="tryon-modal-overlay"
                  style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(26,26,26,0.6);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px">
@@ -236,7 +236,7 @@
                     {{-- HEADER --}}
                     <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid #F2EDE6">
                         <div>
-                            <div id="tryon-modal-title" style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#1A1A1A">Virtual Try-On</div>
+                            <div id="tryon-modal-title" style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#1A1A1A">{{ __('general.virtual_tryon') }}</div>
                             <div id="tryon-modal-subtitle" style="font-size:13px;color:#6B6B6B;margin-top:2px">See how {{ $product->name }} fits on you</div>
                         </div>
                         <button type="button" onclick="closeTryOnModal()" aria-label="Close"
@@ -256,9 +256,9 @@
                                id="tryon-drop-zone"
                                style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:28px;border:2px dashed #E8621A;border-radius:16px;background:#FFF8F2;cursor:pointer;text-align:center">
                             <div style="font-size:42px">🧍</div>
-                            <div style="font-weight:700;color:#1A1A1A">Upload a full-body photo</div>
-                            <div style="font-size:12px;color:#6B6B6B">Stand straight, facing camera, plain background preferred</div>
-                            <div style="font-size:11px;color:#9A9A9A">JPG or PNG · Max 10MB</div>
+                            <div style="font-weight:700;color:#1A1A1A">{{ __('general.tryon_upload_prompt') }}</div>
+                            <div style="font-size:12px;color:#6B6B6B">{{ __('general.tryon_photo_hint') }}</div>
+                            <div style="font-size:11px;color:#9A9A9A">{{ __('general.tryon_file_hint') }}</div>
                             <input id="tryon-photo" name="photo" type="file" accept="image/jpeg,image/png" hidden>
                         </label>
 
@@ -267,7 +267,7 @@
 
                         <div style="margin-top:18px">
                             <label for="tryon-height" style="display:block;font-size:13px;font-weight:600;color:#1A1A1A;margin-bottom:6px">
-                                Your height <span style="color:#9A9A9A;font-weight:400">(optional — improves accuracy)</span>
+                                {{ __('general.tryon_height_label') }}
                             </label>
                             <div style="display:flex;align-items:center;gap:8px">
                                 <input id="tryon-height" name="height_cm" type="number" min="100" max="250" placeholder="e.g. 175"
@@ -279,20 +279,20 @@
                         <div style="margin-top:18px;display:flex;flex-direction:column;gap:10px">
                             <label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:#1A1A1A;cursor:pointer">
                                 <input id="tryon-save-body" type="checkbox" checked style="margin-top:3px">
-                                <span>Save my body model for future try-ons <span style="color:#9A9A9A">(faster next time)</span></span>
+                                <span>{{ __('general.tryon_save_body') }} <span style="color:#9A9A9A">(faster next time)</span></span>
                             </label>
                             <label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:#1A1A1A;cursor:pointer">
                                 <input id="tryon-consent-photo" type="checkbox" style="margin-top:3px">
-                                <span>Keep my photo on file <span style="color:#9A9A9A">(otherwise deleted after 24h)</span></span>
+                                <span>{{ __('general.tryon_keep_photo') }} <span style="color:#9A9A9A">(otherwise deleted after 24h)</span></span>
                             </label>
                             <div style="font-size:11px;color:#9A9A9A;line-height:1.5">
-                                Your photo is processed securely and never shared with other users.
+                                {{ __('general.tryon_privacy_note') }}
                             </div>
                         </div>
 
                         <button id="tryon-submit-btn" type="button" onclick="submitTryOn()"
                                 style="margin-top:20px;width:100%;background:var(--orange,#E8621A);color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer">
-                            Generate My Try-On
+                            {{ __('general.tryon_generate_btn') }}
                         </button>
                     </div>
 
@@ -303,24 +303,24 @@
                                  style="width:120px;height:120px;border-radius:50%;background:radial-gradient(circle at 30% 30%, #F5A673, #E8621A 70%);box-shadow:0 0 60px rgba(232,98,26,0.4);animation:tryonBlobPulse 2.4s ease-in-out infinite"></div>
                         </div>
 
-                        <div style="text-align:center;font-weight:700;color:#1A1A1A;margin-bottom:14px">Creating your virtual fitting…</div>
+                        <div style="text-align:center;font-weight:700;color:#1A1A1A;margin-bottom:14px">{{ __('general.tryon_creating') }}</div>
 
                         <ol style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;font-size:13px">
                             <li id="tryon-step-1" data-status="active"
                                 style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#FBF7F1;border-radius:10px">
-                                <span class="tryon-step-dot"></span><span>Uploading photo</span>
+                                <span class="tryon-step-dot"></span><span>{{ __('general.tryon_step_upload') }}</span>
                             </li>
                             <li id="tryon-step-2" data-status="pending"
                                 style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#FBF7F1;border-radius:10px">
-                                <span class="tryon-step-dot"></span><span>Analyzing body shape with SAM 3D</span>
+                                <span class="tryon-step-dot"></span><span>{{ __('general.tryon_step_body') }}</span>
                             </li>
                             <li id="tryon-step-3" data-status="pending"
                                 style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#FBF7F1;border-radius:10px">
-                                <span class="tryon-step-dot"></span><span>Fitting {{ $product->name }} to your body</span>
+                                <span class="tryon-step-dot"></span><span>{{ __('general.tryon_step_fitting', ['product' => $product->name]) }}</span>
                             </li>
                             <li id="tryon-step-4" data-status="pending"
                                 style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#FBF7F1;border-radius:10px">
-                                <span class="tryon-step-dot"></span><span>Finalizing your try-on</span>
+                                <span class="tryon-step-dot"></span><span>{{ __('general.tryon_step_finalizing') }}</span>
                             </li>
                         </ol>
 
@@ -340,13 +340,13 @@
 
                         <button type="button" onclick="closeTryOnModal()"
                                 style="margin-top:14px;width:100%;background:transparent;color:#6B6B6B;border:1.5px solid #E8E0D8;border-radius:12px;padding:12px;font-size:14px;font-weight:600;cursor:pointer">
-                            Continue Shopping
+                            {{ __('general.continue_shopping') }}
                         </button>
                     </div>
 
                     {{-- STATE 3: RESULT --}}
                     <div id="tryon-result-state" style="display:none;padding:20px 24px 24px">
-                        <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#1A1A1A;margin-bottom:12px">Your Try-On is Ready! 🎉</div>
+                        <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#1A1A1A;margin-bottom:12px">{{ __('general.tryon_ready_title') }} 🎉</div>
 
                         <div id="tryon-viewer"
                              style="height:350px;background:#1A1A1A;border-radius:14px;position:relative;overflow:hidden"></div>
@@ -354,20 +354,20 @@
                         <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
                             <button type="button" onclick="closeTryOnModal()"
                                     style="flex:1;min-width:140px;background:var(--orange,#E8621A);color:#fff;border:none;border-radius:10px;padding:12px;font-weight:700;cursor:pointer">
-                                Close
+                                {{ __('general.tryon_close') }}
                             </button>
                             <button type="button" onclick="resetTryOnToUpload()"
                                     style="flex:1;min-width:140px;background:transparent;color:#1A1A1A;border:1.5px solid #E8E0D8;border-radius:10px;padding:12px;font-weight:600;cursor:pointer">
-                                Try Again
+                                {{ __('general.tryon_try_again') }}
                             </button>
                             <button type="button" onclick="deleteCurrentTryOn()"
                                     style="flex:1;min-width:140px;background:transparent;color:#B91C1C;border:1.5px solid #FECACA;border-radius:10px;padding:12px;font-weight:600;cursor:pointer">
-                                Delete Try-On
+                                {{ __('general.tryon_delete') }}
                             </button>
                         </div>
 
                         <div style="margin-top:12px;font-size:11px;color:#9A9A9A;text-align:center">
-                            3D fitting is approximate. Actual fit may vary slightly.
+                            {{ __('general.tryon_disclaimer') }}
                         </div>
                     </div>
                 </div>
@@ -406,21 +406,21 @@
                         <div class="viewer-panel-section">
                             <div class="viewer-panel-section-title">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                                Rotate View
+                                {{ __('general.rotate_view') }}
                             </div>
                             <div class="viewer-panel-instruction" id="panelRotate"><span>Left click + drag</span></div>
                         </div>
                         <div class="viewer-panel-section">
                             <div class="viewer-panel-section-title">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
-                                Pan View
+                                {{ __('general.pan_view') }}
                             </div>
                             <div class="viewer-panel-instruction" id="panelPan"><span>Right click + drag</span></div>
                         </div>
                         <div class="viewer-panel-section">
                             <div class="viewer-panel-section-title">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-                                Zoom Active
+                                {{ __('general.zoom_active') }}
                             </div>
                             <div class="viewer-panel-instruction" id="panelZoom"><span>Scroll up & down</span></div>
                         </div>
@@ -461,7 +461,7 @@
                     </div>
                     <span class="rating-count">{{ $averageRating }} ({{ $reviews->count() }} review{{ $reviews->count() !== 1 ? 's' : '' }})</span>
                 @else
-                    <span class="rating-count">No reviews yet</span>
+                    <span class="rating-count">{{ __('general.no_reviews') }}</span>
                 @endif
             </div>
 
@@ -473,26 +473,26 @@
             {{-- Stock Urgency ──--}}
             @if($product->stock > 0 && $product->stock <= $product->stock_alert_threshold)
                 <div class="urgency-alert">
-                    <span>⚡ Only {{ $product->stock }} left in stock</span>
+                    <span>⚡ {{ __('general.low_stock', ['count' => $product->stock]) }}</span>
                 </div>
             @elseif($product->stock === 0)
                 <div class="urgency-alert unavail">
-                    <span>✕ Out of stock</span>
+                    <span>✕ {{ __('general.out_of_stock') }}</span>
                 </div>
             @endif
 
             {{-- Feature Pills ──--}}
             <div class="feature-pills">
-                <div class="pill">🚚 Free Shipping</div>
-                <div class="pill">🔄 Product Replace</div>
-                <div class="pill">💳 EMI Available</div>
-                <div class="pill">⏰ 24/7 Support</div>
+                <div class="pill">🚚 {{ __('general.free_shipping') }}</div>
+                <div class="pill">🔄 {{ __('general.product_replace') }}</div>
+                <div class="pill">💳 {{ __('general.emi_available') }}</div>
+                <div class="pill">⏰ {{ __('general.support_247') }}</div>
             </div>
 
             {{-- Color Swatches ──--}}
             @if($product->has_colors && !empty($product->color_swatches))
             <div class="picker-group">
-                <label class="picker-label">Color</label>
+                <label class="picker-label">{{ __('general.color') }}</label>
                 <div class="color-swatches">
                     @foreach($product->color_swatches as $idx => $color)
                         <div class="swatch {{ $idx === 0 ? 'active' : '' }}" style="background-color: {{ $color['hex'] }};" onclick="selectColor(this)" title="{{ $color['name'] }}"></div>
@@ -504,20 +504,23 @@
             {{-- Size Picker ──--}}
             @php $sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL']; @endphp
             <div class="picker-group">
-                <label class="picker-label">Size</label>
+                <label class="picker-label">{{ __('general.size') }}</label>
                 <div class="size-options">
                     @foreach($sizes as $size)
-                        <button class="size-btn {{ $size === 'M' ? 'active' : '' }} {{ $size === 'XXL' ? 'disabled' : '' }}" onclick="selectSize(this)">{{ $size }}</button>
+                        <button class="size-btn {{ $size === 'M' ? 'active' : '' }}"
+                                onclick="selectSize(this)"
+                                {{ $size === 'XXL' ? 'disabled' : '' }}
+                                aria-disabled="{{ $size === 'XXL' ? 'true' : 'false' }}">{{ $size }}</button>
                     @endforeach
                 </div>
                 @if($product->size_guide)
-                    <button type="button" style="margin-top: 0.75rem; background: none; border: none; color: var(--orange); cursor: pointer; font-size: 0.85rem; font-weight: 700;">📏 Size Guide</button>
+                    <button type="button" style="margin-top: 0.75rem; background: none; border: none; color: var(--orange); cursor: pointer; font-size: 0.85rem; font-weight: 700;">📏 {{ __('general.size_guide') }}</button>
                 @endif
             </div>
 
             {{-- Quantity ──--}}
             <div class="picker-group">
-                <label class="picker-label">Quantity</label>
+                <label class="picker-label">{{ __('general.quantity') }}</label>
                 <div class="qty-selector">
                     <button class="qty-btn" onclick="changeQty(-1)">−</button>
                     <input type="number" id="qty" class="qty-input" value="1" min="1" max="{{ $product->max_order_quantity }}">
@@ -528,7 +531,7 @@
 
             {{-- Delivery Checker ──--}}
             <div class="delivery-wrap">
-                <label class="picker-label">📍 Check Delivery</label>
+                <label class="picker-label">📍 {{ __('general.check_delivery') }}</label>
                 <div class="delivery-form">
                     <input type="text" class="delivery-input" placeholder="Enter postal code" id="postalCode" maxlength="6">
                     <button class="delivery-btn" onclick="checkDelivery()">Check</button>
@@ -544,7 +547,7 @@
                     <input type="hidden" name="product_id" value="{{ $product->id }}">
                     <input type="hidden" name="quantity" id="cartQty" value="1">
                     <button type="submit" id="add-to-cart-btn" class="btn-buy" @if($product->stock === 0) disabled @endif>
-                        🛒 Add to Cart
+                        🛒 {{ __('general.add_to_cart') }}
                     </button>
                 </form>
                 <button class="btn-wishlist {{ in_array($product->id, $likedIds) ? 'active' : '' }}" id="wishlistBtn" onclick="toggleWishlist({{ $product->id }})">♡</button>
@@ -552,12 +555,12 @@
 
             {{-- Buy Now ──--}}
             <div style="margin-bottom: 1.5rem;">
-                <form method="POST" action="/checkout/quick">
+                <form method="POST" action="{{ route('checkout.quick') }}">
                     @csrf
                     <input type="hidden" name="product_id" value="{{ $product->id }}">
                     <input type="hidden" name="quantity" id="quickbuyQty" value="1">
                     <button type="submit" style="width: 100%; background: #f3f4f6; color: var(--gray-700); border: 1.5px solid var(--gray-200); padding: 0.75rem; border-radius: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.15s; font-family: 'DM Sans', sans-serif;">
-                        ⚡ Buy Now
+                        ⚡ {{ __('general.buy_now') }}
                     </button>
                 </form>
             </div>
@@ -565,7 +568,7 @@
 
             {{-- Share ──--}}
             <div class="share-wrap">
-                <label class="picker-label">Share</label>
+                <label class="picker-label">{{ __('general.share') }}</label>
                 <div class="share-buttons">
                     <a class="share-btn" href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(request()->url()) }}" target="_blank" title="Share on Facebook">f</a>
                     <a class="share-btn" href="https://twitter.com/intent/tweet?url={{ urlencode(request()->url()) }}&text={{ urlencode($product->name) }}" target="_blank" title="Share on X">𝕏</a>
@@ -580,9 +583,9 @@
     {{-- TABS ──--}}
     <div class="card" style="margin-bottom: 3rem; border-radius: 1rem; box-shadow: var(--shadow-sm); overflow: hidden;">
         <div class="tabs-nav">
-            <button class="tab-btn active" onclick="openTab(event, 'details')">📋 Product Details</button>
-            <button class="tab-btn" onclick="openTab(event, 'shipping')">🚚 Shipping & Returns</button>
-            <button class="tab-btn" onclick="openTab(event, 'reviews')">⭐ Reviews ({{ $reviews->count() }})</button>
+            <button class="tab-btn active" onclick="openTab(event, 'details')">📋 {{ __('general.product_details') }}</button>
+            <button class="tab-btn" onclick="openTab(event, 'shipping')">🚚 {{ __('general.shipping_returns') }}</button>
+            <button class="tab-btn" onclick="openTab(event, 'reviews')">⭐ {{ __('general.reviews_count', ['count' => $reviews->count()]) }}</button>
         </div>
 
         <div style="padding: 2rem;">
@@ -590,33 +593,33 @@
             <div id="details" class="tabs-content active">
                 @if($product->description)
                     <div style="margin-bottom: 1.5rem;">
-                        <h3 style="font-weight: 700; margin-bottom: 0.75rem;">Description</h3>
+                        <h3 style="font-weight: 700; margin-bottom: 0.75rem;">{{ __('general.description') }}</h3>
                         <p style="color: var(--gray-700); line-height: 1.7;">{{ $product->description }}</p>
                     </div>
                 @endif
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
                     @if($product->material)
                     <div>
-                        <p style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem;">🧵 Material</p>
+                        <p style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem;">🧵 {{ __('general.material') }}</p>
                         <p style="font-weight: 600;">{{ $product->material }}</p>
                     </div>
                     @endif
                     @if($product->fit)
                     <div>
-                        <p style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem;">👕 Fit</p>
+                        <p style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem;">👕 {{ __('general.fit') }}</p>
                         <p style="font-weight: 600;">{{ $product->fit }}</p>
                     </div>
                     @endif
                     @if($product->sku)
                     <div>
-                        <p style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem;">🏷️ SKU</p>
+                        <p style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem;">🏷️ {{ __('general.sku') }}</p>
                         <p style="font-family: monospace; font-weight: 600; font-size: 0.9rem;">{{ $product->sku }}</p>
                     </div>
                     @endif
                 </div>
                 @if($product->care_instructions)
                     <div style="margin-top: 1.5rem;">
-                        <p style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem;">Care Instructions</p>
+                        <p style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem;">{{ __('general.care_instructions') }}</p>
                         <p style="color: var(--gray-700); line-height: 1.7;">{{ $product->care_instructions }}</p>
                     </div>
                 @endif
@@ -626,11 +629,11 @@
             <div id="shipping" class="tabs-content">
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
                     <div>
-                        <h4 style="font-weight: 700; margin-bottom: 0.75rem;">🚚 Shipping</h4>
+                        <h4 style="font-weight: 700; margin-bottom: 0.75rem;">🚚 {{ __('general.shipping') }}</h4>
                         <p style="color: var(--gray-700); line-height: 1.7;">{{ $product->delivery_estimate ?? 'Estimated delivery within 3–5 business days.' }}</p>
                     </div>
                     <div>
-                        <h4 style="font-weight: 700; margin-bottom: 0.75rem;">↩️ Returns & Exchanges</h4>
+                        <h4 style="font-weight: 700; margin-bottom: 0.75rem;">↩️ {{ __('general.returns_exchanges') }}</h4>
                         <p style="color: var(--gray-700); line-height: 1.7;">{{ $product->shipping_returns ?? '30-day return policy. Free returns. No questions asked.' }}</p>
                     </div>
                 </div>
@@ -677,7 +680,7 @@
                                         <div class="review-author">{{ $review->user->name }}</div>
                                         <div class="review-meta">
                                             @if(in_array($review->user_id, $verifiedBuyerIds))
-                                                <span class="review-badge">✓ Verified Buyer</span>
+                                                <span class="review-badge">✓ {{ __('general.verified_buyer') }}</span>
                                             @endif
                                             <span>{{ $review->created_at->diffForHumans() }}</span>
                                         </div>
@@ -689,14 +692,14 @@
                                     </div>
                                     <p class="review-text">{{ $review->comment }}</p>
                                     <div class="review-helpful">
-                                        <span style="font-size: 0.8rem;">Helpful?</span>
+                                        <span style="font-size: 0.8rem;">{{ __('general.helpful') }}</span>
                                         <button class="helpful-btn" onclick="voteHelpful({{ $review->id }})">👍 {{ $review->helpful_votes ?? 0 }}</button>
                                     </div>
                                 </div>
                             @endforeach
                         </div>
                     @else
-                        <p style="text-align: center; color: var(--gray-500); padding: 2rem;">No reviews yet. Be the first to review this product!</p>
+                        <p style="text-align: center; color: var(--gray-500); padding: 2rem;">{{ __('general.no_reviews') }}</p>
                     @endif
                 </div>
             </div>
@@ -706,7 +709,7 @@
     {{-- YOU MAY ALSO LIKE ──--}}
     @if($relatedProducts->isNotEmpty())
     <div style="margin-bottom: 4rem;">
-        <h2 style="font-family: 'Playfair Display', serif; font-size: 1.75rem; font-weight: 800; margin-bottom: 1.5rem;">💡 You May Also Like</h2>
+        <h2 style="font-family: 'Playfair Display', serif; font-size: 1.75rem; font-weight: 800; margin-bottom: 1.5rem;">💡 {{ __('general.related_products') }}</h2>
         <div class="related-grid">
             @foreach($relatedProducts as $related)
                 <a href="{{ route('products.show', $related) }}" class="related-card">
@@ -726,7 +729,7 @@
 <div id="sizeGuideModal" class="modal">
     <div class="modal-content">
         <button class="modal-close" onclick="closeSizeGuide()">✕</button>
-        <h2 style="margin-bottom: 1rem;">📏 Size Guide</h2>
+        <h2 style="margin-bottom: 1rem;">📏 {{ __('general.size_guide') }}</h2>
         @if($product->size_guide)
             <p style="color: var(--gray-700); line-height: 1.7;">{{ $product->size_guide }}</p>
         @else
@@ -880,6 +883,11 @@ function toggle3DViewer(show) {
             document.getElementById('panelZoom').innerHTML = '<span>Pinch to zoom</span>';
         }
         if (!viewerInitialized && typeof initViewer3D === 'function') {
+            if (!product3dModelPath) {
+                console.warn('No 3D model available for this product.');
+                toggle3DViewer(false);
+                return;
+            }
             initViewer3D('viewer-3d', product3dModelPath);
             viewerInitialized = true;
         }
@@ -894,13 +902,15 @@ function toggle3DViewer(show) {
     }
 }
 </script>
+@if($product->is3DReady())
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="{{ asset('js/viewer3d.js') }}?v={{ filemtime(public_path('js/viewer3d.js')) }}"></script>
+@endif
 
 @auth
-@if($product->is3DReady() || true)
+@if($product->is3DReady() && config('model3d.tryon.enabled', false))
 <script>
 (function () {
     const TRYON_PRODUCT_ID = {{ $product->id }};

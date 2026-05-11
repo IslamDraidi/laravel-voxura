@@ -1,5 +1,5 @@
 <x-layout>
-    <x-slot:title>Register</x-slot:title>
+    <x-slot:title>{{ __('general.register') }}</x-slot:title>
 
     <style>
         /* ── Override layout <main> to allow centering ── */
@@ -228,14 +228,14 @@
         {{-- Heading --}}
         <div class="register-heading">
             <h1>Join <span>VOX</span>URA</h1>
-            <p>Create your account to start shopping</p>
+            <p>{{ __('general.sign_up_subtitle') }}</p>
         </div>
 
         {{-- Card --}}
         <div class="register-card">
             <div class="card-top">
-                <h2>Sign Up</h2>
-                <p>Enter your details to create an account</p>
+                <h2>{{ __('general.sign_up_title') }}</h2>
+                <p>{{ __('general.sign_up_desc') }}</p>
             </div>
 
             <div class="card-inner">
@@ -244,7 +244,7 @@
 
                     {{-- Username --}}
                     <div class="form-group">
-                        <label for="name">Username</label>
+                        <label for="name">{{ __('general.username') }}</label>
                         <div class="input-wrap">
                             <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
                                  viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -266,7 +266,7 @@
 
                     {{-- Email --}}
                     <div class="form-group">
-                        <label for="email">Email</label>
+                        <label for="email">{{ __('general.email') }}</label>
                         <div class="input-wrap">
                             <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
                                  viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -288,7 +288,7 @@
 
                     {{-- Password --}}
                     <div class="form-group">
-                        <label for="password">Password</label>
+                        <label for="password">{{ __('general.password') }}</label>
                         <div class="input-wrap">
                             <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
                                  viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -309,7 +309,7 @@
 
                     {{-- Confirm Password --}}
                     <div class="form-group">
-                        <label for="password_confirmation">Confirm Password</label>
+                        <label for="password_confirmation">{{ __('general.confirm_password') }}</label>
                         <div class="input-wrap">
                             <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
                                  viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -326,7 +326,7 @@
 
                     {{-- Submit --}}
                     <button type="submit" class="btn-submit">
-                        Create Account
+                        {{ __('general.create_account') }}
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
                              viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
@@ -335,8 +335,8 @@
 
                     {{-- Already have an account — inside form, no divider, matching React --}}
                     <p class="signin-link">
-                        Already have an account?
-                        <a href="/login">Sign In</a>
+                        {{ __('general.have_account') }}
+                        <a href="/login">{{ __('general.sign_in') }}</a>
                     </p>
 
                 </form>
@@ -344,7 +344,7 @@
         </div>
 
         <p class="register-footer-note">
-            By signing up, you agree to our Terms of Service and Privacy Policy
+            {{ __('general.terms_agree_signup') }}
         </p>
 
     </div>

@@ -1,4 +1,4 @@
-<x-layout title="Order #{{ $order->id }}">
+<x-layout title="{{ __('general.order_number', ['number' => $order->id]) }}">
 <style>
 .order-page { padding-top: 100px; padding-bottom: 4rem; }
 
@@ -197,8 +197,8 @@
 <div class="order-page">
 
     <div class="order-page-header">
-        <h1 class="order-page-title">Order <span>#{{ $order->id }}</span></h1>
-        <a href="/orders" class="btn-back">← My Orders</a>
+        <h1 class="order-page-title">{{ __('general.order_number', ['number' => $order->id]) }}</h1>
+        <a href="/orders" class="btn-back">{{ __('general.back_to_orders') }}</a>
     </div>
 
     <div class="order-layout">
@@ -208,7 +208,7 @@
 
             {{-- Items --}}
             <div class="order-detail-card">
-                <div class="card-header">🛍️ Items ({{ $order->items->sum('quantity') }})</div>
+                <div class="card-header">🛍️ {{ __('general.order_items', ['count' => $order->items->sum('quantity')]) }}</div>
                 @foreach($order->items as $item)
                     @if($item->product)
                     <div class="order-item-row">
@@ -231,7 +231,7 @@
 
             {{-- Shipping --}}
             <div class="order-detail-card">
-                <div class="card-header">📦 Shipping</div>
+                <div class="card-header">📦 {{ __('general.shipping') }}</div>
                 <div class="shipping-info">
                     <p>{{ $order->shipping_address }}</p>
                     @if($order->shippingMethod)
@@ -255,27 +255,27 @@
 
         {{-- ── Sidebar ── --}}
         <div class="order-sidebar-card">
-            <p class="sidebar-title">Order Summary</p>
+            <p class="sidebar-title">{{ __('general.order_summary') }}</p>
 
             <div class="sidebar-row">
-                <span>Subtotal</span>
+                <span>{{ __('general.subtotal') }}</span>
                 <span>₪{{ number_format($order->subtotal ?: $order->total_amount, 2) }}</span>
             </div>
             @if($order->discount_amount > 0)
             <div class="sidebar-row">
-                <span style="color:#16a34a;font-weight:600;">Discount{{ $order->coupon_code ? ' ('.$order->coupon_code.')' : '' }}</span>
+                <span style="color:#16a34a;font-weight:600;">{{ __('general.discount') }}{{ $order->coupon_code ? ' ('.$order->coupon_code.')' : '' }}</span>
                 <span style="color:#16a34a;font-weight:700;">-₪{{ number_format($order->discount_amount, 2) }}</span>
             </div>
             @endif
             <div class="sidebar-row">
-                <span>Shipping</span>
+                <span>{{ __('general.shipping') }}</span>
                 <span style="font-weight:600;color:{{ (float)$order->shipping_cost == 0 ? '#22c55e' : 'var(--gray-900)' }};">
-                    {{ (float)$order->shipping_cost == 0 ? 'Free' : '₪'.number_format($order->shipping_cost, 2) }}
+                    {{ (float)$order->shipping_cost == 0 ? __('general.free') : '₪'.number_format($order->shipping_cost, 2) }}
                 </span>
             </div>
             @if($order->tax_amount > 0 || $order->shipping_tax_amount > 0)
             <div class="sidebar-row">
-                <span>Tax</span>
+                <span>{{ __('general.tax') }}</span>
                 <span>₪{{ number_format($order->tax_amount + $order->shipping_tax_amount, 2) }}</span>
             </div>
             @if($order->tax_breakdown)
@@ -288,20 +288,26 @@
             @endif
             @endif
             <div class="sidebar-row total">
-                <span>Total</span>
+                <span>{{ __('general.total') }}</span>
                 <span>₪{{ number_format($order->grand_total ?: $order->grandTotal(), 2) }}</span>
             </div>
 
             <div class="status-block"
                  style="background:{{ $order->statusBg() }};color:{{ $order->statusColor() }};">
-                Status: {{ ucfirst($order->status) }}
+                {{ __('general.order_status') }} {{ ucfirst($order->status) }}
             </div>
 
             <p class="order-date-info">
-                Placed on {{ $order->created_at->format('M d, Y') }}
+                {{ __('general.order_placed_on', ['date' => $order->created_at->format('M d, Y')]) }}
             </p>
 
-            <a href="/#products" class="btn-shop-again">Shop Again →</a>
+            <a href="{{ route('orders.track', $order) }}"
+               style="display:block;text-align:center;padding:0.65rem 1rem;margin-bottom:0.75rem;background:var(--orange-light);color:var(--orange);border-radius:10px;font-size:0.85rem;font-weight:700;text-decoration:none;transition:background 0.15s;"
+               onmouseover="this.style.background='#fed7aa'" onmouseout="this.style.background='var(--orange-light)'">
+                {{ __('general.track_order') }}
+            </a>
+
+            <a href="/#products" class="btn-shop-again">{{ __('general.shop_again') }}</a>
         </div>
 
     </div>
