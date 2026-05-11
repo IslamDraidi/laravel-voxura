@@ -43,7 +43,7 @@
                             <circle cx="19" cy="21" r="1"/>
                             <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
                         </svg>
-                        Add to Cart
+                        {{ __('general.add_to_cart') }}
                     </button>
                 </form>
             </div>
@@ -58,10 +58,19 @@
                 <a href="/product/{{ $product->id }}">{{ $product->name }}</a>
             </h3>
             <p class="pc-description">{{ $product->description }}</p>
+            @if($product->stock > 0 && $product->stock <= $product->stock_alert_threshold)
+            <p style="margin:0 0 0.4rem 0;font-size:0.75rem;font-weight:700;color:#ea580c;letter-spacing:0.02em;">
+                ⚡ {{ __('general.low_stock', ['count' => $product->stock]) }}
+            </p>
+            @elseif($product->stock === 0)
+            <p style="margin:0 0 0.4rem 0;font-size:0.75rem;font-weight:700;color:#9ca3af;letter-spacing:0.02em;">
+                {{ __('general.out_of_stock') }}
+            </p>
+            @endif
             <div class="pc-footer">
                 <span class="pc-price">₪{{ number_format($product->price) }}</span>
                 <a href="/product/{{ $product->id }}" class="pc-learn">
-                    Learn more →
+                    {{ __('general.view_product') }}
                 </a>
             </div>
             {{-- Compare toggle --}}
@@ -82,7 +91,7 @@
                              viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                         </svg>
-                        Added to compare
+                        {{ __('general.compare_added') }}
                     </button>
                 @else
                     <button type="submit" style="
@@ -97,7 +106,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round"
                                   d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                         </svg>
-                        Compare
+                        {{ __('general.compare_btn') }}
                     </button>
                 @endif
             </form>

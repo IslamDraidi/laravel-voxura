@@ -4,11 +4,10 @@
         {{-- العنوان --}}
         <div class="contact-header">
             <h2 class="contact-title">
-                Get in <span>Touch</span>
+                {{ __('general.contact_title') }}
             </h2>
             <p class="contact-subtitle">
-                Have questions? We'd love to hear from you. Send us a message
-                and we'll respond as soon as possible.
+                {{ __('general.contact_subtitle') }}
             </p>
         </div>
 
@@ -16,29 +15,46 @@
 
             {{-- الفورم --}}
             <div class="contact-form-wrap">
-                <form method="POST" action="/contact" class="contact-form">
+
+                @if(session('contact_success'))
+                    <div style="background:rgba(232,98,26,0.1);border:1px solid var(--orange);border-radius:10px;padding:14px 18px;color:var(--orange);margin-bottom:20px;font-size:14px;">
+                        {{ session('contact_success') }}
+                    </div>
+                @endif
+
+                @if($errors->any())
+                    <div style="background:rgba(220,38,38,0.1);border:1px solid #dc2626;border-radius:10px;padding:14px 18px;color:#dc2626;margin-bottom:20px;font-size:14px;">
+                        <ul style="margin:0;padding:0;list-style:none;">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('contact.send') }}" class="contact-form">
                     @csrf
 
                     <div class="form-group">
-                        <label>Name</label>
+                        <label>{{ __('general.contact_name_label') }}</label>
                         <input type="text" name="name"
-                               placeholder="Your name" required />
+                               placeholder="{{ __('general.contact_name_placeholder') }}" required />
                     </div>
 
                     <div class="form-group">
-                        <label>Email</label>
+                        <label>{{ __('general.contact_email_label') }}</label>
                         <input type="email" name="email"
                                placeholder="your@email.com" required />
                     </div>
 
                     <div class="form-group">
-                        <label>Message</label>
+                        <label>{{ __('general.contact_message_label') }}</label>
                         <textarea name="message" rows="5"
-                                  placeholder="Your message" required></textarea>
+                                  placeholder="{{ __('general.contact_msg_placeholder') }}" required></textarea>
                     </div>
 
                     <button type="submit" class="btn-contact">
-                        Send Message
+                        {{ __('general.contact_send') }}
                     </button>
 
                 </form>
@@ -58,7 +74,7 @@
                         </svg>
                     </div>
                     <div>
-                        <h3>Email</h3>
+                        <h3>{{ __('general.contact_email_label') }}</h3>
                         <p>hello@voxura.com</p>
                     </div>
                 </div>
@@ -73,7 +89,7 @@
                         </svg>
                     </div>
                     <div>
-                        <h3>Phone</h3>
+                        <h3>{{ __('general.phone') }}</h3>
                         <p>+1 (555) 123-4567</p>
                     </div>
                 </div>

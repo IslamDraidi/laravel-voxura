@@ -7,8 +7,7 @@
                 Why <span>Voxura</span>
             </h2>
             <p class="about-subtitle">
-                We're not just selling products. We're delivering experiences that elevate
-                your everyday life through innovative technology and thoughtful design.
+                {{ __('general.about_subtitle') }}
             </p>
         </div>
 
@@ -25,8 +24,8 @@
                         <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>
                     </svg>
                 </div>
-                <h3>Premium Quality</h3>
-                <p>Handpicked products designed with excellence in mind</p>
+                <h3>{{ __('general.about_quality_title') }}</h3>
+                <p>{{ __('general.about_quality_desc') }}</p>
             </div>
 
             {{-- كارد 2 --}}
@@ -38,8 +37,8 @@
                         <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
                     </svg>
                 </div>
-                <h3>Cutting Edge</h3>
-                <p>Latest technology to keep you ahead of the curve</p>
+                <h3>{{ __('general.about_cutting_title') }}</h3>
+                <p>{{ __('general.about_cutting_desc') }}</p>
             </div>
 
             {{-- كارد 3 --}}
@@ -51,8 +50,8 @@
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                     </svg>
                 </div>
-                <h3>Trusted Brand</h3>
-                <p>Warranty and support you can count on</p>
+                <h3>{{ __('general.about_trusted_title') }}</h3>
+                <p>{{ __('general.about_trusted_desc') }}</p>
             </div>
 
         </div>
