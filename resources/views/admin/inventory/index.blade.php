@@ -1,4 +1,4 @@
-<x-admin-layout title="Inventory" section="reporting" active="inventory">
+<x-admin-layout title="{{ __('admin.inventory_title') }}" section="reporting" active="inventory">
 <style>
 .stock-badge { display:inline-flex; align-items:center; gap:0.3rem; padding:0.25rem 0.7rem; border-radius:999px; font-size:0.75rem; font-weight:700; }
 .stock-badge.ok  { background:#dcfce7; color:#16a34a; }
@@ -15,11 +15,11 @@
         <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
     </svg>
     @if($outCount > 0)
-        <span>{{ $outCount }} product{{ $outCount > 1 ? 's' : '' }} <strong>out of stock</strong></span>
+        <span>{{ $outCount }} product{{ $outCount > 1 ? 's' : '' }} <strong>{{ __('admin.stock_badge_out') }}</strong></span>
     @endif
     @if($outCount > 0 && $lowCount > 0) <span style="opacity:0.5;">·</span> @endif
     @if($lowCount > 0)
-        <span>{{ $lowCount }} product{{ $lowCount > 1 ? 's' : '' }} <strong>low on stock</strong> (≤10)</span>
+        <span>{{ $lowCount }} product{{ $lowCount > 1 ? 's' : '' }} <strong>{{ __('admin.stock_badge_low') }}</strong> (≤10)</span>
     @endif
 </div>
 @endif
@@ -27,19 +27,19 @@
 {{-- Stats --}}
 <div class="stat-grid" style="margin-bottom:2rem;">
     <div class="stat-card">
-        <span class="sc-label">Total Products</span>
+        <span class="sc-label">{{ __('admin.total_products_stat') }}</span>
         <span class="sc-value">{{ $products->count() }}</span>
     </div>
     <div class="stat-card">
-        <span class="sc-label">Low Stock</span>
+        <span class="sc-label">{{ __('admin.low_stock_stat') }}</span>
         <span class="sc-value" style="color:#d97706;">{{ $lowCount }}</span>
     </div>
     <div class="stat-card">
-        <span class="sc-label">Out of Stock</span>
+        <span class="sc-label">{{ __('admin.out_of_stock_stat') }}</span>
         <span class="sc-value red">{{ $outCount }}</span>
     </div>
     <div class="stat-card">
-        <span class="sc-label">Total Units</span>
+        <span class="sc-label">{{ __('admin.total_units_stat') }}</span>
         <span class="sc-value">{{ number_format($products->sum('stock')) }}</span>
     </div>
 </div>
@@ -55,9 +55,9 @@
             @endforeach
         </select>
         <select name="stock">
-            <option value="">All Stock Levels</option>
-            <option value="low" {{ request('stock') === 'low' ? 'selected' : '' }}>Low Stock (≤10)</option>
-            <option value="out" {{ request('stock') === 'out' ? 'selected' : '' }}>Out of Stock</option>
+            <option value="">{{ __('admin.all_stock_levels') }}</option>
+            <option value="low" {{ request('stock') === 'low' ? 'selected' : '' }}>{{ __('admin.low_stock_filter') }}</option>
+            <option value="out" {{ request('stock') === 'out' ? 'selected' : '' }}>{{ __('admin.out_of_stock_filter') }}</option>
         </select>
         <button type="submit" class="add-btn">Filter</button>
         @if(request()->hasAny(['search','category','stock']))
@@ -76,8 +76,8 @@
                     <th>Product</th>
                     <th>Category</th>
                     <th>Price</th>
-                    <th>Status</th>
-                    <th>Stock</th>
+                    <th>{{ __('admin.status_stock_col') }}</th>
+                    <th>{{ __('admin.stock_col') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -94,7 +94,7 @@
                             @endif
                             <div>
                                 <p style="font-weight:700;color:var(--dark);margin:0 0 0.1rem;">{{ $p->name }}</p>
-                                <a href="/admin/products/{{ $p->id }}/edit" style="font-size:0.75rem;color:var(--orange);text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">Edit product →</a>
+                                <a href="/admin/products/{{ $p->id }}/edit" style="font-size:0.75rem;color:var(--orange);text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">{{ __('admin.edit_product_link') }}</a>
                             </div>
                         </div>
                     </td>
@@ -102,11 +102,11 @@
                     <td style="font-weight:700;">₪{{ number_format($p->price, 2) }}</td>
                     <td>
                         @if($p->stock === 0)
-                            <span class="stock-badge out">Out of stock</span>
+                            <span class="stock-badge out">{{ __('admin.stock_badge_out') }}</span>
                         @elseif($p->stock <= 10)
-                            <span class="stock-badge low">Low stock</span>
+                            <span class="stock-badge low">{{ __('admin.stock_badge_low') }}</span>
                         @else
-                            <span class="stock-badge ok">In stock</span>
+                            <span class="stock-badge ok">{{ __('admin.stock_badge_ok') }}</span>
                         @endif
                     </td>
                     <td>
@@ -115,7 +115,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" style="text-align:center;color:var(--muted);padding:2.5rem;">No products found.</td>
+                    <td colspan="5" style="text-align:center;color:var(--muted);padding:2.5rem;">{{ __('admin.no_products') }}</td>
                 </tr>
                 @endforelse
             </tbody>
@@ -123,7 +123,7 @@
     </div>
     @if($products->isNotEmpty())
     <div style="display:flex;justify-content:flex-end;margin-top:1rem;">
-        <button type="submit" class="add-btn">Save Stock Changes</button>
+        <button type="submit" class="add-btn">{{ __('admin.save_stock_btn') }}</button>
     </div>
     @endif
 </form>

@@ -1,4 +1,4 @@
-<x-admin-layout title="Add Product" section="catalog" active="products">
+<x-admin-layout title="{{ __('admin.add_product_title') }}" section="catalog" active="products">
 <style>
 /* ── Create Product Page ── */
 .cp-header { margin-bottom: 20px; }
@@ -118,13 +118,13 @@
     <div class="cp-breadcrumb">
         <a href="/admin">Admin</a> ›
         <a href="/admin/products">Products</a> ›
-        Add New Product
+        {{ __('admin.add_product_title') }}
     </div>
     <div class="cp-title-row">
-        <h1 class="cp-page-title">Add New Product</h1>
+        <h1 class="cp-page-title">{{ __('admin.add_product_title') }}</h1>
         <div class="cp-header-actions">
             <button type="button" class="cp-btn-draft" onclick="cpSubmit('draft')">Save as Draft</button>
-            <button type="button" class="cp-btn-publish" onclick="cpSubmit('active')">Publish Product</button>
+            <button type="button" class="cp-btn-publish" onclick="cpSubmit('active')">{{ __('admin.publish_btn') }}</button>
         </div>
     </div>
 </div>
@@ -141,12 +141,12 @@
             {{-- Card 1: Basic Information --}}
             <div class="cp-card">
                 <div class="cp-card-header">
-                    <div class="cp-card-title">Basic Information</div>
+                    <div class="cp-card-title">{{ __('admin.basic_info') }}</div>
                     <div class="cp-card-sub">Core product identity and identifiers</div>
                 </div>
                 <div class="cp-card-body">
                     <div class="cp-field">
-                        <label class="cp-label" for="cp-name">Product Name <span class="req">*</span></label>
+                        <label class="cp-label" for="cp-name">{{ __('admin.product_name_label') }} <span class="req">*</span></label>
                         <input type="text" id="cp-name" name="name" class="form-input"
                                placeholder="e.g. Premium Linen Blazer"
                                value="{{ old('name') }}" required>
@@ -154,7 +154,7 @@
                     </div>
                     <div class="cp-grid-2">
                         <div class="cp-field">
-                            <label class="cp-label" for="cp-sku">SKU</label>
+                            <label class="cp-label" for="cp-sku">{{ __('admin.sku_label') }}</label>
                             <input type="text" id="cp-sku" name="sku" class="form-input"
                                    placeholder="e.g. VX-TSH-001"
                                    value="{{ old('sku') }}">
@@ -162,7 +162,7 @@
                             @error('sku')<p class="form-error">{{ $message }}</p>@enderror
                         </div>
                         <div class="cp-field">
-                            <label class="cp-label" for="cp-material">Material</label>
+                            <label class="cp-label" for="cp-material">{{ __('admin.material_label') }}</label>
                             <input type="text" id="cp-material" name="material" class="form-input"
                                    placeholder="e.g. 100% Cotton"
                                    value="{{ old('material') }}">
@@ -175,29 +175,29 @@
             {{-- Card 2: Pricing & Inventory --}}
             <div class="cp-card">
                 <div class="cp-card-header">
-                    <div class="cp-card-title">Pricing & Inventory</div>
+                    <div class="cp-card-title">{{ __('admin.pricing_stock') }}</div>
                     <div class="cp-card-sub">Price, stock levels and sales configuration</div>
                 </div>
                 <div class="cp-card-body">
                     <div class="cp-grid-2">
                         <div class="cp-field">
-                            <label class="cp-label" for="cp-price">Price ($) <span class="req">*</span></label>
+                            <label class="cp-label" for="cp-price">{{ __('admin.price_label') }} ($) <span class="req">*</span></label>
                             <input type="number" id="cp-price" name="price" class="form-input"
                                    placeholder="0.00" min="0" step="0.01"
                                    value="{{ old('price') }}" required>
                             @error('price')<p class="form-error">{{ $message }}</p>@enderror
                         </div>
                         <div class="cp-field">
-                            <label class="cp-label" for="cp-sale-badge">Sale Badge</label>
+                            <label class="cp-label" for="cp-sale-badge">{{ __('admin.sale_badge_label') }}</label>
                             <input type="text" id="cp-sale-badge" name="sale_badge" class="form-input"
-                                   placeholder="e.g. 20% OFF"
+                                   placeholder="{{ __('admin.sale_badge_ph') }}"
                                    value="{{ old('sale_badge') }}">
                             @error('sale_badge')<p class="form-error">{{ $message }}</p>@enderror
                         </div>
                     </div>
                     <div class="cp-grid-2">
                         <div class="cp-field">
-                            <label class="cp-label" for="cp-stock">Stock Quantity <span class="req">*</span></label>
+                            <label class="cp-label" for="cp-stock">{{ __('admin.stock_label') }} <span class="req">*</span></label>
                             <input type="number" id="cp-stock" name="stock" class="form-input"
                                    placeholder="0" min="0"
                                    value="{{ old('stock') }}" required>
@@ -232,12 +232,12 @@
             {{-- Card 3: Product Description --}}
             <div class="cp-card">
                 <div class="cp-card-header">
-                    <div class="cp-card-title">Product Description</div>
+                    <div class="cp-card-title">{{ __('admin.description_label') }}</div>
                     <div class="cp-card-sub">Shown on the product page — be detailed and persuasive</div>
                 </div>
                 <div class="cp-card-body">
                     <div class="cp-field">
-                        <label class="cp-label" for="cp-desc">Description <span class="req">*</span></label>
+                        <label class="cp-label" for="cp-desc">{{ __('admin.description_label') }} <span class="req">*</span></label>
                         <textarea id="cp-desc" name="description" class="form-textarea" rows="7"
                                   placeholder="Describe your product in detail — materials, fit, features, and what makes it special…"
                                   required>{{ old('description') }}</textarea>
@@ -250,25 +250,25 @@
             {{-- Card 4: Product Details --}}
             <div class="cp-card">
                 <div class="cp-card-header">
-                    <div class="cp-card-title">Product Details</div>
-                    <div class="cp-card-sub">Fit, care instructions and shipping policy</div>
+                    <div class="cp-card-title">{{ __('admin.details_section') }}</div>
+                    <div class="cp-card-sub">{{ __('admin.details_sub') }}</div>
                 </div>
                 <div class="cp-card-body">
                     <div class="cp-field">
-                        <label class="cp-label" for="cp-fit">Fit</label>
+                        <label class="cp-label" for="cp-fit">{{ __('admin.fit_label') }}</label>
                         <input type="text" id="cp-fit" name="fit" class="form-input"
                                placeholder="e.g. Relaxed fit"
                                value="{{ old('fit') }}">
                         @error('fit')<p class="form-error">{{ $message }}</p>@enderror
                     </div>
                     <div class="cp-field">
-                        <label class="cp-label" for="cp-care">Care Instructions</label>
+                        <label class="cp-label" for="cp-care">{{ __('admin.care_label') }}</label>
                         <textarea id="cp-care" name="care_instructions" class="form-textarea" rows="3"
                                   placeholder="Machine wash cold. Tumble dry low.">{{ old('care_instructions') }}</textarea>
                         @error('care_instructions')<p class="form-error">{{ $message }}</p>@enderror
                     </div>
                     <div class="cp-field">
-                        <label class="cp-label" for="cp-shipping">Shipping & Returns</label>
+                        <label class="cp-label" for="cp-shipping">{{ __('admin.shipping_info_label') }}</label>
                         <textarea id="cp-shipping" name="shipping_returns" class="form-textarea" rows="4"
                                   placeholder="Add shipping windows, free shipping threshold, and return policy details.">{{ old('shipping_returns') }}</textarea>
                         @error('shipping_returns')<p class="form-error">{{ $message }}</p>@enderror
@@ -303,7 +303,7 @@
             {{-- Card 6: Product Flags --}}
             <div class="cp-card">
                 <div class="cp-card-header">
-                    <div class="cp-card-title">Product Flags</div>
+                    <div class="cp-card-title">{{ __('admin.merchandising') }}</div>
                 </div>
                 <div class="cp-card-body">
                     <label class="cp-toggle-row">
@@ -330,13 +330,13 @@
             {{-- Card 7: Category --}}
             <div class="cp-card">
                 <div class="cp-card-header">
-                    <div class="cp-card-title">Category</div>
+                    <div class="cp-card-title">{{ __('admin.category_label') }}</div>
                 </div>
                 <div class="cp-card-body">
                     <div class="cp-field">
-                        <label class="cp-label" for="cp-category">Category <span class="req">*</span></label>
+                        <label class="cp-label" for="cp-category">{{ __('admin.category_label') }} <span class="req">*</span></label>
                         <select id="cp-category" name="category_id" class="form-select" required>
-                            <option value="">Select category…</option>
+                            <option value="">{{ __('admin.select_category') }}</option>
                             @foreach($categories as $category)
                                 <option value="{{ $category->id }}"
                                         {{ old('category_id') == $category->id ? 'selected' : '' }}>
@@ -352,12 +352,12 @@
             {{-- Card 8: Product Images --}}
             <div class="cp-card">
                 <div class="cp-card-header">
-                    <div class="cp-card-title">Product Images</div>
+                    <div class="cp-card-title">{{ __('admin.images_label') }}</div>
                     <div class="cp-card-sub">JPG, PNG, WEBP — max 5MB per image</div>
                 </div>
                 <div class="cp-card-body">
                     <div class="cp-field">
-                        <label class="cp-label">Cover Image</label>
+                        <label class="cp-label">{{ __('admin.main_image_label') }}</label>
                         <div id="cp-cover-preview" class="cp-preview-cover">
                             <img id="cp-cover-img" src="" alt="">
                             <div class="cp-preview-cover-info">
@@ -377,7 +377,7 @@
                     </div>
 
                     <div class="cp-field">
-                        <label class="cp-label">Gallery Images</label>
+                        <label class="cp-label">{{ __('admin.additional_images') }}</label>
                         <div id="cp-gallery-grid" class="cp-gallery-grid"></div>
                         <div class="cp-image-zone" id="cp-gallery-zone">
                             <input type="file" id="cp-gallery-input" name="gallery[]"
@@ -397,7 +397,7 @@
             {{-- Card 9: 3D Model --}}
             <div class="cp-card">
                 <div class="cp-card-header">
-                    <div class="cp-card-title">3D Model</div>
+                    <div class="cp-card-title">{{ __('admin.model3d_label') }}</div>
                     <div class="cp-card-sub">AI-powered 3D generation</div>
                 </div>
                 <div class="cp-card-body">
@@ -438,9 +438,9 @@
 <div class="cp-bottom-bar">
     <span class="cp-bottom-warn">⚠ All changes will be lost if you leave without saving</span>
     <div class="cp-bottom-actions">
-        <a href="/admin/products" class="act-btn" id="cp-cancel-btn">Cancel</a>
+        <a href="/admin/products" class="act-btn" id="cp-cancel-btn">{{ __('admin.cancel_btn') }}</a>
         <button type="button" class="cp-btn-draft" onclick="cpSubmit('draft')">Save as Draft</button>
-        <button type="button" class="cp-btn-publish" onclick="cpSubmit('active')">Publish Product</button>
+        <button type="button" class="cp-btn-publish" onclick="cpSubmit('active')">{{ __('admin.publish_btn') }}</button>
     </div>
 </div>
 

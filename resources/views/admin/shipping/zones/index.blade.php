@@ -1,30 +1,29 @@
-<x-admin-layout title="Shipping Zones" section="configure" active="zones">
+<x-admin-layout title="{{ __('admin.zones_title') }}" section="configure" active="zones">
 
 <div class="info-banner" style="margin-bottom:1.5rem;">
     <span>ℹ️</span>
-    <span>Shipping zones group countries/regions together. Assign shipping methods to zones with optional rate overrides for location-specific pricing.</span>
+    <span>{{ __('admin.zones_info') }}</span>
 </div>
 
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
     <p class="result-count">
-        {{ $zones->count() }} zone{{ $zones->count() > 1 ? 's' : '' }}
-        · {{ $zones->where('is_active', true)->count() }} active
+        {{ __('admin.zones_configured', ['count' => $zones->count(), 'active' => $zones->where('is_active', true)->count()]) }}
     </p>
-    <a href="/admin/shipping/zones/create" class="add-btn">+ Add Zone</a>
+    <a href="/admin/shipping/zones/create" class="add-btn">{{ __('admin.add_zone_btn') }}</a>
 </div>
 
 @if($zones->isEmpty())
-    <div class="admin-empty">No shipping zones configured. Add a zone to enable region-based shipping rates.</div>
+    <div class="admin-empty">{{ __('admin.no_zones') }}</div>
 @else
     <div class="card" style="padding:0;overflow-x:auto;">
         <table>
             <thead>
                 <tr>
-                    <th>Zone Name</th>
-                    <th>Countries</th>
-                    <th>Methods</th>
-                    <th>Status</th>
-                    <th>Actions</th>
+                    <th>{{ __('admin.zone_name_col') }}</th>
+                    <th>{{ __('admin.countries_col') }}</th>
+                    <th>{{ __('admin.methods_col') }}</th>
+                    <th>{{ __('admin.status_col') }}</th>
+                    <th>{{ __('admin.actions_col') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -37,22 +36,22 @@
                     <td>{{ $zone->methods_count }}</td>
                     <td>
                         <span class="badge {{ $zone->is_active ? 'badge-green' : 'badge-gray' }}">
-                            {{ $zone->is_active ? 'Active' : 'Inactive' }}
+                            {{ $zone->is_active ? __('admin.active_badge') : __('admin.inactive_badge') }}
                         </span>
                     </td>
                     <td>
                         <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
-                            <a href="/admin/shipping/zones/{{ $zone->id }}/edit" class="act-btn">Edit</a>
+                            <a href="/admin/shipping/zones/{{ $zone->id }}/edit" class="act-btn">{{ __('admin.edit_btn') }}</a>
                             <form method="POST" action="/admin/shipping/zones/{{ $zone->id }}/toggle" style="display:inline;">
                                 @csrf
                                 <button type="submit" class="act-btn {{ $zone->is_active ? 'green' : '' }}">
-                                    {{ $zone->is_active ? '✓ Active' : '○ Inactive' }}
+                                    {{ $zone->is_active ? __('admin.toggle_active_btn') : __('admin.toggle_inactive_btn') }}
                                 </button>
                             </form>
                             <form method="POST" action="/admin/shipping/zones/{{ $zone->id }}" style="display:inline;">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="act-btn red"
-                                        onclick="return confirm('Delete zone &quot;{{ $zone->name }}&quot;?')">Delete</button>
+                                        onclick="return confirm('{{ __('admin.delete_zone_confirm', ['name' => $zone->name]) }}')">{{ __('admin.delete_btn') }}</button>
                             </form>
                         </div>
                     </td>

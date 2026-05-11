@@ -1,4 +1,4 @@
-<x-admin-layout title="Refunds" section="sales" active="refunds">
+<x-admin-layout title="{{ __('admin.refunds_title') }}" section="sales" active="refunds">
 
     <div class="stat-grid">
         <div class="stat-card">
@@ -22,7 +22,7 @@
     @if($refunds->isEmpty())
         <div class="admin-empty">
             <p style="font-size:2rem;margin-bottom:0.5rem;">✓</p>
-            <p>No refunds issued yet.</p>
+            <p>{{ __('admin.no_refunds') }}</p>
         </div>
     @else
         <div class="card">
@@ -30,14 +30,14 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Order</th>
+                        <th>{{ __('admin.refund_order_col') }}</th>
                         <th>Customer</th>
-                        <th>Amount</th>
+                        <th>{{ __('admin.refund_amount_col') }}</th>
                         <th>Gateway</th>
                         <th>Reason</th>
-                        <th>Status</th>
-                        <th>Issued By</th>
-                        <th>Date</th>
+                        <th>{{ __('admin.refund_status_col2') }}</th>
+                        <th>{{ __('admin.refund_by_col2') }}</th>
+                        <th>{{ __('admin.refund_date_col2') }}</th>
                     </tr>
                 </thead>
                 <tbody>

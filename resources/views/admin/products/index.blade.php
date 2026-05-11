@@ -2,28 +2,28 @@
 
 {{-- Page header --}}
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;">
-    <h2 style="font-size:16px;font-weight:700;color:var(--dark);margin:0;">All Products</h2>
-    <a href="/admin/products/create" class="add-btn">+ Add Product</a>
+    <h2 style="font-size:16px;font-weight:700;color:var(--dark);margin:0;">{{ __('admin.all_products') }}</h2>
+    <a href="/admin/products/create" class="add-btn">{{ __('admin.add_product') }}</a>
 </div>
 
 {{-- Filters --}}
 <form method="GET" action="/admin/products">
     <div class="search-bar" style="margin-bottom:1.25rem;">
-        <input type="text" name="search" placeholder="Search products…" value="{{ request('search') }}">
+        <input type="text" name="search" placeholder="{{ __('admin.search_products') }}" value="{{ request('search') }}">
         <select name="category">
-            <option value="">All Categories</option>
+            <option value="">{{ __('admin.all_categories') }}</option>
             @foreach($categories as $cat)
                 <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
             @endforeach
         </select>
         <select name="status">
-            <option value="">All Status</option>
-            <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>In Stock</option>
-            <option value="out"    {{ request('status') === 'out'    ? 'selected' : '' }}>Out of Stock</option>
+            <option value="">{{ __('admin.all_status') }}</option>
+            <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>{{ __('admin.in_stock') }}</option>
+            <option value="out"    {{ request('status') === 'out'    ? 'selected' : '' }}>{{ __('admin.out_of_stock') }}</option>
         </select>
-        <button type="submit" class="add-btn">Filter</button>
+        <button type="submit" class="add-btn">{{ __('admin.filter') }}</button>
         @if(request()->hasAny(['search','category','status']))
-            <a href="/admin/products" class="act-btn" style="text-decoration:none;">Clear</a>
+            <a href="/admin/products" class="act-btn" style="text-decoration:none;">{{ __('admin.clear') }}</a>
         @endif
     </div>
 </form>
@@ -31,19 +31,19 @@
 {{-- Stats --}}
 <div class="stat-grid" style="margin-bottom:1.5rem;">
     <div class="stat-card">
-        <span class="sc-label">Total Products</span>
+        <span class="sc-label">{{ __('admin.total_products') }}</span>
         <span class="sc-value">{{ $products->count() }}</span>
     </div>
     <div class="stat-card">
-        <span class="sc-label">In Stock</span>
+        <span class="sc-label">{{ __('admin.in_stock') }}</span>
         <span class="sc-value green">{{ $products->where('stock', '>', 0)->count() }}</span>
     </div>
     <div class="stat-card">
-        <span class="sc-label">Out of Stock</span>
+        <span class="sc-label">{{ __('admin.out_of_stock') }}</span>
         <span class="sc-value red">{{ $products->where('stock', 0)->count() }}</span>
     </div>
     <div class="stat-card">
-        <span class="sc-label">Categories</span>
+        <span class="sc-label">{{ __('admin.categories_col') }}</span>
         <span class="sc-value">{{ $categories->count() }}</span>
     </div>
 </div>
@@ -51,17 +51,17 @@
 {{-- Table --}}
 <div class="card" style="padding:0;overflow-x:auto;">
     @if($products->isEmpty())
-        <div class="admin-empty">No products found.</div>
+        <div class="admin-empty">{{ __('admin.no_products_found') }}</div>
     @else
         <table>
             <thead>
                 <tr>
-                    <th>Product</th>
-                    <th>Category</th>
-                    <th>Price</th>
-                    <th>Stock</th>
-                    <th title="3D Model Status">3D</th>
-                    <th>Actions</th>
+                    <th>{{ __('admin.product_col') }}</th>
+                    <th>{{ __('admin.category_col') }}</th>
+                    <th>{{ __('admin.price_col') }}</th>
+                    <th>{{ __('admin.stock_col') }}</th>
+                    <th title="{{ __('admin.model_3d_col') }}">{{ __('admin.model_3d_col') }}</th>
+                    <th>{{ __('admin.actions_col') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -92,26 +92,26 @@
                         @endif
                     </td>
                     <td style="font-weight:600;color:var(--dark);">
-                        {{ number_format($product->price, 2) }} SAR
+                        ₪{{ number_format($product->price, 2) }}
                     </td>
                     <td>
                         @if($product->stock > 10)
                             <span class="badge badge-green">{{ $product->stock }}</span>
                         @elseif($product->stock > 0)
-                            <span class="badge badge-amber">{{ $product->stock }} low</span>
+                            <span class="badge badge-amber">{{ __('admin.low_stock_badge', ['count' => $product->stock]) }}</span>
                         @else
-                            <span class="badge badge-red">Out of stock</span>
+                            <span class="badge badge-red">{{ __('admin.out_of_stock') }}</span>
                         @endif
                     </td>
                     <td>
                         @php
                             $m3dStatus = $product->model3d_status ?? 'idle';
                             $m3dMap = [
-                                'idle'       => ['color' => '#9ca3af', 'label' => 'No 3D model', 'spin' => false],
-                                'queued'     => ['color' => '#f59e0b', 'label' => 'Queued',      'spin' => false],
-                                'processing' => ['color' => '#ea580c', 'label' => 'Processing',  'spin' => true],
-                                'ready'      => ['color' => '#16a34a', 'label' => 'Ready',       'spin' => false],
-                                'failed'     => ['color' => '#dc2626', 'label' => 'Failed',      'spin' => false],
+                                'idle'       => ['color' => '#9ca3af', 'label' => __('admin.model3d_none'),       'spin' => false],
+                                'queued'     => ['color' => '#f59e0b', 'label' => __('admin.model3d_queued'),     'spin' => false],
+                                'processing' => ['color' => '#ea580c', 'label' => __('admin.model3d_processing'), 'spin' => true],
+                                'ready'      => ['color' => '#16a34a', 'label' => __('admin.model3d_ready'),      'spin' => false],
+                                'failed'     => ['color' => '#dc2626', 'label' => __('admin.model3d_failed'),     'spin' => false],
                             ];
                             $m3d = $m3dMap[$m3dStatus] ?? $m3dMap['idle'];
                         @endphp
@@ -119,9 +119,9 @@
                     </td>
                     <td>
                         <div style="display:flex;gap:6px;">
-                            <button type="button" class="act-btn" onclick="previewProduct({{ $product->id }})">View</button>
-                            <button type="button" class="act-btn" onclick="adminNavigate('/admin/products/{{ $product->id }}/edit')">Edit</button>
-                            <button type="button" class="act-btn red" onclick="deleteProduct({{ $product->id }}, '{{ addslashes($product->name) }}')">Delete</button>
+                            <button type="button" class="act-btn" onclick="previewProduct({{ $product->id }})">{{ __('admin.view_btn') }}</button>
+                            <button type="button" class="act-btn" onclick="adminNavigate('/admin/products/{{ $product->id }}/edit')">{{ __('admin.edit_btn') }}</button>
+                            <button type="button" class="act-btn red" onclick="deleteProduct({{ $product->id }}, '{{ addslashes($product->name) }}')">{{ __('admin.delete_btn') }}</button>
                         </div>
                     </td>
                 </tr>

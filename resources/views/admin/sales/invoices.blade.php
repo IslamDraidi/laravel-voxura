@@ -1,4 +1,4 @@
-<x-admin-layout title="Invoices" section="sales" active="invoices">
+<x-admin-layout title="{{ __('admin.invoices_title') }}" section="sales" active="invoices">
 
     <form method="GET" class="search-bar">
         <input type="text" name="search" placeholder="Search by customer…" value="{{ request('search') }}">
@@ -9,7 +9,7 @@
     <p class="result-count">{{ $invoices->count() }} invoice{{ $invoices->count() !== 1 ? 's' : '' }}</p>
 
     @if($invoices->isEmpty())
-        <div class="admin-empty">No invoices found.</div>
+        <div class="admin-empty">{{ __('admin.no_invoices') }}</div>
     @else
         <div class="card">
             <table>

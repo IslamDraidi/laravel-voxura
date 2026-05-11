@@ -78,7 +78,7 @@
 }
 </style>
 
-<a href="/admin/orders" onclick="event.preventDefault();adminNavigate('/admin/orders')" style="font-size:0.82rem;color:var(--muted);text-decoration:none;margin-bottom:1rem;display:inline-block;">← Back to Orders</a>
+<a href="/admin/orders" onclick="event.preventDefault();adminNavigate('/admin/orders')" style="font-size:0.82rem;color:var(--muted);text-decoration:none;margin-bottom:1rem;display:inline-block;">{{ __('admin.back_to_orders') }}</a>
 
 <div class="order-detail">
 
@@ -87,19 +87,19 @@
 
         {{-- Customer --}}
         <div class="detail-card">
-            <div class="detail-card-header">👤 Customer</div>
+            <div class="detail-card-header">{{ __('admin.customer_card') }}</div>
             <div class="detail-card-body">
                 <div class="info-grid">
                     <div>
-                        <p class="info-label">Name</p>
+                        <p class="info-label">{{ __('admin.name_label') }}</p>
                         <p class="info-value">{{ $order->user->name }}</p>
                     </div>
                     <div>
-                        <p class="info-label">Email</p>
+                        <p class="info-label">{{ __('admin.email_label') }}</p>
                         <p class="info-value">{{ $order->user->email }}</p>
                     </div>
                     <div style="grid-column: span 2;">
-                        <p class="info-label">Shipping Address</p>
+                        <p class="info-label">{{ __('admin.shipping_address_label') }}</p>
                         <p class="info-value">{{ $order->shipping_address }}</p>
                     </div>
                 </div>
@@ -108,14 +108,14 @@
 
         {{-- Items --}}
         <div class="detail-card">
-            <div class="detail-card-header">🛍️ Items ({{ $order->items->sum('quantity') }})</div>
+            <div class="detail-card-header">{{ __('admin.items_card', ['count' => $order->items->count()]) }}</div>
             <div class="detail-card-body">
                 @foreach($order->items as $item)
                     <div class="item-row">
                         @if($item->product)
                             <img src="{{ asset('images/' . $item->product->image) }}" alt="{{ $item->product->name }}">
                         @endif
-                        <span class="item-name">{{ $item->product?->name ?? 'Deleted' }}</span>
+                        <span class="item-name">{{ $item->product?->name ?? __('admin.deleted_item') }}</span>
                         <span class="item-qty">× {{ $item->quantity }}</span>
                         <span class="item-total">₪{{ number_format($item->subtotal(), 2) }}</span>
                     </div>
@@ -125,13 +125,13 @@
 
         {{-- Payment Info --}}
         <div class="detail-card">
-            <div class="detail-card-header">💳 Payment</div>
+            <div class="detail-card-header">{{ __('admin.payment_card') }}</div>
             <div class="detail-card-body">
                 @php $payment = $order->payments->where('status', 'completed')->first() ?? $order->payments->first(); @endphp
                 @if($payment)
                     <div class="info-grid">
                         <div>
-                            <p class="info-label">Gateway</p>
+                            <p class="info-label">{{ __('admin.gateway_label') }}</p>
                             <p class="info-value">
                                 <span class="gateway-badge {{ $payment->gateway === 'paypal' ? 'gateway-paypal' : 'gateway-tap' }}">
                                     {{ ucfirst($payment->gateway ?? 'N/A') }}
@@ -139,7 +139,7 @@
                             </p>
                         </div>
                         <div>
-                            <p class="info-label">Status</p>
+                            <p class="info-label">{{ __('admin.status_label') }}</p>
                             <p class="info-value">
                                 @php
                                     $payBadge = match($payment->status) {
@@ -154,19 +154,19 @@
                             </p>
                         </div>
                         <div>
-                            <p class="info-label">Transaction ID</p>
+                            <p class="info-label">{{ __('admin.transaction_id_label') }}</p>
                             <p class="info-value" style="font-size:0.8rem;word-break:break-all;">{{ $payment->transaction_id ?? '—' }}</p>
                         </div>
                         <div>
-                            <p class="info-label">Date</p>
+                            <p class="info-label">{{ __('admin.date_label') }}</p>
                             <p class="info-value">{{ $payment->created_at->format('M d, Y · g:i A') }}</p>
                         </div>
                         <div>
-                            <p class="info-label">Attempts</p>
+                            <p class="info-label">{{ __('admin.attempts_label') }}</p>
                             <p class="info-value">{{ $payment->attempts }}</p>
                         </div>
                         <div>
-                            <p class="info-label">Amount</p>
+                            <p class="info-label">{{ __('admin.amount_label') }}</p>
                             <p class="info-value">₪{{ number_format($payment->amount, 2) }}</p>
                         </div>
                     </div>
@@ -174,10 +174,10 @@
                     {{-- Failure history --}}
                     @if($order->payments->where('failure_code', '!=', null)->count())
                     <div style="margin-top:1rem;">
-                        <p style="font-size:0.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:0.5rem;">Failure History</p>
+                        <p style="font-size:0.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:0.5rem;">{{ __('admin.failure_history') }}</p>
                         <table class="failure-table">
                             <thead>
-                                <tr><th>#</th><th>Gateway</th><th>Date</th><th>Reason</th></tr>
+                                <tr><th>{{ __('admin.fail_hash') }}</th><th>{{ __('admin.fail_gateway') }}</th><th>{{ __('admin.fail_date') }}</th><th>{{ __('admin.fail_reason') }}</th></tr>
                             </thead>
                             <tbody>
                                 @foreach($order->payments->where('failure_code', '!=', null) as $fp)
@@ -193,7 +193,7 @@
                     </div>
                     @endif
                 @else
-                    <p style="color:var(--muted);font-size:0.85rem;">No payment recorded yet.</p>
+                    <p style="color:var(--muted);font-size:0.85rem;">{{ __('admin.no_payment') }}</p>
                 @endif
             </div>
         </div>
@@ -202,10 +202,10 @@
         @if(in_array($order->status, ['paid', 'partially_refunded', 'refunded', 'processing', 'shipped', 'delivered']))
         <div class="detail-card">
             <div class="detail-card-header">
-                💸 Refunds
+                {{ __('admin.refunds_card') }}
                 @if($order->totalRefunded() > 0)
                     <span style="margin-left:auto;font-size:0.78rem;color:var(--muted);">
-                        Total refunded: <strong style="color:#dc2626;">₪{{ number_format($order->totalRefunded(), 2) }}</strong>
+                        {{ __('admin.total_refunded') }} <strong style="color:#dc2626;">₪{{ number_format($order->totalRefunded(), 2) }}</strong>
                     </span>
                 @endif
             </div>
@@ -215,7 +215,7 @@
                 @if($order->refunds->isNotEmpty())
                 <table class="refund-table">
                     <thead>
-                        <tr><th>Date</th><th>Amount</th><th>Reason</th><th>Status</th><th>By</th><th>Refund ID</th></tr>
+                        <tr><th>{{ __('admin.refund_date_col') }}</th><th>{{ __('admin.refund_amount_col') }}</th><th>{{ __('admin.refund_reason_col') }}</th><th>{{ __('admin.refund_status_col') }}</th><th>{{ __('admin.refund_by_col') }}</th><th>{{ __('admin.refund_id_col') }}</th></tr>
                     </thead>
                     <tbody>
                         @foreach($order->refunds as $refund)
@@ -244,7 +244,7 @@
                 {{-- Refund form --}}
                 @if($order->isFullyRefunded())
                     <div style="text-align:center;padding:1rem 0;">
-                        <span class="badge badge-green" style="font-size:0.85rem;padding:0.4rem 1rem;">✓ Fully Refunded</span>
+                        <span class="badge badge-green" style="font-size:0.85rem;padding:0.4rem 1rem;">{{ __('admin.fully_refunded') }}</span>
                     </div>
                 @elseif($refundableAmount > 0 && $order->payments->where('status', 'completed')->count())
                     <div class="refund-form" x-data="{ fullRefund: false, amount: {{ $refundableAmount }} }">
@@ -253,7 +253,7 @@
                             @csrf
                             <div class="refund-row">
                                 <div>
-                                    <label>Amount ($)</label>
+                                    <label>{{ __('admin.amount_label_form') }}</label>
                                     <input type="number" name="amount" step="0.01" min="0.01"
                                            max="{{ $refundableAmount }}"
                                            x-model="amount" :readonly="fullRefund" required>
@@ -262,17 +262,17 @@
                                     <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;white-space:nowrap;">
                                         <input type="checkbox" x-model="fullRefund"
                                                @change="if(fullRefund) amount = {{ $refundableAmount }}">
-                                        Full Refund
+                                        {{ __('admin.full_refund_checkbox') }}
                                     </label>
                                 </div>
                             </div>
                             <div style="margin-bottom:0.75rem;">
-                                <label>Reason (min 10 characters)</label>
+                                <label>{{ __('admin.reason_label') }}</label>
                                 <textarea name="reason" required minlength="10" maxlength="500"
-                                          placeholder="Describe the reason for this refund…"></textarea>
+                                          placeholder="{{ __('admin.reason_ph') }}"></textarea>
                             </div>
-                            <button type="submit" class="btn-refund">💸 Issue Refund</button>
-                            <span style="font-size:0.75rem;color:var(--muted);margin-left:0.75rem;">Max: ₪{{ number_format($refundableAmount, 2) }}</span>
+                            <button type="submit" class="btn-refund">{{ __('admin.issue_refund_btn') }}</button>
+                            <span style="font-size:0.75rem;color:var(--muted);margin-left:0.75rem;">{{ __('admin.max_refund') }} ₪{{ number_format($refundableAmount, 2) }}</span>
                         </form>
                     </div>
                 @endif
@@ -287,36 +287,36 @@
     <div>
         {{-- Order Summary --}}
         <div class="detail-card">
-            <div class="detail-card-header">📋 Summary</div>
+            <div class="detail-card-header">{{ __('admin.summary_card') }}</div>
             <div class="detail-card-body">
                 <div class="totals-row">
-                    <span>Subtotal</span>
+                    <span>{{ __('admin.subtotal_row') }}</span>
                     <span>₪{{ number_format($order->subtotal ?: $order->total_amount, 2) }}</span>
                 </div>
                 @if($order->discount_amount > 0)
                 <div class="totals-row" style="color:#16a34a;">
-                    <span>Discount {{ $order->coupon_code ? '('.$order->coupon_code.')' : '' }}</span>
+                    <span>{{ __('admin.discount_row') }} {{ $order->coupon_code ? '('.$order->coupon_code.')' : '' }}</span>
                     <span>−₪{{ number_format($order->discount_amount, 2) }}</span>
                 </div>
                 @endif
                 <div class="totals-row">
-                    <span>Shipping</span>
-                    <span>{{ (float)$order->shipping_cost == 0 ? 'Free' : '₪'.number_format($order->shipping_cost, 2) }}</span>
+                    <span>{{ __('admin.shipping_row') }}</span>
+                    <span>{{ (float)$order->shipping_cost == 0 ? __('admin.free_shipping') : '₪'.number_format($order->shipping_cost, 2) }}</span>
                 </div>
                 @if($order->tax_amount > 0 || $order->shipping_tax_amount > 0)
                 <div class="totals-row">
-                    <span>Tax</span>
+                    <span>{{ __('admin.tax_row') }}</span>
                     <span>₪{{ number_format($order->tax_amount + $order->shipping_tax_amount, 2) }}</span>
                 </div>
                 @endif
                 <div class="totals-row grand">
-                    <span>Total</span>
+                    <span>{{ __('admin.total_row') }}</span>
                     <span>₪{{ number_format($order->grand_total ?: $order->grandTotal(), 2) }}</span>
                 </div>
 
                 @if($order->totalRefunded() > 0)
                 <div class="totals-row" style="color:#dc2626;margin-top:0.5rem;">
-                    <span>Refunded</span>
+                    <span>{{ __('admin.refunded_row') }}</span>
                     <span>−₪{{ number_format($order->totalRefunded(), 2) }}</span>
                 </div>
                 @endif
@@ -325,13 +325,13 @@
 
         {{-- Status --}}
         <div class="detail-card">
-            <div class="detail-card-header">📌 Status</div>
+            <div class="detail-card-header">{{ __('admin.status_card') }}</div>
             <div class="detail-card-body" style="text-align:center;">
                 <div class="status-pill" style="background:{{ $order->statusBg() }};color:{{ $order->statusColor() }};">
                     {{ ucfirst(str_replace('_', ' ', $order->status)) }}
                 </div>
                 <p style="font-size:0.78rem;color:var(--muted);margin-top:0.75rem;">
-                    Placed {{ $order->created_at->format('M d, Y · g:i A') }}
+                    {{ __('admin.placed_on', ['date' => $order->created_at->format('M d, Y · g:i A')]) }}
                 </p>
 
                 {{-- Inline status update --}}
@@ -345,7 +345,7 @@
                             </option>
                         @endforeach
                     </select>
-                    <button type="submit" class="act-btn">Update</button>
+                    <button type="submit" class="act-btn">{{ __('admin.update_btn') }}</button>
                 </form>
             </div>
         </div>
@@ -353,12 +353,12 @@
         {{-- Shipping --}}
         @if($order->shippingMethod)
         <div class="detail-card">
-            <div class="detail-card-header">📦 Shipping</div>
+            <div class="detail-card-header">{{ __('admin.shipping_card') }}</div>
             <div class="detail-card-body">
                 <p style="font-weight:700;color:var(--dark);font-size:0.88rem;">{{ $order->shippingMethod->name }}</p>
                 @if($order->shippingMethod->estimated_days_min && $order->shippingMethod->estimated_days_max)
                     <p style="font-size:0.8rem;color:var(--muted);margin-top:0.25rem;">
-                        {{ $order->shippingMethod->estimated_days_min }}–{{ $order->shippingMethod->estimated_days_max }} business days
+                        {{ __('admin.business_days', ['min' => $order->shippingMethod->estimated_days_min, 'max' => $order->shippingMethod->estimated_days_max]) }}
                     </p>
                 @endif
             </div>

@@ -1,51 +1,51 @@
-<x-admin-layout title="Coupons" section="marketing" active="promotions">
+<x-admin-layout title="{{ __('admin.coupons_title') }}" section="marketing" active="promotions">
 
     {{-- Create Form --}}
     <div class="card" style="margin-bottom:2rem;">
-        <p class="section-title">Create New Coupon</p>
+        <p class="section-title">{{ __('admin.create_coupon') }}</p>
         <form id="coupon-add-form" method="POST" action="{{ route('admin.coupons.store') }}">
             @csrf
             <div class="form-grid">
 
                 <div class="form-group">
-                    <label class="form-label">Code</label>
+                    <label class="form-label">{{ __('admin.code_label') }}</label>
                     <input type="text" name="code" class="form-input" placeholder="SUMMER20"
                            value="{{ old('code') }}" required style="text-transform:uppercase;">
                     @error('code')<p class="form-error">{{ $message }}</p>@enderror
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Type</label>
+                    <label class="form-label">{{ __('admin.type_label') }}</label>
                     <select name="type" class="form-select" required>
-                        <option value="percentage" {{ old('type') === 'percentage' ? 'selected' : '' }}>Percentage (%)</option>
-                        <option value="fixed"      {{ old('type') === 'fixed'      ? 'selected' : '' }}>Fixed Amount ($)</option>
+                        <option value="percentage" {{ old('type') === 'percentage' ? 'selected' : '' }}>{{ __('admin.type_percentage') }}</option>
+                        <option value="fixed"      {{ old('type') === 'fixed'      ? 'selected' : '' }}>{{ __('admin.type_fixed') }}</option>
                     </select>
                     @error('type')<p class="form-error">{{ $message }}</p>@enderror
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Value</label>
+                    <label class="form-label">{{ __('admin.value_label') }}</label>
                     <input type="number" name="value" class="form-input" placeholder="20"
                            min="0.01" step="0.01" value="{{ old('value') }}" required>
                     @error('value')<p class="form-error">{{ $message }}</p>@enderror
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Min. Order ($)</label>
+                    <label class="form-label">{{ __('admin.min_order_label') }}</label>
                     <input type="number" name="min_order_amount" class="form-input" placeholder="0"
                            min="0" step="0.01" value="{{ old('min_order_amount', 0) }}">
                     @error('min_order_amount')<p class="form-error">{{ $message }}</p>@enderror
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Max Uses</label>
-                    <input type="number" name="max_uses" class="form-input" placeholder="Unlimited"
+                    <label class="form-label">{{ __('admin.max_uses_label') }}</label>
+                    <input type="number" name="max_uses" class="form-input" placeholder="{{ __('admin.unlimited_ph') }}"
                            min="1" value="{{ old('max_uses') }}">
                     @error('max_uses')<p class="form-error">{{ $message }}</p>@enderror
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Expires At</label>
+                    <label class="form-label">{{ __('admin.expires_at_label') }}</label>
                     <input type="date" name="expires_at" class="form-input"
                            min="{{ date('Y-m-d', strtotime('+1 day')) }}"
                            value="{{ old('expires_at') }}">
@@ -54,7 +54,7 @@
 
             </div>
             <div style="margin-top:1.25rem;">
-                <button type="submit" class="add-btn">+ Create Coupon</button>
+                <button type="submit" class="add-btn">{{ __('admin.create_coupon_btn') }}</button>
             </div>
         </form>
     </div>
@@ -64,13 +64,13 @@
         <table>
             <thead>
                 <tr>
-                    <th>Code</th>
-                    <th>Type / Value</th>
-                    <th>Min Order</th>
-                    <th>Used</th>
-                    <th>Expires</th>
-                    <th>Status</th>
-                    <th>Actions</th>
+                    <th>{{ __('admin.code_col') }}</th>
+                    <th>{{ __('admin.type_value_col') }}</th>
+                    <th>{{ __('admin.min_order_col') }}</th>
+                    <th>{{ __('admin.used_col') }}</th>
+                    <th>{{ __('admin.expires_col') }}</th>
+                    <th>{{ __('admin.status_col_h') }}</th>
+                    <th>{{ __('admin.actions_col') }}</th>
                 </tr>
             </thead>
             <tbody id="coupons-tbody">
@@ -98,27 +98,27 @@
                         @if($coupon->expires_at)
                             {{ $coupon->expires_at->format('M d, Y') }}
                         @else
-                            <span style="color:var(--muted);">Never</span>
+                            <span style="color:var(--muted);">{{ __('admin.never_expires') }}</span>
                         @endif
                     </td>
                     <td>
                         @if($expired)
-                            <span class="badge badge-red" id="coupon-status-{{ $coupon->id }}">Expired</span>
+                            <span class="badge badge-red" id="coupon-status-{{ $coupon->id }}">{{ __('admin.coupon_expired') }}</span>
                         @elseif($maxed)
-                            <span class="badge badge-red" id="coupon-status-{{ $coupon->id }}">Limit reached</span>
+                            <span class="badge badge-red" id="coupon-status-{{ $coupon->id }}">{{ __('admin.coupon_limit_reached') }}</span>
                         @elseif($coupon->is_active)
-                            <span class="badge badge-green" id="coupon-status-{{ $coupon->id }}">Active</span>
+                            <span class="badge badge-green" id="coupon-status-{{ $coupon->id }}">{{ __('admin.coupon_active') }}</span>
                         @else
-                            <span class="badge badge-gray" id="coupon-status-{{ $coupon->id }}">Inactive</span>
+                            <span class="badge badge-gray" id="coupon-status-{{ $coupon->id }}">{{ __('admin.coupon_inactive') }}</span>
                         @endif
                     </td>
                     <td style="white-space:nowrap;">
                         <button type="button" class="act-btn" id="coupon-toggle-{{ $coupon->id }}"
                                 onclick="toggleCoupon({{ $coupon->id }}, '{{ $coupon->code }}', {{ $coupon->is_active ? 'true' : 'false' }})">
-                            {{ $coupon->is_active ? 'Deactivate' : 'Activate' }}
+                            {{ $coupon->is_active ? __('admin.deactivate_btn') : __('admin.activate_btn') }}
                         </button>
                         <button type="button" class="act-btn red"
-                                onclick="deleteCoupon({{ $coupon->id }}, '{{ $coupon->code }}')">Delete</button>
+                                onclick="deleteCoupon({{ $coupon->id }}, '{{ $coupon->code }}')">{{ __('admin.delete_btn') }}</button>
                     </td>
                 </tr>
                 @endforeach
@@ -126,7 +126,7 @@
         </table>
     </div>
     @if($coupons->isEmpty())
-        <div class="admin-empty" id="coupons-empty">No coupons yet. Create one above.</div>
+        <div class="admin-empty" id="coupons-empty">{{ __('admin.no_coupons') }}</div>
     @endif
 
     <script>
@@ -153,11 +153,11 @@
                     '<td><span class="badge ' + badge + '">' + escHtml(valLabel) + '</span></td>' +
                     '<td>' + (parseFloat(coupon.min_order_amount) > 0 ? '₪' + parseFloat(coupon.min_order_amount).toFixed(0) : '<span style="color:var(--muted);">—</span>') + '</td>' +
                     '<td>0' + (coupon.max_uses ? ' / ' + coupon.max_uses : '') + '</td>' +
-                    '<td style="white-space:nowrap;">' + (coupon.expires_at ? coupon.expires_at : '<span style="color:var(--muted);">Never</span>') + '</td>' +
-                    '<td><span class="badge badge-green" id="coupon-status-' + coupon.id + '">Active</span></td>' +
+                    '<td style="white-space:nowrap;">' + (coupon.expires_at ? coupon.expires_at : '<span style="color:var(--muted);">{{ __('admin.never_expires') }}</span>') + '</td>' +
+                    '<td><span class="badge badge-green" id="coupon-status-' + coupon.id + '">{{ __('admin.coupon_active') }}</span></td>' +
                     '<td style="white-space:nowrap;">' +
-                        '<button type="button" class="act-btn" id="coupon-toggle-' + coupon.id + '" onclick="toggleCoupon(' + coupon.id + ', \'' + escJs(coupon.code) + '\', true)">Deactivate</button>' +
-                        '<button type="button" class="act-btn red" onclick="deleteCoupon(' + coupon.id + ', \'' + escJs(coupon.code) + '\')">Delete</button>' +
+                        '<button type="button" class="act-btn" id="coupon-toggle-' + coupon.id + '" onclick="toggleCoupon(' + coupon.id + ', \'' + escJs(coupon.code) + '\', true)">{{ __('admin.deactivate_btn') }}</button>' +
+                        '<button type="button" class="act-btn red" onclick="deleteCoupon(' + coupon.id + ', \'' + escJs(coupon.code) + '\')">{{ __('admin.delete_btn') }}</button>' +
                     '</td>';
                 tbody.appendChild(row);
                 form.reset();
@@ -183,10 +183,10 @@
                 if (row) row.style.opacity = newActive ? '1' : '0.6';
                 if (statusEl) {
                     statusEl.className = 'badge ' + (newActive ? 'badge-green' : 'badge-gray');
-                    statusEl.textContent = newActive ? 'Active' : 'Inactive';
+                    statusEl.textContent = newActive ? '{{ __('admin.coupon_active') }}' : '{{ __('admin.coupon_inactive') }}';
                 }
                 if (toggleBtn) {
-                    toggleBtn.textContent = newActive ? 'Deactivate' : 'Activate';
+                    toggleBtn.textContent = newActive ? '{{ __('admin.deactivate_btn') }}' : '{{ __('admin.activate_btn') }}';
                     toggleBtn.setAttribute('onclick', 'toggleCoupon(' + id + ', \'' + escJs(code) + '\', ' + newActive + ')');
                 }
                 if (typeof showToast === 'function') showToast(data.message || 'Updated.', 'success');

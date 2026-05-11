@@ -1,9 +1,9 @@
-<x-admin-layout title="Customer Groups" section="customers" active="groups">
+<x-admin-layout title="{{ __('admin.groups_title') }}" section="customers" active="groups">
 
     <div class="info-banner">
         <span>👪</span>
         <div>
-            <strong>Customer Groups</strong><br>
+            <strong>{{ __('admin.groups_title') }}</strong><br>
             Groups allow you to segment customers (e.g. VIP, Wholesale, Retail) and apply group-specific pricing,
             discounts, and access rules. This feature will be available in a future update.
         </div>
@@ -11,7 +11,7 @@
 
     <div class="card" style="text-align:center;padding:3rem 2rem;">
         <div style="font-size:3rem;margin-bottom:1rem;">👪</div>
-        <h2 style="font-size:1.25rem;font-weight:700;color:var(--dark);margin-bottom:0.5rem;">Customer Groups Coming Soon</h2>
+        <h2 style="font-size:1.25rem;font-weight:700;color:var(--dark);margin-bottom:0.5rem;">{{ __('admin.groups_title') }} {{ __('admin.coming_soon') }}</h2>
         <p style="color:var(--muted);font-size:14px;max-width:400px;margin:0 auto 1.5rem;">
             Segment your customers into groups and apply tailored pricing rules,
             exclusive promotions, and access restrictions per group.

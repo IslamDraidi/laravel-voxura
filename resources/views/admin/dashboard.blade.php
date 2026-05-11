@@ -60,62 +60,62 @@
 </style>
 
 {{-- ═══════════════ OVERALL DETAILS ═══════════════ --}}
-<p class="section-heading">Overall Details</p>
+<p class="section-heading">{{ __('admin.overall_details') }}</p>
 <div class="overview-grid">
 
     <div class="ov-card">
         <div class="ov-icon">💰</div>
-        <div class="ov-label">Total Sales</div>
+        <div class="ov-label">{{ __('admin.total_sales') }}</div>
         <div class="ov-value orange">₪{{ number_format($totalSales, 0) }}</div>
-        <div class="ov-sub">All time revenue</div>
+        <div class="ov-sub">{{ __('admin.all_time_revenue') }}</div>
     </div>
 
     <div class="ov-card">
         <div class="ov-icon">🛍️</div>
-        <div class="ov-label">Total Orders</div>
+        <div class="ov-label">{{ __('admin.total_orders') }}</div>
         <div class="ov-value blue">{{ number_format($totalOrders) }}</div>
-        <div class="ov-sub">All time orders</div>
+        <div class="ov-sub">{{ __('admin.all_time_orders') }}</div>
     </div>
 
     <div class="ov-card">
         <div class="ov-icon">👤</div>
-        <div class="ov-label">Total Customers</div>
+        <div class="ov-label">{{ __('admin.total_customers') }}</div>
         <div class="ov-value green">{{ number_format($totalCustomers) }}</div>
-        <div class="ov-sub">Registered users</div>
+        <div class="ov-sub">{{ __('admin.registered_users') }}</div>
     </div>
 
     <div class="ov-card">
         <div class="ov-icon">📈</div>
-        <div class="ov-label">Avg Order Sale</div>
+        <div class="ov-label">{{ __('admin.avg_order_sale') }}</div>
         <div class="ov-value orange">₪{{ number_format($avgOrderSale, 2) }}</div>
-        <div class="ov-sub">Per transaction</div>
+        <div class="ov-sub">{{ __('admin.per_transaction') }}</div>
     </div>
 
     <div class="ov-card">
         <div class="ov-icon">📋</div>
-        <div class="ov-label">Unpaid Invoices</div>
+        <div class="ov-label">{{ __('admin.unpaid_invoices') }}</div>
         <div class="ov-value red">{{ number_format($unpaidInvoices) }}</div>
-        <div class="ov-sub">Pending payment</div>
+        <div class="ov-sub">{{ __('admin.pending_payment') }}</div>
     </div>
 
 </div>
 
 {{-- ═══════════════ TODAY'S DETAILS ════════════════ --}}
-<p class="section-heading">Today's Details</p>
+<p class="section-heading">{{ __('admin.todays_details') }}</p>
 <div class="today-grid">
 
     <div class="td-card orange">
-        <div class="td-label">Today's Sales</div>
+        <div class="td-label">{{ __('admin.todays_sales') }}</div>
         <div class="td-value">₪{{ number_format($todaySales, 0) }}</div>
     </div>
 
     <div class="td-card dark">
-        <div class="td-label">Today's Orders</div>
+        <div class="td-label">{{ __('admin.todays_orders') }}</div>
         <div class="td-value">{{ $todayOrders }}</div>
     </div>
 
     <div class="td-card green">
-        <div class="td-label">Today's Customers</div>
+        <div class="td-label">{{ __('admin.todays_customers') }}</div>
         <div class="td-value">{{ $todayCustomers }}</div>
     </div>
 
@@ -126,16 +126,16 @@
 
     {{-- Top Selling Products --}}
     <div class="card" style="padding:20px 22px;">
-        <p class="section-heading" style="margin-bottom:.75rem;">🏆 Top Selling Products</p>
+        <p class="section-heading" style="margin-bottom:.75rem;">{{ __('admin.top_selling_products') }}</p>
         @if($topProducts->isEmpty())
-            <p style="color:var(--muted);font-size:13px;">No sales data yet.</p>
+            <p style="color:var(--muted);font-size:13px;">{{ __('admin.no_sales_data') }}</p>
         @else
             <table>
                 <thead>
                     <tr>
-                        <th>Product</th>
-                        <th style="text-align:right;">Sales</th>
-                        <th style="text-align:right;">Revenue</th>
+                        <th>{{ __('admin.product_col') }}</th>
+                        <th style="text-align:right;">{{ __('admin.sales_col') }}</th>
+                        <th style="text-align:right;">{{ __('admin.revenue_col') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -158,16 +158,16 @@
 
     {{-- Customers with Most Sales --}}
     <div class="card" style="padding:20px 22px;">
-        <p class="section-heading" style="margin-bottom:.75rem;">⭐ Customers with Most Sales</p>
+        <p class="section-heading" style="margin-bottom:.75rem;">{{ __('admin.customers_most_sales') }}</p>
         @if($topCustomers->isEmpty())
-            <p style="color:var(--muted);font-size:13px;">No customer data yet.</p>
+            <p style="color:var(--muted);font-size:13px;">{{ __('admin.no_customer_data') }}</p>
         @else
             <table>
                 <thead>
                     <tr>
-                        <th>Customer</th>
-                        <th style="text-align:right;">Orders</th>
-                        <th style="text-align:right;">Total Spent</th>
+                        <th>{{ __('admin.customer_col') }}</th>
+                        <th style="text-align:right;">{{ __('admin.orders_col') }}</th>
+                        <th style="text-align:right;">{{ __('admin.total_spent_col') }}</th>
                     </tr>
                 </thead>
                 <tbody>

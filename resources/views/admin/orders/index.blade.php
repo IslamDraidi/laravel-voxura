@@ -1,19 +1,19 @@
-<x-admin-layout title="Orders" section="sales" active="orders">
+<x-admin-layout title="{{ __('admin.orders_title') }}" section="sales" active="orders">
 
     {{-- Status Tabs --}}
     <div class="sub-nav">
         @php $currentStatus = request('status', ''); @endphp
 
         @foreach([
-            ''                    => ['label' => 'All',                'count' => $statusCounts['all']],
-            'pending'             => ['label' => 'Pending',            'count' => $statusCounts['pending']],
-            'paid'                => ['label' => 'Paid',               'count' => $statusCounts['paid']],
-            'processing'          => ['label' => 'Processing',         'count' => $statusCounts['processing']],
-            'shipped'             => ['label' => 'Shipped',            'count' => $statusCounts['shipped']],
-            'delivered'           => ['label' => 'Delivered',          'count' => $statusCounts['delivered']],
-            'cancelled'           => ['label' => 'Cancelled',          'count' => $statusCounts['cancelled']],
-            'payment_blocked'     => ['label' => 'Blocked',            'count' => $statusCounts['payment_blocked']],
-            'refunded'            => ['label' => 'Refunded',           'count' => $statusCounts['refunded']],
+            ''                    => ['label' => __('admin.tab_all'),         'count' => $statusCounts['all']],
+            'pending'             => ['label' => __('admin.tab_pending'),     'count' => $statusCounts['pending']],
+            'paid'                => ['label' => __('admin.tab_paid'),        'count' => $statusCounts['paid']],
+            'processing'          => ['label' => __('admin.tab_processing'),  'count' => $statusCounts['processing']],
+            'shipped'             => ['label' => __('admin.tab_shipped'),     'count' => $statusCounts['shipped']],
+            'delivered'           => ['label' => __('admin.tab_delivered'),   'count' => $statusCounts['delivered']],
+            'cancelled'           => ['label' => __('admin.tab_cancelled'),   'count' => $statusCounts['cancelled']],
+            'payment_blocked'     => ['label' => __('admin.tab_blocked'),     'count' => $statusCounts['payment_blocked']],
+            'refunded'            => ['label' => __('admin.tab_refunded'),    'count' => $statusCounts['refunded']],
         ] as $val => $tab)
             <a href="/admin/orders?status={{ $val }}{{ request('search') ? '&search='.request('search') : '' }}"
                class="sub-btn {{ $currentStatus === $val ? 'active' : '' }}">
@@ -28,33 +28,33 @@
         @if(request('status'))
             <input type="hidden" name="status" value="{{ request('status') }}">
         @endif
-        <input type="text" name="search" placeholder="Search by customer name or email…"
+        <input type="text" name="search" placeholder="{{ __('admin.search_orders_ph') }}"
                value="{{ request('search') }}">
-        <button type="submit" class="add-btn">Search</button>
+        <button type="submit" class="add-btn">{{ __('admin.search_btn') }}</button>
         <a href="/admin/orders{{ request('status') ? '?status='.request('status') : '' }}"
-           style="font-size:0.85rem;color:var(--muted);text-decoration:none;align-self:center;">Reset</a>
+           style="font-size:0.85rem;color:var(--muted);text-decoration:none;align-self:center;">{{ __('admin.reset_btn') }}</a>
     </form>
 
-    <p class="result-count">Showing {{ $orders->count() }} {{ Str::plural('order', $orders->count()) }}</p>
+    <p class="result-count">{{ __('admin.showing_orders', ['count' => $orders->count()]) }}</p>
 
     {{-- Orders --}}
     @if($orders->isEmpty())
         <div class="admin-empty">
             <p style="font-size:2rem;margin-bottom:0.5rem;">📭</p>
-            <p>No orders found.</p>
+            <p>{{ __('admin.no_orders') }}</p>
         </div>
     @else
         <div class="card">
             <table>
                 <thead>
                     <tr>
-                        <th>Order #</th>
-                        <th>Customer</th>
-                        <th>Date</th>
-                        <th>Items</th>
-                        <th>Total</th>
-                        <th>Status</th>
-                        <th>Update</th>
+                        <th>{{ __('admin.order_num_col') }}</th>
+                        <th>{{ __('admin.customer_col_h') }}</th>
+                        <th>{{ __('admin.date_col') }}</th>
+                        <th>{{ __('admin.items_col') }}</th>
+                        <th>{{ __('admin.total_col') }}</th>
+                        <th>{{ __('admin.status_col') }}</th>
+                        <th>{{ __('admin.update_col') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -112,9 +112,9 @@
                                     @endforeach
                                 </select>
                                 <button type="button" class="act-btn"
-                                        onclick="updateOrderStatus({{ $order->id }})">Update</button>
+                                        onclick="updateOrderStatus({{ $order->id }})">{{ __('admin.update_btn') }}</button>
                                 <button type="button" class="act-btn"
-                                        onclick="adminNavigate('/admin/orders/{{ $order->id }}')">View</button>
+                                        onclick="adminNavigate('/admin/orders/{{ $order->id }}')">{{ __('admin.view_btn') }}</button>
                             </div>
                         </td>
                     </tr>

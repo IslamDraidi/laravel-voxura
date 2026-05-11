@@ -1,4 +1,4 @@
-<x-admin-layout title="Communications" section="marketing" active="communications">
+<x-admin-layout title="{{ __('admin.communications_title') }}" section="marketing" active="communications">
 
     <div class="stat-grid">
         <div class="stat-card">
@@ -28,7 +28,7 @@
                 Send bulk promotional emails or newsletters to customer segments. Requires an email service provider integration.
             </p>
             <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;">
-                <span class="badge badge-gray">Coming Soon</span>
+                <span class="badge badge-gray">{{ __('admin.coming_soon') }}</span>
                 <span class="badge badge-gray">Requires SMTP / Mailgun / SES</span>
             </div>
         </div>
@@ -38,7 +38,7 @@
             <p style="font-size:13px;color:var(--muted);margin-bottom:1rem;">
                 Send order status SMS updates to customers via Twilio or similar providers.
             </p>
-            <span class="badge badge-gray">Coming Soon</span>
+            <span class="badge badge-gray">{{ __('admin.coming_soon') }}</span>
         </div>
 
         <div class="card">
@@ -46,7 +46,7 @@
             <p style="font-size:13px;color:var(--muted);margin-bottom:1rem;">
                 Browser and mobile push notifications for promotions, back-in-stock alerts, and more.
             </p>
-            <span class="badge badge-gray">Coming Soon</span>
+            <span class="badge badge-gray">{{ __('admin.coming_soon') }}</span>
         </div>
     </div>
 

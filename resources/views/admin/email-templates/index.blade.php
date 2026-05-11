@@ -1,4 +1,4 @@
-<x-admin-layout title="Email Templates" section="cms" active="emails">
+<x-admin-layout title="{{ __('admin.email_templates_title') }}" section="cms" active="emails">
 <style>
 /* Template card layout */
 .template-card { background:#fff; border:1px solid var(--border); border-radius:12px; overflow:hidden; transition:box-shadow 0.2s; margin-bottom:1rem; }
@@ -54,7 +54,7 @@
             <div class="template-meta">
                 <p class="template-name">{{ $tpl->name }}</p>
                 <p class="template-key">{{ $tpl->key }}</p>
-                <p class="template-subject">Subject: {{ $tpl->subject }}</p>
+                <p class="template-subject">{{ __('admin.subject_label') }}: {{ $tpl->subject }}</p>
             </div>
             <div class="template-card-actions">
                 <button type="button" class="act-btn blue" onclick="openPreview({{ $tpl->id }})">
@@ -74,7 +74,7 @@
 
                 {{-- Subject --}}
                 <div class="field-group">
-                    <label class="field-label" for="subject-{{ $tpl->id }}">Subject Line</label>
+                    <label class="field-label" for="subject-{{ $tpl->id }}">{{ __('admin.subject_label') }}</label>
                     <input type="text" id="subject-{{ $tpl->id }}" name="subject"
                            class="field-input" value="{{ $tpl->subject }}" required>
                 </div>
@@ -96,7 +96,7 @@
 
                 {{-- Body --}}
                 <div class="field-group">
-                    <label class="field-label" for="body-{{ $tpl->id }}">HTML Body</label>
+                    <label class="field-label" for="body-{{ $tpl->id }}">{{ __('admin.body_label') }}</label>
                     <textarea id="body-{{ $tpl->id }}" name="body"
                               class="field-textarea" required>{{ $tpl->body }}</textarea>
                 </div>
@@ -110,7 +110,7 @@
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="add-btn">Save Template</button>
+                    <button type="submit" class="add-btn">{{ __('admin.save_template_btn') }}</button>
                     <button type="button" class="act-btn"
                             onclick="toggleEdit({{ $tpl->id }})">Cancel</button>
                 </div>

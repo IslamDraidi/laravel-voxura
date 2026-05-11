@@ -1,8 +1,8 @@
-<x-admin-layout title="Product Reports" section="reporting" active="products">
+<x-admin-layout title="{{ __('admin.product_reports_title') }}" section="reporting" active="products">
 
     {{-- Period selector --}}
     <div class="sub-nav">
-        @foreach(['7' => 'Last 7 days', '30' => 'Last 30 days', '90' => 'Last 90 days', '365' => 'Last year'] as $val => $label)
+        @foreach(['7' => __('admin.period_7'), '30' => __('admin.period_30'), '90' => __('admin.period_90'), '365' => __('admin.period_365_alt')] as $val => $label)
             <a href="{{ route('admin.reports.products', ['period' => $val]) }}"
                class="sub-btn {{ $period == $val ? 'active' : '' }}">{{ $label }}</a>
         @endforeach
@@ -10,15 +10,15 @@
 
     <div class="stat-grid">
         <div class="stat-card">
-            <div class="sc-label">Revenue (Period)</div>
+            <div class="sc-label">{{ __('admin.revenue_period') }}</div>
             <div class="sc-value green" style="font-size:1.5rem;">₪{{ number_format($totalRevenue, 2) }}</div>
         </div>
         <div class="stat-card">
-            <div class="sc-label">Units Sold</div>
+            <div class="sc-label">{{ __('admin.units_sold') }}</div>
             <div class="sc-value">{{ number_format($totalUnitsSold) }}</div>
         </div>
         <div class="stat-card">
-            <div class="sc-label">Products Sold</div>
+            <div class="sc-label">{{ __('admin.products_sold') }}</div>
             <div class="sc-value blue">{{ $topProducts->count() }}</div>
         </div>
     </div>
@@ -26,9 +26,9 @@
     <div class="two-col" style="margin-bottom:0;">
         {{-- Revenue by Category Chart --}}
         <div class="card" style="margin-bottom:16px;">
-            <p class="section-title">Revenue by Category</p>
+            <p class="section-title">{{ __('admin.revenue_by_category') }}</p>
             @if($revenueByCategory->isEmpty())
-                <div class="admin-empty" style="padding:1.5rem;">No sales data yet.</div>
+                <div class="admin-empty" style="padding:1.5rem;">{{ __('admin.no_sales_yet') }}</div>
             @else
                 <canvas id="catChart" height="160"></canvas>
             @endif
@@ -36,9 +36,9 @@
 
         {{-- Top 5 Products --}}
         <div class="card" style="margin-bottom:16px;">
-            <p class="section-title">Top 5 Products</p>
+            <p class="section-title">{{ __('admin.top5_products') }}</p>
             @if($topProducts->isEmpty())
-                <div class="admin-empty" style="padding:1.5rem;">No sales data yet.</div>
+                <div class="admin-empty" style="padding:1.5rem;">{{ __('admin.no_sales_yet') }}</div>
             @else
                 @foreach($topProducts->take(5) as $i => $product)
                 @php $pct = $totalRevenue > 0 ? ($product->total_revenue / $totalRevenue) * 100 : 0; @endphp
@@ -60,16 +60,16 @@
     {{-- Full product table --}}
     @if($topProducts->isNotEmpty())
     <div class="card">
-        <p class="section-title">All Products — Sales Breakdown</p>
+        <p class="section-title">{{ __('admin.all_products_breakdown') }}</p>
         <table>
             <thead>
                 <tr>
                     <th>#</th>
                     <th>Product</th>
                     <th>Category</th>
-                    <th>Units Sold</th>
+                    <th>{{ __('admin.units_col') }}</th>
                     <th>Revenue</th>
-                    <th>Revenue Share</th>
+                    <th>{{ __('admin.revenue_share_col') }}</th>
                 </tr>
             </thead>
             <tbody>

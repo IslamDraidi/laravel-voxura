@@ -1,4 +1,4 @@
-<x-admin-layout title="Attribute Families" section="catalog" active="attr-families">
+<x-admin-layout title="{{ __('admin.attr_families_title') }}" section="catalog" active="attr-families">
 
     <div class="info-banner">
         <span>🗃️</span>
@@ -11,7 +11,7 @@
 
     <div class="card" style="text-align:center;padding:3rem 2rem;">
         <div style="font-size:3rem;margin-bottom:1rem;">🗃️</div>
-        <h2 style="font-size:1.25rem;font-weight:700;color:var(--dark);margin-bottom:0.5rem;">Attribute Families Coming Soon</h2>
+        <h2 style="font-size:1.25rem;font-weight:700;color:var(--dark);margin-bottom:0.5rem;">{{ __('admin.attr_families_title') }} {{ __('admin.coming_soon') }}</h2>
         <p style="color:var(--muted);font-size:14px;max-width:400px;margin:0 auto 1.5rem;">
             Group attributes into families and assign a family to each product type,
             making attribute management scalable as your catalog grows.

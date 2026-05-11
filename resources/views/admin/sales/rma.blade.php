@@ -1,4 +1,4 @@
-<x-admin-layout title="RMA" section="sales" active="rma">
+<x-admin-layout title="{{ __('admin.rma_title') }}" section="sales" active="rma">
 
     <div class="info-banner">
         <span>📦</span>
@@ -11,7 +11,7 @@
 
     <div class="card" style="text-align:center;padding:3rem 2rem;">
         <div style="font-size:3rem;margin-bottom:1rem;">↩️</div>
-        <h2 style="font-size:1.25rem;font-weight:700;color:var(--dark);margin-bottom:0.5rem;">RMA Coming Soon</h2>
+        <h2 style="font-size:1.25rem;font-weight:700;color:var(--dark);margin-bottom:0.5rem;">RMA {{ __('admin.coming_soon') }}</h2>
         <p style="color:var(--muted);font-size:14px;max-width:400px;margin:0 auto 1.5rem;">
             Return Merchandise Authorization will let you manage customer return requests,
             approve or reject them, and track refund/exchange status.

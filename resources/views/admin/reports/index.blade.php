@@ -1,4 +1,4 @@
-<x-admin-layout title="Reports" section="reporting" active="sales">
+<x-admin-layout title="{{ __('admin.reports_title') }}" section="reporting" active="sales">
 <style>
 .chart-wrap { position: relative; height: 280px; }
 .status-bars { display: flex; flex-direction: column; gap: 0.85rem; }
@@ -13,7 +13,7 @@
 
 {{-- Period Tabs --}}
 <div class="sub-nav" style="margin-bottom:1.75rem;">
-    @foreach(['7' => 'Last 7 days', '30' => 'Last 30 days', '90' => 'Last 90 days', '365' => 'This year'] as $val => $label)
+    @foreach(['7' => __('admin.period_7'), '30' => __('admin.period_30'), '90' => __('admin.period_90'), '365' => __('admin.period_365')] as $val => $label)
         <a href="{{ route('admin.reports.index', ['period' => $val]) }}"
            class="sub-btn {{ $period == $val ? 'active' : '' }}">{{ $label }}</a>
     @endforeach
@@ -22,27 +22,27 @@
 {{-- Stats --}}
 <div class="stat-grid" style="margin-bottom:2rem;">
     <div class="stat-card">
-        <span class="sc-label">Total Revenue</span>
+        <span class="sc-label">{{ __('admin.total_revenue_stat') }}</span>
         <span class="sc-value" style="color:var(--orange);">₪{{ number_format($revenue) }}</span>
-        <span class="sc-sub">Excluding cancelled orders</span>
+        <span class="sc-sub">{{ __('admin.excl_cancelled') }}</span>
     </div>
     <div class="stat-card">
-        <span class="sc-label">Orders</span>
+        <span class="sc-label">{{ __('admin.orders_stat') }}</span>
         <span class="sc-value green">{{ number_format($ordersCount) }}</span>
     </div>
     <div class="stat-card">
-        <span class="sc-label">New Customers</span>
+        <span class="sc-label">{{ __('admin.new_customers_stat') }}</span>
         <span class="sc-value blue">{{ number_format($newCustomers) }}</span>
     </div>
     <div class="stat-card">
-        <span class="sc-label">Avg. Order Value</span>
+        <span class="sc-label">{{ __('admin.avg_order_value') }}</span>
         <span class="sc-value">₪{{ number_format($avgOrder, 2) }}</span>
     </div>
 </div>
 
 {{-- Revenue Chart --}}
 <div class="card" style="margin-bottom:2rem;">
-    <p class="section-title">Revenue Over Time</p>
+    <p class="section-title">{{ __('admin.revenue_over_time') }}</p>
     <div class="chart-wrap">
         <canvas id="revenueChart"></canvas>
     </div>
@@ -52,17 +52,17 @@
 
     {{-- Top Products --}}
     <div class="card">
-        <p class="section-title">Top Products</p>
+        <p class="section-title">{{ __('admin.top_products_title') }}</p>
         @if($topProducts->isEmpty())
-            <p style="color:var(--muted);font-size:0.9rem;">No data for this period.</p>
+            <p style="color:var(--muted);font-size:0.9rem;">{{ __('admin.no_data_period') }}</p>
         @else
             <table>
                 <thead>
                     <tr>
-                        <th>#</th>
+                        <th>{{ __('admin.rank_col') }}</th>
                         <th>Product</th>
-                        <th>Qty</th>
-                        <th>Revenue</th>
+                        <th>{{ __('admin.qty_col') }}</th>
+                        <th>{{ __('admin.revenue_col2') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -81,13 +81,13 @@
 
     {{-- Order Status Breakdown --}}
     <div class="card">
-        <p class="section-title">Order Status Breakdown</p>
+        <p class="section-title">{{ __('admin.status_breakdown') }}</p>
         @php
             $total = $statusBreakdown->sum();
             $statusColors = ['pending'=>'#f59e0b','paid'=>'#16a34a','processing'=>'#3b82f6','shipped'=>'#8b5cf6','delivered'=>'#16a34a','cancelled'=>'#ef4444','payment_blocked'=>'#ef4444','refunded'=>'#8b5cf6','partially_refunded'=>'#d97706'];
         @endphp
         @if($total === 0)
-            <p style="color:var(--muted);font-size:0.9rem;">No orders for this period.</p>
+            <p style="color:var(--muted);font-size:0.9rem;">{{ __('admin.no_orders_period') }}</p>
         @else
             <div class="status-bars">
                 @foreach(['pending','paid','processing','shipped','delivered','cancelled','payment_blocked','refunded','partially_refunded'] as $status)
@@ -111,28 +111,28 @@
 {{-- Refund & Payment Stats --}}
 <div class="stat-grid" style="margin-top:2rem;margin-bottom:1.5rem;">
     <div class="stat-card">
-        <span class="sc-label">Refunds Issued</span>
+        <span class="sc-label">{{ __('admin.refunds_issued') }}</span>
         <span class="sc-value red">{{ $refundStats['count'] }}</span>
-        <span class="sc-sub">₪{{ number_format($refundStats['amount'], 2) }} total</span>
+        <span class="sc-sub">{{ __('admin.refund_total', ['amount' => number_format($refundStats['amount'], 2)]) }}</span>
     </div>
     <div class="stat-card">
-        <span class="sc-label">Refund Rate</span>
+        <span class="sc-label">{{ __('admin.refund_rate_stat') }}</span>
         <span class="sc-value" style="color:{{ $refundStats['rate'] > 5 ? 'var(--red)' : 'var(--green)' }};">{{ $refundStats['rate'] }}%</span>
-        <span class="sc-sub">Refunds ÷ Orders</span>
+        <span class="sc-sub">{{ __('admin.refunds_over_orders') }}</span>
     </div>
     <div class="stat-card">
-        <span class="sc-label">Failed Payments</span>
+        <span class="sc-label">{{ __('admin.failed_payments') }}</span>
         <span class="sc-value red">{{ $refundStats['failed_payments'] }}</span>
-        <span class="sc-sub">{{ $refundStats['failed_rate'] }}% failure rate</span>
+        <span class="sc-sub">{{ __('admin.failure_rate', ['rate' => $refundStats['failed_rate']]) }}</span>
     </div>
 </div>
 
 @if($refundStats['top_reasons']->isNotEmpty())
 <div class="card" style="margin-bottom:2rem;">
-    <p class="section-title">Top Refund Reasons</p>
+    <p class="section-title">{{ __('admin.top_refund_reasons') }}</p>
     <table>
         <thead>
-            <tr><th>#</th><th>Reason</th><th>Count</th><th>Total</th></tr>
+            <tr><th>{{ __('admin.rank_col') }}</th><th>{{ __('admin.reason_col') }}</th><th>{{ __('admin.count_col') }}</th><th>{{ __('admin.total_col2') }}</th></tr>
         </thead>
         <tbody>
             @foreach($refundStats['top_reasons'] as $i => $r)

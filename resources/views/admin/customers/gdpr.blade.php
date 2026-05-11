@@ -1,4 +1,4 @@
-<x-admin-layout title="GDPR Data Requests" section="customers" active="gdpr">
+<x-admin-layout title="{{ __('admin.gdpr_title') }}" section="customers" active="gdpr">
 
     <div class="info-banner">
         <span>🔒</span>

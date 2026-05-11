@@ -25,13 +25,13 @@ $selectedMethods = old('methods', isset($zone) ? $zone->methods->pluck('id')->to
 
 <div class="form-grid" style="margin-bottom:1rem;">
     <div class="form-group" style="grid-column:1/-1;">
-        <label class="form-label">Zone Name *</label>
-        <input type="text" name="name" class="form-input" required value="{{ old('name', $zone->name ?? '') }}" placeholder="e.g. Middle East, Europe">
+        <label class="form-label">{{ __('admin.zone_name_label') }}</label>
+        <input type="text" name="name" class="form-input" required value="{{ old('name', $zone->name ?? '') }}" placeholder="{{ __('admin.zone_name_ph') }}">
         @error('name')<p class="form-error">{{ $message }}</p>@enderror
     </div>
 
     <div class="form-group" style="grid-column:1/-1;">
-        <label class="form-label">Countries * <span style="font-weight:400;text-transform:none;">(hold Ctrl/Cmd to select multiple)</span></label>
+        <label class="form-label">{{ __('admin.countries_label') }} <span style="font-weight:400;text-transform:none;">{{ __('admin.countries_hint') }}</span></label>
         <select name="countries[]" multiple class="form-select" style="min-height:180px;" required>
             @foreach($isoCountries as $code => $name)
                 <option value="{{ $code }}" {{ in_array($code, $selectedCountries) ? 'selected' : '' }}>{{ $code }} — {{ $name }}</option>
@@ -41,7 +41,7 @@ $selectedMethods = old('methods', isset($zone) ? $zone->methods->pluck('id')->to
     </div>
 
     <div class="form-group" style="grid-column:1/-1;">
-        <label class="form-label">Regions/States <span style="font-weight:400;text-transform:none;">(comma-separated, optional)</span></label>
+        <label class="form-label">{{ __('admin.regions_label') }} <span style="font-weight:400;text-transform:none;">{{ __('admin.regions_hint') }}</span></label>
         <input type="text" name="regions" class="form-input"
                value="{{ old('regions', isset($zone) && $zone->regions ? implode(', ', $zone->regions) : '') }}"
                placeholder="e.g. CA, NY, TX">
@@ -50,15 +50,15 @@ $selectedMethods = old('methods', isset($zone) ? $zone->methods->pluck('id')->to
 
 @if(isset($methods) && $methods->count())
 <div class="card" style="margin-bottom:1rem;">
-    <p class="section-title">Assign Shipping Methods</p>
+    <p class="section-title">{{ __('admin.assign_methods_title') }}</p>
     <table>
         <thead>
             <tr>
-                <th>Assign</th>
-                <th>Method</th>
-                <th>Type</th>
-                <th>Default Rate</th>
-                <th>Rate Override ($)</th>
+                <th>{{ __('admin.assign_col') }}</th>
+                <th>{{ __('admin.method_name_col') }}</th>
+                <th>{{ __('admin.method_type_col') }}</th>
+                <th>{{ __('admin.default_rate_col') }}</th>
+                <th>{{ __('admin.rate_override_col') }}</th>
             </tr>
         </thead>
         <tbody>

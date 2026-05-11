@@ -1,4 +1,4 @@
-<x-admin-layout title="Shipments" section="sales" active="shipments">
+<x-admin-layout title="{{ __('admin.shipments_title') }}" section="sales" active="shipments">
 
     <div class="stat-grid">
         <div class="stat-card">
@@ -28,7 +28,7 @@
     </form>
 
     @if($shipments->isEmpty())
-        <div class="admin-empty">No shipments found.</div>
+        <div class="admin-empty">{{ __('admin.no_shipments') }}</div>
     @else
         <div class="card">
             <table>

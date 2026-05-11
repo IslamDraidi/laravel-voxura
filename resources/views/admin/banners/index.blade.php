@@ -1,4 +1,4 @@
-<x-admin-layout title="Banners" section="cms" active="banners">
+<x-admin-layout title="{{ __('admin.banners_title') }}" section="cms" active="banners">
 <style>
 /* SortableJS drag behavior — unique to this page */
 .drag-handle { color:#d1d5db; cursor:grab; flex-shrink:0; user-select:none; font-size:1.2rem; }
@@ -18,46 +18,46 @@
 
 {{-- Add Banner Form --}}
 <div class="card" style="margin-bottom:2rem;">
-    <p class="section-title">Add New Banner</p>
+    <p class="section-title">{{ __('admin.add_banner') }}</p>
     <form method="POST" action="/admin/banners" enctype="multipart/form-data">
         @csrf
         <div class="form-grid">
             <div class="form-group">
-                <label class="form-label">Title *</label>
+                <label class="form-label">{{ __('admin.banner_title_label') }}</label>
                 <input type="text" name="title" class="form-input" placeholder="e.g. Summer Sale" required>
             </div>
             <div class="form-group">
-                <label class="form-label">Subtitle</label>
+                <label class="form-label">{{ __('admin.banner_subtitle_label') }}</label>
                 <input type="text" name="subtitle" class="form-input" placeholder="e.g. Up to 50% off">
             </div>
             <div class="form-group">
-                <label class="form-label">Button Text</label>
+                <label class="form-label">{{ __('admin.banner_btn_text') }}</label>
                 <input type="text" name="button_text" class="form-input" placeholder="e.g. Shop Now">
             </div>
             <div class="form-group">
-                <label class="form-label">Button URL</label>
+                <label class="form-label">{{ __('admin.banner_btn_url') }}</label>
                 <input type="text" name="button_url" class="form-input" placeholder="e.g. /search?q=sale">
             </div>
             <div class="form-group">
-                <label class="form-label">Sort Order</label>
+                <label class="form-label">{{ __('admin.banner_sort_order') }}</label>
                 <input type="number" name="sort_order" class="form-input" value="0" min="0">
             </div>
             <div class="form-group">
-                <label class="form-label">Banner Image (recommended: 1440×600)</label>
+                <label class="form-label">{{ __('admin.banner_image_label') }}</label>
                 <input type="file" name="image" class="form-input" accept="image/*">
             </div>
         </div>
         <div style="margin-top:1.25rem;">
-            <button type="submit" class="add-btn">+ Add Banner</button>
+            <button type="submit" class="add-btn">{{ __('admin.add_banner_btn') }}</button>
         </div>
     </form>
 </div>
 
 {{-- Banner List --}}
 @if($banners->isEmpty())
-    <div class="admin-empty">No banners yet. Add one above.</div>
+    <div class="admin-empty">{{ __('admin.no_banners') }}</div>
 @else
-    <p class="result-count" style="margin-bottom:0.75rem;">Drag rows to reorder · {{ $banners->count() }} banner{{ $banners->count() > 1 ? 's' : '' }}</p>
+    <p class="result-count" style="margin-bottom:0.75rem;">{{ __('admin.drag_to_reorder') }} · {{ $banners->count() }} banner{{ $banners->count() > 1 ? 's' : '' }}</p>
     <div class="banner-list" id="bannerList">
         @foreach($banners as $banner)
         <div class="banner-row {{ $banner->is_active ? '' : 'inactive' }}" data-id="{{ $banner->id }}">
@@ -76,15 +76,15 @@
                 @endif
                 <div class="banner-meta">
                     <span class="{{ $banner->is_active ? 'badge badge-green' : 'badge badge-gray' }}">
-                        {{ $banner->is_active ? 'Active' : 'Inactive' }}
+                        {{ $banner->is_active ? __('admin.banner_active_badge') : __('admin.banner_inactive_badge') }}
                     </span>
                     @if($banner->button_text)
-                        <span>Button: {{ $banner->button_text }}</span>
+                        <span>{{ __('admin.banner_btn_label') }} {{ $banner->button_text }}</span>
                     @endif
                     @if($banner->button_url)
                         <span>→ {{ $banner->button_url }}</span>
                     @endif
-                    <span>Order: {{ $banner->sort_order }}</span>
+                    <span>{{ __('admin.banner_order_label') }} {{ $banner->sort_order }}</span>
                 </div>
             </div>
 
@@ -93,14 +93,14 @@
                 <form method="POST" action="/admin/banners/{{ $banner->id }}/toggle">
                     @csrf
                     <button type="submit" class="act-btn {{ $banner->is_active ? 'green' : '' }}">
-                        {{ $banner->is_active ? '✓ Active' : '○ Inactive' }}
+                        {{ $banner->is_active ? __('admin.toggle_active_btn') : __('admin.toggle_inactive_btn') }}
                     </button>
                 </form>
                 {{-- Delete --}}
                 <form method="POST" action="/admin/banners/{{ $banner->id }}">
                     @csrf @method('DELETE')
                     <button type="submit" class="act-btn red"
-                            onclick="return confirm('Delete this banner?')">Delete</button>
+                            onclick="return confirm('{{ __('admin.delete_banner_confirm') }}')">{{ __('admin.delete_btn') }}</button>
                 </form>
             </div>
         </div>

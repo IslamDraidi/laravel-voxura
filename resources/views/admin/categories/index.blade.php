@@ -4,11 +4,11 @@
 
         {{-- Add Form --}}
         <div class="card" style="position:sticky;top:20px;align-self:start;">
-            <p class="section-title">Add Category</p>
+            <p class="section-title">{{ __('admin.add_category_btn') }}</p>
             <form id="cat-add-form" method="POST" action="/admin/categories">
                 @csrf
                 <div class="form-group">
-                    <label class="form-label">Name</label>
+                    <label class="form-label">{{ __('admin.category_name_label') }}</label>
                     <input type="text" name="name" class="form-input"
                            placeholder="e.g. Formal Wear"
                            value="{{ old('name') }}" required>
@@ -17,9 +17,9 @@
                     @enderror
                 </div>
                 <div class="form-group" style="margin-top:0.75rem;">
-                    <label class="form-label">Parent Category <span style="color:var(--muted);font-weight:400;">(optional)</span></label>
+                    <label class="form-label">{{ __('admin.parent_category') }} <span style="color:var(--muted);font-weight:400;">(optional)</span></label>
                     <select name="parent_id" class="form-input">
-                        <option value="">— Top-level category —</option>
+                        <option value="">{{ __('admin.no_parent') }}</option>
                         @foreach($parentOptions as $parent)
                             <option value="{{ $parent->id }}" {{ old('parent_id') == $parent->id ? 'selected' : '' }}>
                                 {{ $parent->name }}
@@ -30,21 +30,21 @@
                         <p class="form-error">{{ $message }}</p>
                     @enderror
                 </div>
-                <button type="submit" class="add-btn" style="margin-top:0.75rem;width:100%;">+ Add Category</button>
+                <button type="submit" class="add-btn" style="margin-top:0.75rem;width:100%;">{{ __('admin.add_category_btn') }}</button>
             </form>
         </div>
 
         {{-- Category List --}}
         <div class="card">
             @if($parents->isEmpty())
-                <div class="admin-empty" id="cat-empty">No categories yet — add one!</div>
+                <div class="admin-empty" id="cat-empty">{{ __('admin.no_categories') }}</div>
             @endif
             <table id="cat-table" style="{{ $parents->isEmpty() ? 'display:none' : '' }}">
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Products</th>
-                        <th>Actions</th>
+                        <th>{{ __('admin.name_col') }}</th>
+                        <th>{{ __('admin.products_count_col') }}</th>
+                        <th>{{ __('admin.actions_col') }}</th>
                     </tr>
                 </thead>
                 <tbody id="cat-tbody">
@@ -65,17 +65,17 @@
                                        style="padding:0.35rem 0.6rem;font-size:0.85rem;">
                                 <input type="hidden" name="parent_id" value="">
                                 <button type="submit" class="act-btn"
-                                        style="background:var(--orange);color:#fff;border-color:var(--orange);">Save</button>
+                                        style="background:var(--orange);color:#fff;border-color:var(--orange);">{{ __('admin.save_btn') }}</button>
                                 <button type="button" class="act-btn"
-                                        onclick="toggleEdit({{ $parent->id }}, false)">Cancel</button>
+                                        onclick="toggleEdit({{ $parent->id }}, false)">{{ __('admin.cancel_btn') }}</button>
                             </form>
                         </td>
                         <td id="count-{{ $parent->id }}">{{ $parent->products_count }}</td>
                         <td>
                             <div id="actions-{{ $parent->id }}" style="display:flex;gap:0.4rem;">
-                                <button class="act-btn" onclick="toggleEdit({{ $parent->id }}, true)">Edit</button>
+                                <button class="act-btn" onclick="toggleEdit({{ $parent->id }}, true)">{{ __('admin.edit_btn') }}</button>
                                 <button type="button" class="act-btn red"
-                                        onclick="deleteCategory({{ $parent->id }}, '{{ addslashes($parent->name) }}')">Delete</button>
+                                        onclick="deleteCategory({{ $parent->id }}, '{{ addslashes($parent->name) }}')">{{ __('admin.delete_btn') }}</button>
                             </div>
                         </td>
                     </tr>
@@ -96,7 +96,7 @@
                                        value="{{ $child->name }}" required
                                        style="padding:0.35rem 0.6rem;font-size:0.85rem;">
                                 <select name="parent_id" class="form-input" style="padding:0.35rem 0.6rem;font-size:0.85rem;width:auto;">
-                                    <option value="">— Top-level —</option>
+                                    <option value="">{{ __('admin.no_parent') }}</option>
                                     @foreach($parentOptions as $opt)
                                         <option value="{{ $opt->id }}" {{ $child->parent_id == $opt->id ? 'selected' : '' }}>
                                             {{ $opt->name }}
@@ -104,17 +104,17 @@
                                     @endforeach
                                 </select>
                                 <button type="submit" class="act-btn"
-                                        style="background:var(--orange);color:#fff;border-color:var(--orange);">Save</button>
+                                        style="background:var(--orange);color:#fff;border-color:var(--orange);">{{ __('admin.save_btn') }}</button>
                                 <button type="button" class="act-btn"
-                                        onclick="toggleEdit({{ $child->id }}, false)">Cancel</button>
+                                        onclick="toggleEdit({{ $child->id }}, false)">{{ __('admin.cancel_btn') }}</button>
                             </form>
                         </td>
                         <td id="count-{{ $child->id }}">{{ $child->products_count }}</td>
                         <td>
                             <div id="actions-{{ $child->id }}" style="display:flex;gap:0.4rem;">
-                                <button class="act-btn" onclick="toggleEdit({{ $child->id }}, true)">Edit</button>
+                                <button class="act-btn" onclick="toggleEdit({{ $child->id }}, true)">{{ __('admin.edit_btn') }}</button>
                                 <button type="button" class="act-btn red"
-                                        onclick="deleteCategory({{ $child->id }}, '{{ addslashes($child->name) }}')">Delete</button>
+                                        onclick="deleteCategory({{ $child->id }}, '{{ addslashes($child->name) }}')">{{ __('admin.delete_btn') }}</button>
                             </div>
                         </td>
                     </tr>

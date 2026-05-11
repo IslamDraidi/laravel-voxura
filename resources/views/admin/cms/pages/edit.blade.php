@@ -1,4 +1,4 @@
-<x-admin-layout title="Edit Page" section="cms" active="pages">
+<x-admin-layout title="{{ __('admin.edit_cms_title') }}" section="cms" active="pages">
 
     <div style="max-width:820px;">
         <div class="card">
@@ -12,14 +12,14 @@
 
                 <div class="form-grid" style="margin-bottom:14px;">
                     <div class="form-group" style="grid-column:1/-1;">
-                        <label class="form-label">Page Title <span style="color:var(--red)">*</span></label>
+                        <label class="form-label">{{ __('admin.title_label') }} <span style="color:var(--red)">*</span></label>
                         <input type="text" name="title" class="form-input"
                                value="{{ old('title', $page->title) }}" required>
                         @error('title')<p class="form-error">{{ $message }}</p>@enderror
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">URL Key (slug)</label>
+                        <label class="form-label">{{ __('admin.slug_label') }}</label>
                         <div style="display:flex;align-items:center;gap:4px;">
                             <span style="color:var(--muted);font-size:13px;white-space:nowrap;">/</span>
                             <input type="text" name="slug" class="form-input"
@@ -29,7 +29,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Status</label>
+                        <label class="form-label">{{ __('admin.status_label') }}</label>
                         <select name="status" class="form-select">
                             <option value="active" {{ old('status', $page->status) === 'active' ? 'selected' : '' }}>Active</option>
                             <option value="draft"  {{ old('status', $page->status) === 'draft'  ? 'selected' : '' }}>Draft</option>
@@ -45,7 +45,7 @@
                 </div>
 
                 <div class="form-group" style="margin-bottom:14px;">
-                    <label class="form-label">Page Content</label>
+                    <label class="form-label">{{ __('admin.content_label') }}</label>
                     <textarea name="content" class="form-textarea" style="min-height:200px;"
                               placeholder="Write your page content here (HTML supported)…">{{ old('content', $page->content) }}</textarea>
                     @error('content')<p class="form-error">{{ $message }}</p>@enderror
@@ -67,7 +67,7 @@
                 </div>
 
                 <div style="display:flex;gap:8px;">
-                    <button type="submit" class="add-btn">Save Changes</button>
+                    <button type="submit" class="add-btn">{{ __('admin.save_changes') }}</button>
                     <button type="button" class="topbar-ghost" onclick="adminNavigate('{{ route('admin.cms.pages.index') }}')">Cancel</button>
                 </div>
             </form>

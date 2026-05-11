@@ -1,4 +1,4 @@
-<x-admin-layout title="Search &amp; SEO" section="marketing" active="seo">
+<x-admin-layout title="{{ __('admin.seo_title') }}" section="marketing" active="seo">
 
     <div class="info-banner">
         <span>🔍</span>
@@ -67,7 +67,7 @@
             </table>
 
             <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border);">
-                <p style="font-size:12px;color:var(--muted);margin-bottom:0.5rem;font-weight:600;">🚀 Coming Soon</p>
+                <p style="font-size:12px;color:var(--muted);margin-bottom:0.5rem;font-weight:600;">🚀 {{ __('admin.coming_soon') }}</p>
                 <div style="display:flex;gap:6px;flex-wrap:wrap;">
                     <span class="badge badge-gray">Meta Titles</span>
                     <span class="badge badge-gray">Meta Descriptions</span>

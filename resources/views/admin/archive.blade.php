@@ -3,7 +3,7 @@
     @if($products->isEmpty())
         <div class="admin-empty">
             <p style="font-size:2rem;margin-bottom:0.5rem;">📭</p>
-            <p>No archived products — everything is live!</p>
+            <p>{{ __('admin.no_archived') }}</p>
         </div>
     @else
         <div class="card">
@@ -11,11 +11,11 @@
                 <thead>
                     <tr>
                         <th>Image</th>
-                        <th>Name</th>
-                        <th>Category</th>
-                        <th>Price</th>
+                        <th>{{ __('admin.name_col') }}</th>
+                        <th>{{ __('admin.category_col') }}</th>
+                        <th>{{ __('admin.price_col') }}</th>
                         <th>Deleted Date</th>
-                        <th>Actions</th>
+                        <th>{{ __('admin.actions_col') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -30,19 +30,19 @@
                         <td>{{ $product->category->name }}</td>
                         <td>₪{{ number_format($product->price) }}</td>
                         <td style="white-space:nowrap;">
-                            <span class="badge badge-red">{{ $product->deleted_at->format('M d, Y') }}</span>
+                            <span class="badge badge-red">{{ __('admin.archived_on', ['date' => $product->deleted_at->format('M d, Y')]) }}</span>
                         </td>
                         <td style="white-space:nowrap;">
                             <form method="POST" action="/admin/products/{{ $product->id }}/restore" style="display:inline;">
                                 @csrf
-                                <button type="submit" class="act-btn green">Restore</button>
+                                <button type="submit" class="act-btn green">{{ __('admin.restore_btn') }}</button>
                             </form>
-                            <a href="/admin/products/{{ $product->id }}/edit?from=archive" class="act-btn">Edit</a>
+                            <a href="/admin/products/{{ $product->id }}/edit?from=archive" class="act-btn">{{ __('admin.edit_btn') }}</a>
                             <form method="POST" action="/admin/products/{{ $product->id }}/force-delete" style="display:inline;">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="act-btn red"
                                         onclick="return confirm('Permanently delete \"{{ $product->name }}\"? This cannot be undone!')">
-                                    Delete Forever
+                                    {{ __('admin.force_delete_btn') }}
                                 </button>
                             </form>
                         </td>

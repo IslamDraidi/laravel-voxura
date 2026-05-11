@@ -1,4 +1,4 @@
-<x-admin-layout title="Attributes" section="catalog" active="attributes">
+<x-admin-layout title="{{ __('admin.attributes_title') }}" section="catalog" active="attributes">
 
     <div class="info-banner">
         <span>✏️</span>
@@ -11,7 +11,7 @@
 
     <div class="card" style="text-align:center;padding:3rem 2rem;">
         <div style="font-size:3rem;margin-bottom:1rem;">✏️</div>
-        <h2 style="font-size:1.25rem;font-weight:700;color:var(--dark);margin-bottom:0.5rem;">Attributes Coming Soon</h2>
+        <h2 style="font-size:1.25rem;font-weight:700;color:var(--dark);margin-bottom:0.5rem;">{{ __('admin.attributes_title') }} {{ __('admin.coming_soon') }}</h2>
         <p style="color:var(--muted);font-size:14px;max-width:400px;margin:0 auto 1.5rem;">
             Define reusable attributes like Color, Size, and Material that can be assigned to products
             and used to filter catalog results.

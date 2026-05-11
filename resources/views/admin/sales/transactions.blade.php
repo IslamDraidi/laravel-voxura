@@ -1,4 +1,4 @@
-<x-admin-layout title="Transactions" section="sales" active="transactions">
+<x-admin-layout title="{{ __('admin.transactions_title') }}" section="sales" active="transactions">
 
     <div class="stat-grid">
         <div class="stat-card">
@@ -33,19 +33,19 @@
     </form>
 
     @if($transactions->isEmpty())
-        <div class="admin-empty">No transactions found.</div>
+        <div class="admin-empty">{{ __('admin.no_transactions') }}</div>
     @else
         <div class="card">
             <table>
                 <thead>
                     <tr>
-                        <th>Transaction ID</th>
-                        <th>Order #</th>
+                        <th>{{ __('admin.tx_id_col') }}</th>
+                        <th>{{ __('admin.tx_order_col') }} #</th>
                         <th>Customer</th>
                         <th>Method</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                        <th>Date</th>
+                        <th>{{ __('admin.tx_amount_col') }}</th>
+                        <th>{{ __('admin.tx_status_col') }}</th>
+                        <th>{{ __('admin.tx_date_col') }}</th>
                     </tr>
                 </thead>
                 <tbody>

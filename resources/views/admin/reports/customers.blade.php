@@ -1,8 +1,8 @@
-<x-admin-layout title="Customer Reports" section="reporting" active="customers">
+<x-admin-layout title="{{ __('admin.customer_reports_title') }}" section="reporting" active="customers">
 
     {{-- Period selector --}}
     <div class="sub-nav">
-        @foreach(['7' => 'Last 7 days', '30' => 'Last 30 days', '90' => 'Last 90 days', '365' => 'Last year'] as $val => $label)
+        @foreach(['7' => __('admin.period_7'), '30' => __('admin.period_30'), '90' => __('admin.period_90'), '365' => __('admin.period_365_alt')] as $val => $label)
             <a href="{{ route('admin.reports.customers', ['period' => $val]) }}"
                class="sub-btn {{ $period == $val ? 'active' : '' }}">{{ $label }}</a>
         @endforeach
@@ -10,32 +10,32 @@
 
     <div class="stat-grid">
         <div class="stat-card">
-            <div class="sc-label">Total Customers</div>
+            <div class="sc-label">{{ __('admin.total_customers_stat') }}</div>
             <div class="sc-value">{{ $totalCustomers }}</div>
         </div>
         <div class="stat-card">
-            <div class="sc-label">New This Period</div>
+            <div class="sc-label">{{ __('admin.new_this_period') }}</div>
             <div class="sc-value green">{{ $newCustomers }}</div>
         </div>
         <div class="stat-card">
-            <div class="sc-label">Active Buyers</div>
+            <div class="sc-label">{{ __('admin.active_buyers') }}</div>
             <div class="sc-value blue">{{ $activeCustomers }}</div>
-            <div class="sc-sub">Ordered in period</div>
+            <div class="sc-sub">{{ __('admin.ordered_in_period') }}</div>
         </div>
     </div>
 
     <div class="two-col">
         {{-- Signups Chart --}}
         <div class="card">
-            <p class="section-title">New Customer Signups</p>
+            <p class="section-title">{{ __('admin.new_signups') }}</p>
             <canvas id="signupChart" height="140"></canvas>
         </div>
 
         {{-- Top Customers --}}
         <div class="card">
-            <p class="section-title">Top Customers by Spend</p>
+            <p class="section-title">{{ __('admin.top_customers_by_spend') }}</p>
             @if($topCustomers->isEmpty())
-                <div class="admin-empty" style="padding:1.5rem;">No orders yet.</div>
+                <div class="admin-empty" style="padding:1.5rem;">{{ __('admin.no_orders_yet') }}</div>
             @else
                 <table>
                     <thead>

@@ -1,51 +1,51 @@
-<x-admin-layout title="Reviews" section="customers" active="reviews">
+<x-admin-layout title="{{ __('admin.reviews_title') }}" section="customers" active="reviews">
 
     <div class="stat-grid">
         <div class="stat-card">
-            <div class="sc-label">Total Reviews</div>
+            <div class="sc-label">{{ __('admin.total_reviews') }}</div>
             <div class="sc-value">{{ $stats['total'] }}</div>
         </div>
         <div class="stat-card">
-            <div class="sc-label">Avg Rating</div>
+            <div class="sc-label">{{ __('admin.avg_rating') }}</div>
             <div class="sc-value green">{{ $stats['avg'] }} ★</div>
         </div>
         <div class="stat-card">
-            <div class="sc-label">5-Star Reviews</div>
+            <div class="sc-label">{{ __('admin.five_star') }}</div>
             <div class="sc-value green">{{ $stats['stars5'] }}</div>
         </div>
         <div class="stat-card">
-            <div class="sc-label">1-Star Reviews</div>
+            <div class="sc-label">{{ __('admin.one_star') }}</div>
             <div class="sc-value red">{{ $stats['stars1'] }}</div>
         </div>
     </div>
 
     <form method="GET" class="search-bar">
-        <input type="text" name="search" placeholder="Search by customer or product…" value="{{ request('search') }}">
+        <input type="text" name="search" placeholder="{{ __('admin.search_reviews_ph') }}" value="{{ request('search') }}">
         <select name="rating" class="form-select" style="width:auto">
-            <option value="">All Ratings</option>
+            <option value="">{{ __('admin.all_ratings') }}</option>
             @for($i = 5; $i >= 1; $i--)
-                <option value="{{ $i }}" {{ request('rating') == $i ? 'selected' : '' }}>{{ $i }} Star{{ $i !== 1 ? 's' : '' }}</option>
+                <option value="{{ $i }}" {{ request('rating') == $i ? 'selected' : '' }}>{{ $i !== 1 ? __('admin.stars_label', ['n' => $i]) : __('admin.star_label', ['n' => $i]) }}</option>
             @endfor
         </select>
-        <button type="submit" class="add-btn">Filter</button>
-        <a href="{{ route('admin.reviews.index') }}" style="font-size:0.85rem;color:var(--muted);align-self:center;">Reset</a>
+        <button type="submit" class="add-btn">{{ __('admin.filter') }}</button>
+        <a href="{{ route('admin.reviews.index') }}" style="font-size:0.85rem;color:var(--muted);align-self:center;">{{ __('admin.reset_btn') }}</a>
     </form>
 
     <p class="result-count">{{ $reviews->count() }} review{{ $reviews->count() !== 1 ? 's' : '' }}</p>
 
     @if($reviews->isEmpty())
-        <div class="admin-empty">No reviews found.</div>
+        <div class="admin-empty">{{ __('admin.no_reviews') }}</div>
     @else
         <div class="card">
             <table>
                 <thead>
                     <tr>
-                        <th>Customer</th>
-                        <th>Product</th>
-                        <th>Rating</th>
-                        <th>Comment</th>
-                        <th>Date</th>
-                        <th>Actions</th>
+                        <th>{{ __('admin.customer_h') }}</th>
+                        <th>{{ __('admin.product_h') }}</th>
+                        <th>{{ __('admin.rating_h') }}</th>
+                        <th>{{ __('admin.comment_h') }}</th>
+                        <th>{{ __('admin.date_col') }}</th>
+                        <th>{{ __('admin.actions_col') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -70,9 +70,9 @@
                         <td style="white-space:nowrap;font-size:12px;">{{ $review->created_at->format('M d, Y') }}</td>
                         <td>
                             <form method="POST" action="{{ route('admin.reviews.destroy', $review) }}"
-                                  onsubmit="return confirm('Delete this review?')">
+                                  onsubmit="return confirm('{{ __('admin.delete_review_confirm') }}')">
                                 @csrf @method('DELETE')
-                                <button type="submit" class="act-btn red">Delete</button>
+                                <button type="submit" class="act-btn red">{{ __('admin.delete_btn') }}</button>
                             </form>
                         </td>
                     </tr>
