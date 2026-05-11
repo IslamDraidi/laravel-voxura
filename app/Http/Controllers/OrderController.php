@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\OrderConfirmationMail;
 use App\Mail\TemplateMail;
 use App\Models\Coupon;
 use App\Models\EmailTemplate;
@@ -10,6 +11,7 @@ use App\Models\OrderItem;
 use App\Models\ShippingMethod;
 use App\Models\TaxRate;
 use App\Services\GuestCart;
+use Illuminate\Support\Facades\DB;
 use App\Services\ShippingCalculator;
 use App\Services\TaxCalculator;
 use Illuminate\Http\Request;
@@ -17,6 +19,32 @@ use Illuminate\Support\Facades\Mail;
 
 class OrderController extends Controller
 {
+    /** POST /checkout/quick — Buy Now: adds one product to cart then goes to checkout */
+    public function quickCheckout(Request $request)
+    {
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'quantity'   => 'nullable|integer|min:1|max:100',
+        ]);
+
+        $product  = \App\Models\Product::findOrFail($request->product_id);
+        $quantity = max(1, (int) ($request->quantity ?? 1));
+
+        if (auth()->check()) {
+            $cart = auth()->user()->getOrCreateCart();
+            $item = $cart->items()->where('product_id', $product->id)->first();
+            if ($item) {
+                $item->increment('quantity', $quantity);
+            } else {
+                $cart->items()->create(['product_id' => $product->id, 'quantity' => $quantity]);
+            }
+        } else {
+            (new \App\Services\GuestCart())->add($product->id, $quantity);
+        }
+
+        return redirect()->route('checkout');
+    }
+
     /** GET /checkout */
     public function checkout(ShippingCalculator $shippingCalculator)
     {
@@ -214,7 +242,7 @@ class OrderController extends Controller
             'tax_breakdown'      => $taxResult['breakdown'],
             'shipping_cost'      => $shippingCost,
             'grand_total'        => $grandTotal,
-            'currency'           => 'USD',
+            'currency'           => 'ILS',
             'channel'            => 'web',
             'status'             => 'pending',
             'shipping_address'   => $shippingAddress,
@@ -224,18 +252,21 @@ class OrderController extends Controller
             $coupon->increment('used_count');
         }
 
-        foreach ($cart->items as $item) {
-            OrderItem::create([
-                'order_id'      => $order->id,
-                'product_id'    => $item->product_id,
-                'variant_id'    => $item->variant_id,
-                'variant_label' => $item->variant?->label(),
-                'quantity'      => $item->quantity,
-                'price'         => $item->unitPrice(),
-            ]);
+        DB::transaction(function () use ($order, $cart) {
+            foreach ($cart->items as $item) {
+                OrderItem::create([
+                    'order_id'      => $order->id,
+                    'product_id'    => $item->product_id,
+                    'variant_id'    => $item->variant_id,
+                    'variant_label' => $item->variant?->label(),
+                    'quantity'      => $item->quantity,
+                    'price'         => $item->unitPrice(),
+                ]);
 
-            $item->product->decrement('stock', $item->quantity);
-        }
+                \App\Models\Product::lockForUpdate()->find($item->product_id)
+                    ?->decrement('stock', $item->quantity);
+            }
+        });
 
         // Clear the cart
         if ($isGuest) {
@@ -245,15 +276,11 @@ class OrderController extends Controller
         }
 
         // Send order confirmation email
-        $template = EmailTemplate::where('key', 'order_confirmation')->first();
-        if ($template) {
-            $vars = [
-                'order_id'         => $order->id,
-                'customer_name'    => $request->full_name,
-                'order_total'      => number_format((float) $order->grand_total, 2),
-                'shipping_address' => $shippingAddress,
-            ];
-            Mail::to($request->email)->send(new TemplateMail($template, $vars));
+        try {
+            $order->loadMissing('items');
+            Mail::to($request->email)->send(new OrderConfirmationMail($order));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Order confirmation email failed: ' . $e->getMessage());
         }
 
         // Store order token in session so guest can view it
@@ -283,6 +310,20 @@ class OrderController extends Controller
         $order->load('items.product.category', 'shippingMethod');
 
         return view('orders.show', compact('order'));
+    }
+
+    /** GET /orders/{order}/track — visual status timeline */
+    public function track(Order $order)
+    {
+        if (auth()->check()) {
+            abort_unless($order->user_id === auth()->id(), 403);
+        } else {
+            abort_unless(session('guest_order_id') === $order->id, 403);
+        }
+
+        $order->load('items.product', 'shippingMethod');
+
+        return view('orders.track', compact('order'));
     }
 
     // ── Private ─────────────────────────────────────────────────

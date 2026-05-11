@@ -344,7 +344,7 @@ class PaymentController extends Controller
     private function authorizeOrder(Order $order): void
     {
         if (auth()->check()) {
-            $this->authorizeOrder($order);
+            abort_unless($order->user_id === auth()->id(), 403);
         } else {
             // Guest — allow access only if they placed this order in the same session
             abort_unless(session('guest_order_id') === $order->id, 403);

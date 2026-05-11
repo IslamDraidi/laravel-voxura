@@ -2,18 +2,22 @@
 
 namespace App\Models;
 
+use App\Notifications\ResetPasswordNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 
-class User extends Authenticatable
+class User extends Authenticatable implements CanResetPasswordContract
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, CanResetPassword;
 
     protected $fillable = [
         'name', 'email', 'password', 'role', 'is_blocked',
         'has_body_model', 'body_model_path', 'body_model_generated_at', 'body_height_cm',
+        'preferred_locale',
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -86,6 +90,11 @@ class User extends Authenticatable
     public function tryons()
     {
         return $this->hasMany(VirtualTryon::class);
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotification($token));
     }
 
     public function hasReusableBodyModel(): bool

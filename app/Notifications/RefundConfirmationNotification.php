@@ -26,7 +26,7 @@ class RefundConfirmationNotification extends Notification
     {
         $timeline = match ($this->refund->gateway) {
             'paypal' => '3–5 business days',
-            'tap' => '5���7 business days',
+            'tap' => '5–7 business days',
             default => '5–10 business days',
         };
 

@@ -18,6 +18,7 @@ class Login extends Controller
             if (auth()->user()->isBlocked()) {
                 auth()->logout();
                 $request->session()->invalidate();
+                $request->session()->regenerateToken();
 
                 return back()->withErrors(['email' => 'Your account has been suspended. Please contact support.']);
             }

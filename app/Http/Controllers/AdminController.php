@@ -7,6 +7,8 @@ use App\Http\Requests\Admin\ShippingZoneRequest;
 use App\Http\Requests\Admin\TaxRateRequest;
 use App\Http\Requests\ProductRequest;
 use App\Jobs\Generate3DModelJob;
+use App\Mail\OrderCancelledMail;
+use App\Mail\OrderShippedMail;
 use App\Models\Banner;
 use App\Models\Category;
 use App\Models\EmailTemplate;
@@ -154,7 +156,7 @@ class AdminController extends Controller
             return response()->json(['success' => true, 'message' => 'Product created successfully!', 'redirect' => '/admin/products']);
         }
 
-        return redirect('/admin')->with('success', 'Product added successfully!');
+        return redirect()->route('admin.products.index')->with('success', 'Product added successfully!');
     }
 
     public function edit($id)
@@ -328,34 +330,27 @@ class AdminController extends Controller
 
     private function sendOrderStatusEmail(Order $order, string $status): void
     {
-        $keyMap = [
-            'shipped'   => 'shipping_notification',
-            'cancelled' => 'order_cancelled',
+        $mailableMap = [
+            'shipped'   => OrderShippedMail::class,
+            'cancelled' => OrderCancelledMail::class,
         ];
 
-        if (! isset($keyMap[$status])) {
+        if (! isset($mailableMap[$status])) {
             return;
         }
 
-        $template = \App\Models\EmailTemplate::where('key', $keyMap[$status])->first();
-        if (! $template) {
-            return;
-        }
-
-        $order->loadMissing('user');
+        $order->loadMissing(['user', 'items']);
         $recipientEmail = $order->recipientEmail();
         if (! $recipientEmail) {
             return;
         }
 
-        $vars = [
-            'order_id'      => $order->id,
-            'customer_name' => $order->recipientName(),
-            'order_total'   => number_format((float) $order->grand_total, 2),
-        ];
-
-        \Illuminate\Support\Facades\Mail::to($recipientEmail)
-            ->send(new \App\Mail\TemplateMail($template, $vars));
+        try {
+            \Illuminate\Support\Facades\Mail::to($recipientEmail)
+                ->send(new $mailableMap[$status]($order));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Order status email ({$status}) failed: " . $e->getMessage());
+        }
     }
 
     public function showOrder(Order $order)
@@ -1308,8 +1303,7 @@ class AdminController extends Controller
                 return;
             }
             if (! config('model3d.hf_token')) {
-                Log::critical('Skipping 3D generation: HF_API_TOKEN not configured.');
-                return;
+                Log::warning('HF_API_TOKEN not configured — QwenVL image selection step will be skipped; proceeding with first product image for 3D generation.');
             }
             if (! $product->images()->exists()) {
                 Log::info("Skipping 3D generation for product {$product->id}: no images.");

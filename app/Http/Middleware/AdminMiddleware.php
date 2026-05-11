@@ -14,7 +14,11 @@ class AdminMiddleware
         /** @var User $user */
         $user = Auth::user();
 
-        if (!Auth::check() || !$user->isAdmin()) {
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Please log in to access the admin panel.');
+        }
+
+        if (!$user->isAdmin()) {
             return redirect('/')->with('error', 'Unauthorized');
         }
 
