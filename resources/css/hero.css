@@ -1,78 +1,205 @@
+/* ══════════════════════════════════════════════════════════
+   HERO — redesigned
+   ══════════════════════════════════════════════════════════ */
 
+/* Wrapper */
 .hero {
     position: relative;
-    height: 100svh;
+    min-height: 100vh;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: #000;
-    color: #fff;
     overflow: hidden;
+    padding: 120px 24px 80px;
+    text-align: center;
+    color: #fff;
 }
 
+/* Background image layer */
+.hero-bg-img {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    z-index: 0;
+}
+
+/* Dark gradient overlay */
 .hero-overlay {
     position: absolute;
     inset: 0;
     background: linear-gradient(
-        135deg,
-        rgba(234, 88, 12, 0.20) 0%,
-        #000 50%,
-        #000 100%
+        to bottom,
+        rgba(0,0,0,0.55) 0%,
+        rgba(0,0,0,0.45) 50%,
+        rgba(0,0,0,0.65) 100%
     );
+    z-index: 1;
 }
 
+/* ── Decorative: large arch (right side) ── */
+.hero-arch {
+    position: absolute;
+    right: -80px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.35);
+    z-index: 1;
+    pointer-events: none;
+}
+[dir="rtl"] .hero-arch { right: auto; left: -80px; }
+
+/* ── Decorative: orange arc SVG (top right) ── */
+.hero-arc-line {
+    position: absolute;
+    top: 60px;
+    right: 120px;
+    width: 200px;
+    height: 200px;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.7;
+}
+[dir="rtl"] .hero-arc-line { right: auto; left: 120px; }
+
+/* Content wrapper */
 .hero-content {
     position: relative;
-    z-index: 10;
-    text-align: center;
-    padding: 0 1rem;
-    max-width: 900px;
-    animation: fadeUp 1s ease-out forwards;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    animation: heroFadeUp 0.9s ease-out forwards;
 }
 
+/* 1. Badge */
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1.5px solid #E8621A;
+    border-radius: 50px;
+    padding: 8px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #ffffff;
+    margin-bottom: 28px;
+    font-family: 'DM Sans', sans-serif;
+}
+.hero-badge-icon { color: #E8621A; line-height: 1; font-style: normal; }
+
+/* 3. Title */
 .hero-title {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(4rem, 10vw, 8rem);
+    font-size: clamp(72px, 12vw, 130px);
     font-weight: 900;
-    letter-spacing: 0.02em;
-    margin-bottom: 1.5rem;
+    letter-spacing: -3px;
     line-height: 1;
-    background: linear-gradient(90deg, #fff 0%, #f97316 50%, #ea580c 100%);
+    margin-bottom: 16px;
+    background: linear-gradient(
+        to right,
+        #ffffff 0%,
+        #f0b090 30%,
+        #e8824a 60%,
+        #E8621A 100%
+    );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    animation: fadeUp 1s ease-out 0.2s both;
+    color: transparent;
 }
-.hero-subtitle {
-    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
-    color: #d1d5db;
-    margin-bottom: 3rem;
-    font-weight: 300;
-    animation: fadeIn 1s ease-out 0.4s both;
+[dir="rtl"] .hero-title {
+    background: linear-gradient(
+        to left,
+        #ffffff 0%,
+        #f0b090 30%,
+        #e8824a 60%,
+        #E8621A 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
+/* 4. Tagline */
+.hero-tagline {
+    font-size: 26px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 10px;
+    font-family: 'DM Sans', sans-serif;
+}
+
+/* 5. Sub-tagline */
+.hero-sub {
+    font-size: 15px;
+    color: rgba(255,255,255,0.5);
+    font-weight: 400;
+    margin-bottom: 32px;
+    font-family: 'DM Sans', sans-serif;
+}
+
+/* 6. CTA Button */
 .btn-hero {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    background: #ea580c;
-    color: #fff;
+    gap: 10px;
+    background: #E8621A;
+    color: #ffffff !important;
+    border: none;
+    border-radius: 50px;
+    padding: 16px 36px;
+    font-size: 16px;
+    font-weight: 700;
     font-family: 'DM Sans', sans-serif;
-    font-size: 1.1rem;
-    font-weight: 500;
-    padding: 0.9rem 2rem;
-    border-radius: 999px;
-    text-decoration: none;
-    transition: background 0.3s, transform 0.3s;
-    animation: fadeUp 1s ease-out 0.6s both;
+    text-decoration: none !important;
+    cursor: pointer;
+    margin-bottom: 56px;
+    transition: background 0.2s, transform 0.15s;
 }
-
 .btn-hero:hover {
-    background: #c2410c;
-    transform: scale(1.05);
+    background: #d4551a;
+    transform: translateY(-2px);
+    color: #ffffff !important;
 }
 
-/* ── Scroll Indicator ── */
+/* 7. Scroll indicator */
+.hero-scroll {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+}
+.hero-scroll-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    animation: heroBounce 2s ease-in-out infinite;
+}
+.hero-scroll-text {
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.5px;
+    font-family: 'DM Sans', sans-serif;
+    margin: 0;
+}
+
+/* ── Old scroll indicator kept for dynamic slider ── */
 .scroll-indicator {
     position: absolute;
     bottom: 2.5rem;
@@ -85,29 +212,39 @@
     display: flex;
     justify-content: center;
     padding-top: 6px;
-    animation: fadeIn 2s ease-out 0.8s both;
 }
-
 .scroll-dot {
     width: 6px;
     height: 6px;
-    background: #ea580c;
+    background: #E8621A;
     border-radius: 50%;
     animation: scrollBounce 1.5s ease-in-out infinite;
 }
 
 /* ── Keyframes ── */
-@keyframes fadeUp {
-    from { opacity: 0; transform: translateY(30px); }
+@keyframes heroFadeUp {
+    from { opacity: 0; transform: translateY(28px); }
     to   { opacity: 1; transform: translateY(0); }
 }
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+@keyframes heroBounce {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(6px); }
 }
-
 @keyframes scrollBounce {
     0%, 100% { transform: translateY(0); }
     50%       { transform: translateY(12px); }
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .hero        { padding: 100px 16px 60px; }
+    .hero-tagline { font-size: 20px; }
+    .hero-sub     { font-size: 14px; }
+    .btn-hero     { padding: 13px 28px; font-size: 15px; }
+    .hero-arc-line { display: none; }
+    .hero-arch    { width: 300px; height: 300px; right: -60px; }
+}
+@media (max-width: 480px) {
+    .hero-arch { display: none; }
+    .hero-badge { font-size: 12px; padding: 6px 16px; }
 }

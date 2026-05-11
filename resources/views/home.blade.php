@@ -4,14 +4,26 @@
     <x-hero />
 
     {{-- Featured Products --}}
-    <div style="background:#fff">
+    <div id="next-section" style="background:#fff">
         @foreach($featuredProducts as $index => $product)
             <x-featured-product :product="$product" :index="$index" />
         @endforeach
     </div>
 
-    {{-- Product Grid --}}
-    <x-product-grid :products="$products" :activeCategory="$activeCategory" />
+    {{-- Product Grid with filter drawer --}}
+    <x-product-grid
+        :products="$products"
+        :activeCategory="$activeCategory"
+        :categories="$categories"
+        :sort="$sort"
+        :sizes="$sizes"
+        :colors="$colors"
+        :priceRange="$priceRange"
+        :categoryIds="$categoryIds"
+        :availableSizes="$availableSizes"
+        :availableColors="$availableColors"
+        :productCounts="$productCounts"
+    />
 
     {{-- About --}}
     <x-about />

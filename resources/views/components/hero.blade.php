@@ -9,6 +9,8 @@
          style="{{ $banner->image ? 'background-image:url(' . asset('images/' . $banner->image) . ');' : '' }}">
         <div class="hero-overlay"></div>
         <div class="hero-content">
+            @if($i === 0)
+            @endif
             <h1 class="hero-title">{{ $banner->title }}</h1>
             @if($banner->subtitle)
                 <p class="hero-subtitle">{{ $banner->subtitle }}</p>
@@ -24,7 +26,7 @@
                         <line x1="3" y1="6" x2="21" y2="6"/>
                         <path d="M16 10a4 4 0 0 1-8 0"/>
                     </svg>
-                    Explore Collection
+                    {{ __('general.explore_collection') }}
                 </a>
             @endif
         </div>
@@ -117,12 +119,43 @@
 </script>
 
 @else
-{{-- ── Static fallback hero ── --}}
+{{-- ── Static hero — new design ── --}}
 <section class="hero">
+
+    {{-- Background image --}}
+    <div class="hero-bg-img" style="background-image: url('{{ asset('images/hero-background.png') }}')"></div>
+
+    {{-- Dark gradient overlay --}}
     <div class="hero-overlay"></div>
+
+    {{-- Decorative: large arch right side --}}
+    <div class="hero-arch" aria-hidden="true"></div>
+
+    {{-- Decorative: orange quarter-circle arc (top right) --}}
+    <svg class="hero-arc-line" viewBox="0 0 200 200" fill="none"
+         xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M200 0 A200 200 0 0 0 0 200" stroke="#E8621A" stroke-width="2" fill="none"/>
+    </svg>
+
+    {{-- All hero content --}}
     <div class="hero-content">
+
+        {{-- 1. New arrivals badge --}}
+        <div class="hero-badge">
+            <i class="hero-badge-icon">✦</i>
+            {{ __('general.new_arrivals_badge') }}
+        </div>
+
+        {{-- 3. VOXURA title: white-to-orange gradient --}}
         <h1 class="hero-title">VOXURA</h1>
-        <p class="hero-subtitle">Elevate Your Tech Experience</p>
+
+        {{-- 4. Tagline --}}
+        <p class="hero-tagline">{{ __('general.hero_tagline') }}</p>
+
+        {{-- 5. Sub-tagline --}}
+        <p class="hero-sub">{{ __('general.hero_sub') }}</p>
+
+        {{-- 6. Explore Collection CTA --}}
         <a href="#products" class="btn-hero">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
                  viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -131,9 +164,23 @@
                 <line x1="3" y1="6" x2="21" y2="6"/>
                 <path d="M16 10a4 4 0 0 1-8 0"/>
             </svg>
-            Explore Collection
+            {{ __('general.explore_collection') }}
         </a>
+
+        {{-- 7. Scroll indicator --}}
+        <button class="hero-scroll"
+                onclick="document.getElementById('next-section').scrollIntoView({behavior:'smooth'})"
+                aria-label="{{ __('general.scroll_to_explore') }}">
+            <div class="hero-scroll-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"/>
+                </svg>
+            </div>
+            <p class="hero-scroll-text">{{ __('general.scroll_to_explore') }}</p>
+        </button>
+
     </div>
-    <div class="scroll-indicator"><div class="scroll-dot"></div></div>
 </section>
 @endif
