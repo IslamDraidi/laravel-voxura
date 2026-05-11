@@ -1,14 +1,19 @@
 @props(['title' => 'Admin', 'section' => '', 'active' => '', 'pageTitle' => null])
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title }} — Voxura Admin</title>
-    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('favicon.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    @if(app()->getLocale() === 'ar')
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    @endif
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -448,6 +453,35 @@
     }
     .confirm-ok:hover{background:#b91c1c}
 
+    /* ── LANG SWITCHER (admin topbar) ── */
+    .admin-lang-switcher{display:flex;align-items:center;gap:3px}
+    .admin-lang-btn{
+        background:none;border:1px solid var(--border);
+        border-radius:6px;padding:4px 8px;
+        font-size:11px;font-weight:700;cursor:pointer;
+        color:var(--muted);transition:all .15s;
+        font-family:'Tajawal','DM Sans',sans-serif;line-height:1;
+    }
+    .admin-lang-btn:hover{border-color:var(--orange);color:var(--orange)}
+    .admin-lang-btn.lang-active{
+        background:var(--orange);border-color:var(--orange);color:#fff;
+    }
+
+    /* ── RTL Support ── */
+    [dir="rtl"] body{font-family:'Tajawal',sans-serif;text-align:right}
+    [dir="rtl"] .sidebar{left:auto;right:0}
+    [dir="rtl"] .admin-main{margin-left:0;margin-right:200px}
+    [dir="rtl"] .nav-item{border-left:none;border-right:3px solid transparent}
+    [dir="rtl"] .sidebar .nav-item.active{border-right-color:var(--orange)}
+    [dir="rtl"] .admin-topbar{flex-direction:row-reverse}
+    [dir="rtl"] .topbar-right{flex-direction:row-reverse}
+    [dir="rtl"] .admin-subnav{flex-direction:row-reverse}
+    [dir="rtl"] table th{text-align:right}
+    [dir="rtl"] .form-grid{direction:rtl}
+    [dir="rtl"] .stat-card{text-align:right}
+    [dir="rtl"] .two-col{direction:rtl}
+    [dir="rtl"] #admin-drawer{right:auto;left:0;transform:translateX(-100%);box-shadow:4px 0 24px rgba(0,0,0,0.12)}
+
     /* ── PREVIEW MODAL ── */
     #preview-modal{
         display:none;position:fixed;inset:0;
@@ -504,6 +538,17 @@
     <div class="admin-topbar">
         <div class="topbar-title">{{ $pageTitle ?? $title }}</div>
         <div class="topbar-right">
+            {{-- Language Switcher --}}
+            <form method="POST" action="{{ route('language.switch') }}" id="lang-form-admin" style="display:none;">
+                @csrf
+                <input type="hidden" name="locale" id="lang-input-admin" value="">
+            </form>
+            <div class="admin-lang-switcher">
+                <button type="button" onclick="switchLangAdmin('en')"
+                        class="admin-lang-btn {{ app()->getLocale() === 'en' ? 'lang-active' : '' }}">EN</button>
+                <button type="button" onclick="switchLangAdmin('ar')"
+                        class="admin-lang-btn {{ app()->getLocale() === 'ar' ? 'lang-active' : '' }}">ع</button>
+            </div>
             <a href="{{ route('admin.preview.enable') }}" target="_blank" class="topbar-ghost" title="Browse the storefront as a customer with interactive features hidden">👁 View as Customer</a>
             <form method="POST" action="{{ route('logout') }}" style="margin:0;">
                 @csrf
@@ -623,6 +668,12 @@
 (function () {
     'use strict';
 
+    // ── Language switcher ──
+    window.switchLangAdmin = function(locale) {
+        document.getElementById('lang-input-admin').value = locale;
+        document.getElementById('lang-form-admin').submit();
+    };
+
     // ── CSRF ──
     function csrfToken() {
         var m = document.querySelector('meta[name="csrf-token"]');
@@ -690,7 +741,8 @@
     };
     window.closeDrawer = function () {
         var drawer = document.getElementById('admin-drawer');
-        drawer.style.transform = 'translateX(100%)';
+        var isRtl = document.documentElement.dir === 'rtl';
+        drawer.style.transform = isRtl ? 'translateX(-100%)' : 'translateX(100%)';
         setTimeout(function () {
             drawer.style.display = 'none';
             document.getElementById('admin-drawer-overlay').style.display = 'none';
