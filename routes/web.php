@@ -3,9 +3,11 @@
 use App\Http\Controllers\Admin\AdminRefundController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminPreviewController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\Login;
 use App\Http\Controllers\Auth\Logout;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CmsPageController;
@@ -18,12 +20,20 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TryOnController;
+use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [UserController::class, 'index']);
+Route::post('/language/switch', [LanguageController::class, 'switch'])->name('language.switch');
+
+Route::post('/contact', [ContactController::class, 'send'])->name('contact.send');
+
+Route::get('/', [UserController::class, 'index'])->name('home');
+Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/product/{product}', [ProductController::class, 'show'])->name('products.show');
 Route::get('/search', [ProductController::class, 'search'])->name('products.search');
+Route::get('/search/live', [ProductController::class, 'liveSearch'])->name('products.live-search');
 
 // Public CMS pages
 Route::get('/pages/{slug}', [CmsPageController::class, 'show'])->name('pages.show');
@@ -40,7 +50,15 @@ Route::post('/register', [RegisterController::class, 'store'])->middleware('gues
 Route::post('/logout', Logout::class)->middleware('auth')->name('logout');
 Route::get('/logout', Logout::class)->middleware('auth');
 Route::view('/login', 'auth.login')->middleware('guest')->name('login');
-Route::post('/login', [Login::class, 'store'])->middleware('guest');
+Route::post('/login', [Login::class, 'store'])->middleware(['guest', 'throttle:5,1']);
+
+// Password Reset
+Route::middleware('guest')->group(function () {
+    Route::get('/forgot-password', [ForgotPasswordController::class, 'show'])->name('password.request');
+    Route::post('/forgot-password', [ForgotPasswordController::class, 'store'])->name('password.email')->middleware('throttle:5,1');
+    Route::get('/reset-password/{token}', [ResetPasswordController::class, 'show'])->name('password.reset');
+    Route::post('/reset-password', [ResetPasswordController::class, 'store'])->name('password.update');
+});
 
 // Cart & Checkout — accessible to both guests and authenticated users
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
@@ -51,6 +69,7 @@ Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear
 
 Route::get('/checkout', [OrderController::class, 'checkout'])->name('checkout');
 Route::post('/checkout', [OrderController::class, 'place'])->name('checkout.place');
+Route::post('/checkout/quick', [OrderController::class, 'quickCheckout'])->name('checkout.quick');
 Route::post('/checkout/calculate', [OrderController::class, 'calculateTotals'])->name('checkout.calculate');
 Route::post('/coupon/apply', [CouponController::class, 'apply'])->name('coupon.apply');
 
@@ -61,6 +80,7 @@ Route::get('/payment/{order}/callback', [PaymentController::class, 'callback'])-
 Route::get('/payment/{order}/cancel', [PaymentController::class, 'cancel'])->name('payment.cancel');
 Route::get('/payment/{order}/retry', [PaymentController::class, 'retry'])->name('payment.retry')->middleware('throttle:10,1');
 Route::get('/payment/{order}/failed', [PaymentController::class, 'failed'])->name('payment.failed');
+Route::get('/orders/{order}/track', [OrderController::class, 'track'])->name('orders.track');
 
 Route::middleware('auth')->group(function () {
     // Wishlist
