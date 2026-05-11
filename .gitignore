@@ -24,3 +24,4 @@ venv/
 Homestead.json
 Homestead.yaml
 Thumbs.db
+.claude/settings.local.json
