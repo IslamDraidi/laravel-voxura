@@ -398,4 +398,48 @@ return [
     'cookie_accept'             => 'Accept All',
     'cookie_decline'            => 'Decline',
     'cookie_learn_more'         => 'Learn more',
+
+    // ── Recently Added Keys ───────────────────────────────────────────────────
+    'recently_viewed'       => 'Recently Viewed',
+    'order_placed_success'  => 'Your order has been placed successfully!',
+    'shipping_address'      => 'Shipping Address',
+    'payment_method'        => 'Payment Method',
+    'estimated_delivery'    => 'Estimated Delivery',
+    'accept'                => 'Accept',
+    'decline'               => 'Decline',
+    'cookie_message'        => 'We use cookies to improve your experience on our website.',
+    'no_reviews_first'      => 'No reviews yet. Be the first!',
+    'view_all_categories'   => 'View All Categories',
+
+    // ── Footer ────────────────────────────────────────────────────────────────
+    'footer_tagline'        => 'Elevating your style with premium fashion.',
+    'footer_shop'           => 'Shop',
+    'footer_support'        => 'Support',
+    'footer_company'        => 'Company',
+    'footer_new_arrivals'   => 'New Arrivals',
+    'footer_best_sellers'   => 'Best Sellers',
+    'footer_sale'           => 'Sale',
+    'footer_contact_us'     => 'Contact Us',
+    'footer_shipping_info'  => 'Shipping Info',
+    'footer_returns'        => 'Returns',
+    'footer_faq'            => 'FAQ',
+    'footer_about_us'       => 'About Us',
+    'footer_careers'        => 'Careers',
+    'footer_press'          => 'Press',
+    'footer_privacy'        => 'Privacy',
+    'footer_all_rights'     => 'All rights reserved.',
+
+    // ── Compare Bar ──────────────────────────────────────────────────────────
+    'compare_now'              => 'Compare now',
+    'compare_bar_clear'        => 'Clear',
+    'compare_products_in'      => ':count products in compare',
+    'compare_product_in'       => ':count product in compare',
+
+    // ── Checkout JS strings ───────────────────────────────────────────────────
+    'enter_coupon_first'       => 'Enter a coupon code first.',
+    'checking'                 => 'Checking…',
+    'business_days'            => 'business days',
+    'payment_update_soon'      => "We're currently updating our payment options. Please try again later or",
+    'checkout_guest_hint'      => 'to track your orders. Your order confirmation will be sent to the email below.',
+    'pay_now'                  => 'Pay',
 ];

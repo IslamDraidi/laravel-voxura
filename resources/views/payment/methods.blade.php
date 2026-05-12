@@ -140,7 +140,7 @@
             <div>
                 <strong>{{ __('general.payment_blocked') }}</strong><br>
                 {{ __('general.payment_blocked_msg', ['max' => $maxAttempts]) }}
-                Please <a href="/pages/contact" style="color:#991b1b;font-weight:700;">{{ __('general.contact_support') }}</a> for assistance.
+                <a href="/pages/contact" style="color:#991b1b;font-weight:700;">{{ __('general.contact_support') }}</a>.
             </div>
         </div>
     @else
@@ -168,7 +168,7 @@
             <span class="payment-alert-icon">⚠️</span>
             <div>
                 <strong>{{ __('general.no_payment_methods') }}</strong><br>
-                We're currently updating our payment options. Please try again later or
+                {{ __('general.payment_update_soon') }}
                 <a href="/pages/contact" style="color:#92400e;font-weight:700;">{{ __('general.contact_support') }}</a>.
             </div>
         </div>
@@ -211,7 +211,7 @@
                 </div>
 
                 <button type="submit" class="btn-pay">
-                    Pay ₪{{ number_format($order->grand_total, 2) }} →
+                    {{ __('general.pay_now') }} ₪{{ number_format($order->grand_total, 2) }} →
                 </button>
             </form>
         </div>

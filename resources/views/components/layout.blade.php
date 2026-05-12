@@ -813,7 +813,7 @@
                 </div>
                 <div class="nav-mega-footer">
                     <a href="/#products" class="nav-mega-view-all" @click="catOpen = false">
-                        View All Categories →
+                        {{ __('general.view_all_categories') }} →
                     </a>
                 </div>
             </div>
@@ -841,7 +841,7 @@
             <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;
                         letter-spacing:0.08em;color:#E8621A;padding:0.5rem 0 0.25rem;
                         border-bottom:1px solid #F0EBE4;margin-bottom:0.25rem;">
-                Categories
+                {{ __('general.categories') }}
             </div>
             @foreach($navCategories as $parent)
                 @if($parent->children->isNotEmpty())
@@ -979,7 +979,7 @@
     ">
         <span style="color:#fff;font-size:0.88rem;font-weight:600;">
             <span style="color:var(--orange);font-weight:800;">{{ $compareCount }}</span>
-            {{ $compareCount === 1 ? 'product' : 'products' }} in compare
+            {{ $compareCount === 1 ? __('general.compare_product_in', ['count' => '']) : __('general.compare_products_in', ['count' => '']) }}
         </span>
         <a href="/compare" style="
             background:var(--orange);color:#fff;
@@ -990,7 +990,7 @@
             transition:background 0.15s;
             white-space:nowrap;
         " onmouseover="this.style.background='#c2410c'" onmouseout="this.style.background='#ea580c'">
-            Compare now →
+            {{ __('general.compare_now') }} →
         </a>
         <form method="POST" action="/compare" style="margin:0;">
             @csrf @method('DELETE')
@@ -1005,7 +1005,7 @@
                 transition:border-color 0.15s,color 0.15s;
             " onmouseover="this.style.borderColor='#ef4444';this.style.color='#ef4444'"
                onmouseout="this.style.borderColor='rgba(255,255,255,0.25)';this.style.color='rgba(255,255,255,0.6)'">
-                Clear
+                {{ __('general.compare_bar_clear') }}
             </button>
         </form>
     </div>
@@ -1020,41 +1020,41 @@
                         <span style="color:#ea580c;">VOX</span>URA
                     </h3>
                     <p style="color:#9ca3af;margin:0;font-size:14px;line-height:1.6;">
-                        Elevating your tech experience with premium products
+                        {{ __('general.footer_tagline') }}
                     </p>
                 </div>
                 <div>
-                    <h4 style="font-weight:600;margin:0 0 1rem;font-size:15px;">Shop</h4>
+                    <h4 style="font-weight:600;margin:0 0 1rem;font-size:15px;">{{ __('general.footer_shop') }}</h4>
                     <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;">
-                        <li><a href="{{ route('products.index') }}" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">All Products</a></li>
-                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">New Arrivals</a></li>
-                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">Best Sellers</a></li>
-                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">Sale</a></li>
+                        <li><a href="{{ route('products.index') }}" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">{{ __('general.all_products') }}</a></li>
+                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">{{ __('general.footer_new_arrivals') }}</a></li>
+                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">{{ __('general.footer_best_sellers') }}</a></li>
+                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">{{ __('general.footer_sale') }}</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h4 style="font-weight:600;margin:0 0 1rem;font-size:15px;">Support</h4>
+                    <h4 style="font-weight:600;margin:0 0 1rem;font-size:15px;">{{ __('general.footer_support') }}</h4>
                     <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;">
-                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">Contact Us</a></li>
-                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">Shipping Info</a></li>
-                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">Returns</a></li>
-                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">FAQ</a></li>
+                        <li><a href="/#contact" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">{{ __('general.footer_contact_us') }}</a></li>
+                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">{{ __('general.footer_shipping_info') }}</a></li>
+                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">{{ __('general.footer_returns') }}</a></li>
+                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">{{ __('general.footer_faq') }}</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h4 style="font-weight:600;margin:0 0 1rem;font-size:15px;">Company</h4>
+                    <h4 style="font-weight:600;margin:0 0 1rem;font-size:15px;">{{ __('general.footer_company') }}</h4>
                     <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;">
-                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">About Us</a></li>
-                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">Careers</a></li>
-                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">Press</a></li>
-                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">Privacy</a></li>
-                        <li><a href="/pages/cookies-policy" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">Cookies Policy</a></li>
-                        <li><a href="/pages/privacy-policy" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">Privacy Policy</a></li>
+                        <li><a href="/#about" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">{{ __('general.footer_about_us') }}</a></li>
+                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">{{ __('general.footer_careers') }}</a></li>
+                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">{{ __('general.footer_press') }}</a></li>
+                        <li><a href="#" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">{{ __('general.footer_privacy') }}</a></li>
+                        <li><a href="/pages/cookies-policy" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">{{ __('general.cookies_policy') }}</a></li>
+                        <li><a href="/pages/privacy-policy" style="color:#9ca3af;text-decoration:none;font-size:14px;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#9ca3af'">{{ __('general.privacy_policy') }}</a></li>
                     </ul>
                 </div>
             </div>
             <div style="border-top:1px solid #1f2937;padding-top:2rem;text-align:center;">
-                <p style="color:#9ca3af;margin:0;font-size:14px;">&copy; {{ date('Y') }} Voxura. All rights reserved.</p>
+                <p style="color:#9ca3af;margin:0;font-size:14px;">&copy; {{ date('Y') }} Voxura. {{ __('general.footer_all_rights') }}</p>
             </div>
         </div>
     </footer>

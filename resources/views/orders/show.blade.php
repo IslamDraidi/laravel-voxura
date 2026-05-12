@@ -239,7 +239,7 @@
                             {{ $order->shippingMethod->name }}
                             @if($order->shippingMethod->estimated_days_min && $order->shippingMethod->estimated_days_max)
                                 <span style="font-weight:400;color:var(--gray-400);font-size:0.85rem;">
-                                    — {{ $order->shippingMethod->estimated_days_min }}-{{ $order->shippingMethod->estimated_days_max }} business days
+                                    — {{ $order->shippingMethod->estimated_days_min }}-{{ $order->shippingMethod->estimated_days_max }} {{ __('general.business_days') }}
                                 </span>
                             @elseif($order->shippingMethod->estimated_delivery)
                                 <span style="font-weight:400;color:var(--gray-400);font-size:0.85rem;">
