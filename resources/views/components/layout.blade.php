@@ -717,6 +717,22 @@
                                 {{ __('general.my_orders') }}
                             </a>
 
+                            {{-- My Messages --}}
+                            <a href="{{ route('profile.messages') }}" @click="userOpen = false"
+                               style="display:flex;align-items:center;gap:0.6rem;
+                                      padding:0.65rem 1rem;font-size:0.85rem;
+                                      font-weight:500;color:var(--gray-700);
+                                      text-decoration:none;transition:background 0.12s,color 0.12s;"
+                               onmouseover="this.style.background='var(--orange-light)';this.style.color='var(--orange)'"
+                               onmouseout="this.style.background='';this.style.color='var(--gray-700)'">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none"
+                                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                                </svg>
+                                {{ __('general.my_messages') }}
+                            </a>
+
                             {{-- Profile / Settings --}}
                             <a href="/profile" @click="userOpen = false"
                                style="display:flex;align-items:center;gap:0.6rem;
@@ -872,6 +888,7 @@
             <a href="/cart">{{ __('general.cart') }} @if($cartCount > 0)({{ $cartCount }})@endif</a>
             @auth
             <a href="/orders">{{ __('general.my_orders') }}</a>
+            <a href="{{ route('profile.messages') }}">{{ __('general.my_messages') }}</a>
             <a href="/profile">{{ __('general.settings') }}</a>
             @endauth
             @auth

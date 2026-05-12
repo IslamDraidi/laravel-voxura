@@ -95,6 +95,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile/info', [ProfileController::class, 'updateInfo'])->name('profile.info');
     Route::patch('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+    Route::get('/profile/messages', [ProfileController::class, 'messages'])->name('profile.messages');
 
     // Virtual Try-On
     Route::post('/products/{product}/tryon', [TryOnController::class, 'initiate'])->name('tryon.initiate');

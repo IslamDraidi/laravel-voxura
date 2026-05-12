@@ -226,6 +226,11 @@ return [
     // ── Account / Profile ─────────────────────────────────────────────────────
     'my_account'         => 'My Account',
     'my_wishlist'        => 'My Wishlist',
+    'my_messages'        => 'My Messages',
+    'my_messages_sub'    => 'Messages you sent to us via the contact form.',
+    'no_messages_yet'    => 'You haven\'t sent any messages yet.',
+    'send_first_message' => 'Send a Message',
+    'contact_label'      => 'Contact',
     'profile'            => 'Profile',
     'settings'           => 'Settings',
     'account_settings'   => 'Account Settings',

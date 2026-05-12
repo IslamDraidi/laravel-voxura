@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ContactMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
@@ -28,6 +29,15 @@ class ProfileController extends Controller
         ]);
 
         return back()->with('success', 'Profile updated successfully!');
+    }
+
+    public function messages()
+    {
+        $messages = ContactMessage::where('user_id', auth()->id())
+            ->latest()
+            ->paginate(10);
+
+        return view('profile.messages', compact('messages'));
     }
 
     public function updatePassword(Request $request)

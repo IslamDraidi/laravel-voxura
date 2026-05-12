@@ -226,6 +226,11 @@ return [
     // ── Account / Profile ─────────────────────────────────────────────────────
     'my_account'         => 'حسابي',
     'my_wishlist'        => 'مفضلتي',
+    'my_messages'        => 'رسائلي',
+    'my_messages_sub'    => 'الرسائل التي أرسلتها إلينا عبر نموذج التواصل.',
+    'no_messages_yet'    => 'لم ترسل أي رسائل بعد.',
+    'send_first_message' => 'إرسال رسالة',
+    'contact_label'      => 'تواصل',
     'profile'            => 'الملف الشخصي',
     'settings'           => 'الإعدادات',
     'account_settings'   => 'إعدادات الحساب',
