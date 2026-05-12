@@ -410,6 +410,7 @@
         {{-- Overlay (fixed, sits above everything incl. nav) --}}
         <div
             class="fd-overlay"
+            data-dusk="filter-backdrop"
             x-show="drawerOpen"
             x-transition.opacity
             @click="drawerOpen = false"
@@ -426,6 +427,7 @@
                     <button
                         type="button"
                         class="fd-filter-btn {{ $hasActive ? 'fd-filter-btn--active' : '' }}"
+                        data-dusk="filter-btn"
                         @click="drawerOpen = true"
                     >
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -459,9 +461,9 @@
             @if($hasActive)
             <div class="fd-active-tags">
                 @foreach($sizes as $s)
-                    <a href="{{ $rmFilter('size', $s) }}" class="fd-active-tag">
+                    <a href="{{ $rmFilter('size', $s) }}" class="fd-active-tag" data-dusk="filter-chip">
                         {{ __('general.size') }}: {{ $s }}
-                        <span class="fd-active-tag-x">&times;</span>
+                        <span class="fd-active-tag-x" data-dusk="filter-chip-remove">&times;</span>
                     </a>
                 @endforeach
                 @foreach($colors as $c)
@@ -494,6 +496,7 @@
                  ══════════════════════════════════════════ --}}
             <div
                 class="fd-drawer"
+                data-dusk="filter-drawer"
                 :class="{ 'fd-drawer--open': drawerOpen }"
                 @touchstart.passive="touchStartX = $event.touches[0].clientX"
                 @touchmove.passive="
@@ -505,7 +508,7 @@
                 {{-- Header --}}
                 <div class="fd-header">
                     <span class="fd-title">{{ __('general.filter_title') }}</span>
-                    <button type="button" class="fd-close" @click="drawerOpen = false"
+                    <button type="button" class="fd-close" data-dusk="filter-close-btn" @click="drawerOpen = false"
                             aria-label="{{ __('general.close') }}">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                              stroke-width="2.5" stroke-linecap="round">
@@ -625,7 +628,7 @@
                     <a href="{{ route('products.index') . $sortSuffix }}" class="fd-btn-clear">
                         {{ __('general.clear_all') }}
                     </a>
-                    <button type="submit" class="fd-btn-apply">
+                    <button type="submit" class="fd-btn-apply" data-dusk="apply-filters-btn">
                         {{ __('general.apply_filters') }}
                     </button>
                 </div>

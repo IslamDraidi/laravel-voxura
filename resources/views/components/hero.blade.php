@@ -50,7 +50,7 @@
     </button>
     @endif
 
-    <div class="scroll-indicator"><div class="scroll-dot"></div></div>
+    <div class="scroll-indicator" data-dusk="scroll-indicator"><div class="scroll-dot"></div></div>
 </section>
 
 <style>
@@ -169,6 +169,7 @@
 
         {{-- 7. Scroll indicator --}}
         <button class="hero-scroll"
+                data-dusk="scroll-indicator"
                 onclick="document.getElementById('next-section').scrollIntoView({behavior:'smooth'})"
                 aria-label="{{ __('general.scroll_to_explore') }}">
             <div class="hero-scroll-btn">

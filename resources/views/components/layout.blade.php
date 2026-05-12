@@ -627,9 +627,11 @@
                 </form>
                 <div class="lang-switcher">
                     <button type="button" onclick="switchLang('en')"
+                            data-dusk="lang-en-btn"
                             class="lang-btn {{ app()->getLocale() === 'en' ? 'lang-active' : '' }}">EN</button>
                     <span class="lang-sep">|</span>
                     <button type="button" onclick="switchLang('ar')"
+                            data-dusk="lang-ar-btn"
                             class="lang-btn {{ app()->getLocale() === 'ar' ? 'lang-active' : '' }}">ع</button>
                 </div>
 
@@ -640,7 +642,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round"
                               d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                     </svg>
-                    <span class="nav-badge" id="nav-cart-badge" style="{{ $cartCount < 1 ? 'display:none' : '' }}">{{ $cartCount > 99 ? '99+' : $cartCount }}</span>
+                    <span class="nav-badge" id="nav-cart-badge" data-dusk="cart-count" style="{{ $cartCount < 1 ? 'display:none' : '' }}">{{ $cartCount > 99 ? '99+' : $cartCount }}</span>
                 </a>
 
                 @auth
@@ -755,6 +757,7 @@
                                 <form method="POST" action="/logout" style="margin:0;">
                                     @csrf
                                     <button type="submit"
+                                            data-dusk="logout-button"
                                             style="display:flex;align-items:center;gap:0.6rem;
                                                    width:100%;padding:0.65rem 1rem;
                                                    font-size:0.85rem;font-weight:500;
@@ -930,6 +933,7 @@
                         <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
                     </svg>
                     <input type="text" name="q" id="lsInput" class="ls-input"
+                           data-dusk="search-input"
                            placeholder="{{ __('general.hero_search_placeholder') }}"
                            aria-label="{{ __('general.search') }}"
                            role="combobox" aria-autocomplete="list"
@@ -937,6 +941,7 @@
                            aria-haspopup="listbox" autocomplete="off">
                     <div class="ls-spinner" id="lsSpinner" aria-hidden="true"></div>
                     <button type="button" id="lsClose" class="ls-close-btn"
+                            data-dusk="search-clear"
                             @click="searchOpen = false" aria-label="{{ __('general.close') }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
                              viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"
@@ -1192,14 +1197,14 @@
             const icon = type === 'error'
                 ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>'
                 : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
-            wrap.innerHTML = `<div class="toast-alert" style="color:${c.color};border-color:${c.border};">${icon}${message}</div>`;
+            wrap.innerHTML = `<div class="toast-alert" data-dusk="toast-${type}" style="color:${c.color};border-color:${c.border};">${icon}${message}</div>`;
             document.body.appendChild(wrap);
             setTimeout(() => wrap.remove(), 4000);
         };
     </script>
 
     {{-- ── Cookie Consent Banner ── --}}
-    <div id="cookie-banner" style="
+    <div id="cookie-banner" data-dusk="cookie-banner" style="
         display:none;
         position:fixed;bottom:0;left:0;right:0;z-index:9999;
         background:#fff;border-top:1.5px solid #e5e7eb;
@@ -1224,8 +1229,8 @@
                 <a href="/pages/cookies-policy">{{ __('general.cookie_learn_more') }}</a>
             </p>
             <div class="cb-actions">
-                <button class="cb-btn cb-decline" onclick="cookieConsent('decline')">{{ __('general.cookie_decline') }}</button>
-                <button class="cb-btn cb-accept" onclick="cookieConsent('accept')">{{ __('general.cookie_accept') }}</button>
+                <button class="cb-btn cb-decline" data-dusk="cookie-decline-btn" onclick="cookieConsent('decline')">{{ __('general.cookie_decline') }}</button>
+                <button class="cb-btn cb-accept" data-dusk="cookie-accept-btn" onclick="cookieConsent('accept')">{{ __('general.cookie_accept') }}</button>
             </div>
         </div>
     </div>

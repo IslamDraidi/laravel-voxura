@@ -546,7 +546,7 @@
                     @csrf
                     <input type="hidden" name="product_id" value="{{ $product->id }}">
                     <input type="hidden" name="quantity" id="cartQty" value="1">
-                    <button type="submit" id="add-to-cart-btn" class="btn-buy" @if($product->stock === 0) disabled @endif>
+                    <button type="submit" id="add-to-cart-btn" class="btn-buy" data-dusk="add-to-cart-btn" @if($product->stock === 0) disabled @endif>
                         🛒 {{ __('general.add_to_cart') }}
                     </button>
                 </form>

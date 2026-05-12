@@ -25,3 +25,4 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 .claude/settings.local.json
+vendor/laravel/dusk/bin/

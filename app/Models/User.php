@@ -69,7 +69,7 @@ class User extends Authenticatable implements CanResetPasswordContract
 
     public function getOrCreateCart(): ShoppingCart
     {
-        return $this->cart ?? $this->cart()->create();
+        return $this->cart()->firstOrCreate([]);
     }
 
     public function likedProductIds(): array

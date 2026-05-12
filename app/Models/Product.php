@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'name', 'slug', 'description',
+        'name', 'slug', 'description', 'name_ar', 'description_ar',
         'price', 'stock', 'image', 'category_id',
         'sale_badge', 'is_new', 'max_order_quantity', 'stock_alert_threshold',
         'delivery_estimate', 'material', 'fit', 'care_instructions', 'sku',
@@ -33,6 +34,34 @@ class Product extends Model
             'model3d_queued_at' => 'datetime',
             'model3d_generated_at' => 'datetime',
         ];
+    }
+
+    public function getLocalizedNameAttribute(): string
+    {
+        if (app()->getLocale() === 'ar' && !empty($this->attributes['name_ar'])) {
+            return $this->attributes['name_ar'];
+        }
+
+        return $this->attributes['name'] ?? '';
+    }
+
+    public function getLocalizedDescriptionAttribute(): string
+    {
+        if (app()->getLocale() === 'ar' && !empty($this->attributes['description_ar'])) {
+            return $this->attributes['description_ar'];
+        }
+
+        return $this->attributes['description'] ?? '';
+    }
+
+    public function getIsLowStockAttribute(): bool
+    {
+        return $this->stock > 0 && $this->stock < 5;
+    }
+
+    public function getInStockAttribute(): bool
+    {
+        return $this->stock > 0;
     }
 
     public function is3DReady(): bool
