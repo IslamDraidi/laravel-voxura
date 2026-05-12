@@ -725,6 +725,64 @@
     @endif
 </div>
 
+{{-- RECENTLY VIEWED ──--}}
+@if($recentlyViewed->isNotEmpty())
+<div style="margin-bottom: 4rem;">
+    <h2 style="font-family: 'Playfair Display', serif; font-size: 1.75rem; font-weight: 800; margin-bottom: 1.5rem;">
+        🕒 {{ __('general.recently_viewed') }}
+    </h2>
+    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.25rem;">
+        @foreach($recentlyViewed->take(5) as $item)
+        <a href="{{ route('products.show', $item) }}"
+           style="background: #1a1a1a; border-radius: var(--radius); overflow: hidden;
+                  text-decoration: none; transition: transform 0.15s, box-shadow 0.15s;
+                  display: block;"
+           onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.3)'"
+           onmouseout="this.style.transform='';this.style.boxShadow=''">
+            <div style="aspect-ratio:1/1; overflow:hidden; background:#2a2a2a;">
+                @if($item->images->isNotEmpty())
+                    <img src="{{ asset('images/' . $item->images->first()->image) }}"
+                         alt="{{ $item->name }}"
+                         style="width:100%;height:100%;object-fit:cover;display:block;">
+                @elseif($item->image)
+                    <img src="{{ asset('images/' . $item->image) }}"
+                         alt="{{ $item->name }}"
+                         style="width:100%;height:100%;object-fit:cover;display:block;">
+                @else
+                    <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#555;">
+                        <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/>
+                        </svg>
+                    </div>
+                @endif
+            </div>
+            <div style="padding: 0.75rem;">
+                @if($item->category)
+                    <div style="font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--orange); margin-bottom: 0.3rem;">
+                        {{ $item->category->name }}
+                    </div>
+                @endif
+                <div style="font-family: 'Playfair Display', serif; font-size: 0.9rem; font-weight: 700; color: #fff; line-height: 1.3; margin-bottom: 0.4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    {{ $item->name }}
+                </div>
+                <div style="font-size: 0.9rem; font-weight: 800; color: #fff;">
+                    ₪{{ number_format($item->price, 2) }}
+                </div>
+            </div>
+        </a>
+        @endforeach
+    </div>
+    <style>
+        @media (max-width: 900px) {
+            .recently-viewed-grid { grid-template-columns: repeat(3, 1fr) !important; }
+        }
+        @media (max-width: 600px) {
+            .recently-viewed-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+    </style>
+</div>
+@endif
+
 {{-- SIZE GUIDE MODAL ──--}}
 <div id="sizeGuideModal" class="modal">
     <div class="modal-content">

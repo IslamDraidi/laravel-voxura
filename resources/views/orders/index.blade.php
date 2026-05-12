@@ -194,7 +194,7 @@
 
                         <div class="order-meta">
                             <p class="order-items-count">
-                                {{ $order->items->sum('quantity') }} {{ Str::plural('item', $order->items->sum('quantity')) }}
+                                {{ __('general.order_items', ['count' => $order->items->sum('quantity')]) }}
                             </p>
                             <p class="order-total">₪{{ number_format($order->total_amount) }}</p>
                         </div>

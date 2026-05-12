@@ -237,9 +237,9 @@
                 <div>
                     <p style="font-weight:700;font-size:0.9rem;color:#9a3412;margin-bottom:0.2rem;">{{ __('general.checkout_as_guest') }}</p>
                     <p style="font-size:0.82rem;color:#c2410c;">
-                        <a href="/login" style="color:#ea580c;font-weight:600;text-decoration:underline;">{{ __('general.checkout_sign_in') }}</a> or
+                        <a href="/login" style="color:#ea580c;font-weight:600;text-decoration:underline;">{{ __('general.checkout_sign_in') }}</a> {{ __('general.or_continue_with') }}
                         <a href="{{ route('register') }}" style="color:#ea580c;font-weight:600;text-decoration:underline;">{{ __('general.checkout_create') }}</a>
-                        to track your orders. Your order confirmation will be sent to the email below.
+                        {{ __('general.checkout_guest_hint') }}
                     </p>
                 </div>
             </div>
@@ -444,6 +444,8 @@
 <script>
 const TAX_RATE = {{ $taxRate }};
 const CSRF = document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}';
+const TRANS_FREE = '{{ __('general.free') }}';
+const TRANS_DISCOUNT = '{{ __('general.discount') }}';
 let currentShipping = {{ $firstRate }};
 let currentDiscount = 0;
 let currentMethodId = {{ $shippingMethods->isNotEmpty() ? $shippingMethods->first()->id : 'null' }};
@@ -461,7 +463,7 @@ function selectShipping(methodId, fallbackPrice) {
     // Update display immediately with fallback
     const el = document.getElementById('shippingCost');
     if (el) {
-        el.textContent = fallbackPrice === 0 ? 'Free' : '₪' + fallbackPrice.toFixed(2);
+        el.textContent = fallbackPrice === 0 ? TRANS_FREE : '₪' + fallbackPrice.toFixed(2);
         el.style.color = fallbackPrice === 0 ? '#16a34a' : 'var(--gray-900)';
     }
     recalcTotal();
@@ -494,7 +496,7 @@ async function fetchTotals() {
         // Update shipping
         const el = document.getElementById('shippingCost');
         if (el) {
-            el.textContent = data.shipping_free ? 'Free' : '₪' + data.shipping_amount.toFixed(2);
+            el.textContent = data.shipping_free ? TRANS_FREE : '₪' + data.shipping_amount.toFixed(2);
             el.style.color = data.shipping_free ? '#16a34a' : 'var(--gray-900)';
         }
         currentShipping = data.shipping_amount;
@@ -555,9 +557,9 @@ document.addEventListener('DOMContentLoaded', highlightSelected);
 async function applyCoupon() {
     const code = document.getElementById('couponInput').value.trim();
     const fb   = document.getElementById('couponFeedback');
-    if (!code) { fb.innerHTML = '<span style="color:#ef4444;">Enter a coupon code first.</span>'; return; }
+    if (!code) { fb.innerHTML = '<span style="color:#ef4444;">{{ __('general.enter_coupon_first') }}</span>'; return; }
 
-    fb.innerHTML = '<span style="color:var(--gray-400);">Checking…</span>';
+    fb.innerHTML = '<span style="color:var(--gray-400);">{{ __('general.checking') }}</span>';
 
     try {
         const res = await fetch('{{ route("coupon.apply") }}', {
@@ -581,14 +583,14 @@ async function applyCoupon() {
             fb.innerHTML = `<span style="color:#16a34a;">✓ ${data.discount_label} applied!</span>`;
             document.getElementById('couponCode').value = data.coupon_code;
             document.getElementById('discountRow').style.display = 'flex';
-            document.getElementById('discountLabel').textContent = 'Discount (' + data.coupon_code + ')';
+            document.getElementById('discountLabel').textContent = TRANS_DISCOUNT + ' (' + data.coupon_code + ')';
             document.getElementById('discountAmount').textContent = '-₪' + data.discount.toFixed(2);
 
             currentDiscount = data.discount;
             fetchTotals();
         }
     } catch (e) {
-        fb.innerHTML = '<span style="color:#ef4444;">Something went wrong. Please try again.</span>';
+        fb.innerHTML = '<span style="color:#ef4444;">{{ __('general.error') }}</span>';
     }
 }
 </script>

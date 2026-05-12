@@ -398,4 +398,48 @@ return [
     'cookie_accept'             => 'قبول الكل',
     'cookie_decline'            => 'رفض',
     'cookie_learn_more'         => 'معرفة المزيد',
+
+    // ── Recently Added Keys ───────────────────────────────────────────────────
+    'recently_viewed'       => 'شاهدت مؤخراً',
+    'order_placed_success'  => 'تم تقديم طلبك بنجاح!',
+    'shipping_address'      => 'عنوان الشحن',
+    'payment_method'        => 'طريقة الدفع',
+    'estimated_delivery'    => 'موعد التسليم المتوقع',
+    'accept'                => 'قبول',
+    'decline'               => 'رفض',
+    'cookie_message'        => 'نستخدم ملفات تعريف الارتباط لتحسين تجربتك على موقعنا.',
+    'no_reviews_first'      => 'لا توجد تقييمات بعد. كن الأول!',
+    'view_all_categories'   => 'عرض جميع التصنيفات',
+
+    // ── Footer ────────────────────────────────────────────────────────────────
+    'footer_tagline'        => 'نرفع أسلوبك مع أفضل الأزياء.',
+    'footer_shop'           => 'تسوق',
+    'footer_support'        => 'الدعم',
+    'footer_company'        => 'الشركة',
+    'footer_new_arrivals'   => 'وصل حديثاً',
+    'footer_best_sellers'   => 'الأكثر مبيعاً',
+    'footer_sale'           => 'تخفيضات',
+    'footer_contact_us'     => 'اتصل بنا',
+    'footer_shipping_info'  => 'معلومات الشحن',
+    'footer_returns'        => 'الإرجاع',
+    'footer_faq'            => 'الأسئلة الشائعة',
+    'footer_about_us'       => 'من نحن',
+    'footer_careers'        => 'الوظائف',
+    'footer_press'          => 'الصحافة',
+    'footer_privacy'        => 'الخصوصية',
+    'footer_all_rights'     => 'جميع الحقوق محفوظة.',
+
+    // ── Compare Bar ──────────────────────────────────────────────────────────
+    'compare_now'              => 'قارن الآن',
+    'compare_bar_clear'        => 'مسح',
+    'compare_products_in'      => ':count منتجات في المقارنة',
+    'compare_product_in'       => ':count منتج في المقارنة',
+
+    // ── Checkout JS strings ───────────────────────────────────────────────────
+    'enter_coupon_first'       => 'أدخل رمز الكوبون أولاً.',
+    'checking'                 => 'جارٍ التحقق…',
+    'business_days'            => 'أيام عمل',
+    'payment_update_soon'      => 'نقوم حالياً بتحديث خيارات الدفع. يرجى المحاولة لاحقاً أو',
+    'checkout_guest_hint'      => 'لتتبع طلباتك. سيتم إرسال تأكيد الطلب إلى البريد الإلكتروني أدناه.',
+    'pay_now'                  => 'ادفع',
 ];
