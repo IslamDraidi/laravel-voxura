@@ -75,7 +75,7 @@
                     </div>
                     <div>
                         <h3>{{ __('general.contact_email_label') }}</h3>
-                        <p>hello@voxura.com</p>
+                        <p>support@voxura.com</p>
                     </div>
                 </div>
 
@@ -90,7 +90,7 @@
                     </div>
                     <div>
                         <h3>{{ __('general.phone') }}</h3>
-                        <p>+1 (555) 123-4567</p>
+                        <p>+970 56 804 6647</p>
                     </div>
                 </div>
 
@@ -106,7 +106,7 @@
                     </div>
                     <div>
                         <h3>Location</h3>
-                        <p>San Francisco, CA</p>
+                        <p>Ramallah, PA</p>
                     </div>
                 </div>
 
