@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
+            'store.owner' => \App\Http\Middleware\StoreOwnerMiddleware::class,
         ]);
 
         $middleware->validateCsrfTokens(except: [
@@ -26,6 +27,10 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withSchedule(function (Schedule $schedule): void {
         $schedule->command('tryon:cleanup')->daily();
+        $schedule->command('stores:send-reminders')->dailyAt('09:00');
+        $schedule->command('stores:suspend-expired')->dailyAt('00:00');
+        $schedule->command('stores:auto-feature')->weeklyOn(1, '08:00');
+        $schedule->command('stores:topup-3d-credits')->monthlyOn(1, '00:01');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

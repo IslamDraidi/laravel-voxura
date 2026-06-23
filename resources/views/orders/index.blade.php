@@ -196,6 +196,11 @@
                             <p class="order-items-count">
                                 {{ __('general.order_items', ['count' => $order->items->sum('quantity')]) }}
                             </p>
+                            @if($order->store)
+                                <p style="font-size:0.78rem;color:var(--gray-400);margin-top:1px;">
+                                    {{ __('general.sold_by', ['store' => $order->store->name]) }}
+                                </p>
+                            @endif
                             <p class="order-total">₪{{ number_format($order->total_amount) }}</p>
                         </div>
 

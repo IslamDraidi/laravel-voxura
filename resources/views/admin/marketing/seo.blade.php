@@ -32,7 +32,7 @@
                     <tr>
                         <td style="font-weight:600;font-size:12px;">{{ $product->name }}</td>
                         <td>
-                            <a href="/product/{{ $product->slug }}" target="_blank"
+                            <a href="/products/{{ $product->slug }}" target="_blank"
                                style="color:var(--orange);text-decoration:none;font-family:monospace;font-size:11px;">
                                 /product/{{ $product->slug }}
                             </a>

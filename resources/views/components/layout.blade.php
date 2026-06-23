@@ -1,3 +1,4 @@
+@props(['title' => null, 'mainClass' => '', 'navTransparent' => false])
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 
@@ -8,8 +9,9 @@
     <title>{{ isset($title) ? $title . ' — Voxura' : 'Voxura' }}</title>
 
     <meta property="og:title" content="Voxura" />
-    <meta property="og:description" content="A social platform built with Laravel." />
-    <meta property="og:url" content="https://voxura.laravel.cloud" />
+    <meta property="og:description" content="{{ __('general.og_description') }}" />
+    <meta property="og:url" content="{{ url()->current() }}" />
+    <meta property="og:site_name" content="Voxura" />
 
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     <link rel="shortcut icon" type="image/png" href="{{ asset('favicon.png') }}">
@@ -21,6 +23,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
     @endif
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
@@ -83,7 +86,7 @@
             font-family: 'Bebas Neue', sans-serif;
             font-weight: 800; font-size: 1.9rem;
             text-decoration: none; letter-spacing: -0.02em;
-            transition: color 0.3s;
+            transition: color 0.3s; flex-shrink: 0;
         }
         nav.nav-top .nav-logo      { color: #fff; }
         nav.nav-scrolled .nav-logo { color: var(--gray-900); }
@@ -92,6 +95,7 @@
         .nav-links {
             display: flex; align-items: center; gap: 2rem;
             position: absolute; left: 50%; transform: translateX(-50%);
+            z-index: 1;
         }
         .nav-links a {
             font-size: 0.9rem; font-weight: 500;
@@ -102,7 +106,7 @@
         nav.nav-scrolled .nav-links a  { color: var(--gray-600); }
         nav.nav-scrolled .nav-links a:hover { color: var(--orange); }
 
-        .nav-end { display: flex; align-items: center; gap: 0.5rem; }
+        .nav-end { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
 
         .nav-user {
             font-size: 0.82rem; font-weight: 500;
@@ -279,14 +283,26 @@
             font-family: 'Tajawal', sans-serif;
             text-align: right;
         }
+        /* With direction: rtl on the flex container, the main axis flows
+           right-to-left: logo (first child) lands on the right, nav-links
+           (flex:1) fills the center, nav-end (last child) lands on the left.
+           nav-links and nav-end are in-flow so they can never overlap. */
         [dir="rtl"] .nav-inner {
-            flex-direction: row-reverse;
+            direction: rtl;
         }
-        [dir="rtl"] .nav-links {
-            flex-direction: row-reverse;
+        [dir="rtl"] .btn {
+            font-family: 'Tajawal', 'DM Sans', sans-serif;
+        }
+        /* Compact auth buttons in RTL so they don't crowd nav-links */
+        [dir="rtl"] .nav-end .btn {
+            padding: 0.4rem 0.85rem;
+            font-size: 0.8rem;
         }
         [dir="rtl"] .nav-end {
-            flex-direction: row-reverse;
+            gap: 0.3rem;
+        }
+        [dir="rtl"] .nav-cat-btn {
+            font-family: 'Tajawal', 'DM Sans', sans-serif;
         }
         [dir="rtl"] .nav-mega-child:hover {
             padding-left: 0;
@@ -536,6 +552,112 @@
         nav.nav-top     .nav-search-toggle { color: rgba(255,255,255,0.8); }
         nav.nav-scrolled .nav-search-toggle { color: var(--gray-600); }
         .nav-search-toggle:hover { color: #E8621A !important; }
+
+        /* ── User Dropdown ── */
+        .nav-user-dropdown { position: relative; }
+
+        .nav-user-trigger {
+            display: flex; align-items: center; gap: 8px;
+            background: none; border: none; cursor: pointer;
+            padding: 4px 8px; border-radius: 10px;
+            transition: background 0.15s; font-family: inherit;
+        }
+        .nav-user-trigger:hover { background: rgba(255,255,255,0.08); }
+        nav.nav-scrolled .nav-user-trigger:hover { background: rgba(0,0,0,0.05); }
+
+        .nav-user-avatar {
+            width: 30px; height: 30px; border-radius: 50%;
+            background: var(--orange); color: #fff;
+            font-size: 13px; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .nav-user-name {
+            font-size: 13px; font-weight: 600;
+            color: rgba(255,255,255,0.85);
+            transition: color 0.3s;
+        }
+        nav.nav-scrolled .nav-user-name { color: var(--gray-700); }
+
+        .nav-chevron {
+            color: rgba(255,255,255,0.4);
+            transition: transform 0.2s, color 0.3s;
+            flex-shrink: 0;
+        }
+        nav.nav-scrolled .nav-chevron { color: var(--gray-400); }
+        .nav-chevron.rotated { transform: rotate(180deg); }
+
+        .nav-dropdown-menu {
+            position: absolute; top: calc(100% + 8px); right: 0;
+            width: 240px; background: #ffffff;
+            border: 1px solid var(--gray-200);
+            border-radius: 14px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+            z-index: 9999; overflow: hidden; padding: 6px;
+        }
+        [dir="rtl"] .nav-dropdown-menu { right: auto; left: 0; }
+
+        .nav-dropdown-header { padding: 12px 10px 10px; }
+        .nav-dropdown-name {
+            font-size: 13px; font-weight: 700; color: var(--gray-900); margin-bottom: 2px;
+        }
+        .nav-dropdown-email {
+            font-size: 11px; color: var(--gray-500);
+            margin-bottom: 8px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+
+        .nav-dropdown-badge {
+            display: inline-block; font-size: 10px; font-weight: 600;
+            padding: 2px 8px; border-radius: 20px; letter-spacing: 0.3px;
+        }
+        .badge-admin {
+            background: rgba(127,119,221,0.12); color: #6d63d4;
+            border: 1px solid rgba(127,119,221,0.25);
+        }
+        .badge-store {
+            background: rgba(234,88,12,0.1); color: var(--orange);
+            border: 1px solid rgba(234,88,12,0.2);
+        }
+        .badge-customer {
+            background: var(--gray-100); color: var(--gray-500);
+            border: 1px solid var(--gray-200);
+        }
+
+        .nav-dropdown-divider { height: 1px; background: var(--gray-100); margin: 4px 0; }
+
+        .nav-dropdown-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 9px 10px; border-radius: 8px;
+            font-size: 13px; font-weight: 500;
+            color: var(--gray-700);
+            text-decoration: none; transition: all 0.15s;
+            width: 100%; background: none; border: none;
+            cursor: pointer; font-family: inherit; text-align: left;
+        }
+        [dir="rtl"] .nav-dropdown-item { text-align: right; }
+        .nav-dropdown-item:hover { background: var(--orange-light); color: var(--orange); }
+        .nav-dropdown-item svg { flex-shrink: 0; color: var(--gray-400); transition: color 0.15s; }
+        .nav-dropdown-item:hover svg { color: var(--orange); }
+        .nav-dropdown-item span:not(.nav-dropdown-count) { flex: 1; }
+
+        .nav-dropdown-highlight { color: var(--orange) !important; }
+        .nav-dropdown-highlight svg { color: var(--orange) !important; }
+        .nav-dropdown-highlight:hover { background: var(--orange-light) !important; }
+
+        .nav-dropdown-logout { color: #dc2626 !important; }
+        .nav-dropdown-logout svg { color: #dc2626 !important; }
+        .nav-dropdown-logout:hover { background: #fef2f2 !important; color: #b91c1c !important; }
+        .nav-dropdown-logout:hover svg { color: #b91c1c !important; }
+
+        .nav-dropdown-count {
+            min-width: 18px; height: 18px;
+            background: var(--orange); color: #fff;
+            border-radius: 10px; font-size: 10px; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            padding: 0 5px; flex-shrink: 0;
+        }
     </style>
 </head>
 
@@ -568,7 +690,7 @@
     @endif
 
     {{-- ── Navbar ── --}}
-    <nav id="navbar" class="nav-top"
+    <nav id="navbar" class="{{ $navTransparent ? 'nav-top' : 'nav-scrolled' }}"
          x-data="{ catOpen: false, userOpen: false, searchOpen: false }"
          @click.outside="catOpen = false; userOpen = false; searchOpen = false"
          @keydown.escape.window="catOpen = false; userOpen = false; searchOpen = false">
@@ -592,6 +714,7 @@
                 @endif
 
                 <a href="/#products">{{ __('general.products') }}</a>
+                <a href="{{ route('stores.index') }}">{{ __('general.stores') }}</a>
                 <a href="/#about">{{ __('general.about') }}</a>
                 <a href="/#contact">{{ __('general.contact') }}</a>
             </div>
@@ -665,19 +788,33 @@
                         @endauth
                     </a>
 
+                @php $userStore = null; @endphp
                 @auth
+                    @php $userStore = auth()->user()->store; @endphp
 
                     {{-- User profile dropdown --}}
-                    <div style="position:relative;" @click.outside="userOpen = false">
-                        <button class="nav-icon-btn" @click="userOpen = !userOpen"
-                                :aria-expanded="userOpen" title="{{ auth()->user()->name }}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
-                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    <div class="nav-user-dropdown" @click.outside="userOpen = false">
+
+                        {{-- Trigger --}}
+                        <button @click="userOpen = !userOpen"
+                                :aria-expanded="userOpen"
+                                class="nav-user-trigger">
+                            <span class="nav-user-avatar">
+                                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                            </span>
+                            <span class="nav-user-name">
+                                {{ explode(' ', auth()->user()->name)[0] }}
+                            </span>
+                            <svg class="nav-chevron" :class="{ 'rotated': userOpen }"
+                                 xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                 fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                 stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                                 aria-hidden="true">
+                                <polyline points="6 9 12 15 18 9"/>
                             </svg>
                         </button>
 
+                        {{-- Dropdown panel --}}
                         <div x-show="userOpen"
                              x-transition:enter="mega-enter"
                              x-transition:enter-start="mega-enter-start"
@@ -685,97 +822,91 @@
                              x-transition:leave="mega-leave"
                              x-transition:leave-start="mega-leave-start"
                              x-transition:leave-end="mega-leave-end"
-                             style="display:none;position:absolute;top:calc(100% + 10px);right:0;
-                                    min-width:190px;background:#fff;border-radius:0.75rem;
-                                    box-shadow:0 8px 32px rgba(0,0,0,0.12);
-                                    border:1.5px solid var(--gray-200);
-                                    overflow:hidden;z-index:100;">
+                             class="nav-dropdown-menu"
+                             style="display:none">
 
-                            {{-- User name header --}}
-                            <div style="padding:0.75rem 1rem 0.5rem;
-                                        border-bottom:1px solid var(--gray-100);">
-                                <p style="font-size:0.78rem;color:var(--gray-400);margin:0 0 1px;">
-                                    {{ __('general.signed_in_as') }}
-                                </p>
-                                <p style="font-size:0.88rem;font-weight:700;color:var(--gray-900);
-                                          margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-                                    {{ auth()->user()->name }}
-                                </p>
+                            {{-- Header --}}
+                            <div class="nav-dropdown-header">
+                                <div class="nav-dropdown-name">{{ auth()->user()->name }}</div>
+                                <div class="nav-dropdown-email">{{ auth()->user()->email }}</div>
+                                @if(auth()->user()->isAdmin())
+                                    <span class="nav-dropdown-badge badge-admin">Admin</span>
+                                @elseif($userStore && in_array($userStore->status, ['pending', 'approved']))
+                                    <span class="nav-dropdown-badge badge-store">{{ __('general.store_owner') }}</span>
+                                @else
+                                    <span class="nav-dropdown-badge badge-customer">{{ __('general.customer') }}</span>
+                                @endif
                             </div>
 
-                            {{-- My Orders --}}
-                            <a href="/orders" @click="userOpen = false"
-                               style="display:flex;align-items:center;gap:0.6rem;
-                                      padding:0.65rem 1rem;font-size:0.85rem;
-                                      font-weight:500;color:var(--gray-700);
-                                      text-decoration:none;transition:background 0.12s,color 0.12s;"
-                               onmouseover="this.style.background='var(--orange-light)';this.style.color='var(--orange)'"
-                               onmouseout="this.style.background='';this.style.color='var(--gray-700)'">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none"
-                                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                                </svg>
-                                {{ __('general.my_orders') }}
+                            <div class="nav-dropdown-divider"></div>
+
+                            {{-- STORE OWNER ITEMS --}}
+                            @if($userStore && in_array($userStore->status, ['pending', 'approved']))
+                                @if(Route::has('store.dashboard'))
+                                <a href="{{ route('store.dashboard') }}" class="nav-dropdown-item nav-dropdown-highlight" @click="userOpen = false">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+                                    <span>{{ __('general.store_dashboard') }}</span>
+                                </a>
+                                @endif
+                                @if(Route::has('store.editor'))
+                                <a href="{{ route('store.editor') }}" class="nav-dropdown-item" @click="userOpen = false">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                    <span>{{ __('general.edit_store') }}</span>
+                                </a>
+                                @endif
+                                @if(Route::has('store.messages.index'))
+                                <a href="{{ route('store.messages.index') }}" class="nav-dropdown-item" @click="userOpen = false">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                                    <span>{{ __('general.my_messages') }}</span>
+                                    @php
+                                        $unreadMessages = $userStore->messages()->whereNull('store_reply')->whereIn('status', ['approved'])->count();
+                                    @endphp
+                                    @if($unreadMessages > 0)
+                                        <span class="nav-dropdown-count">{{ $unreadMessages }}</span>
+                                    @endif
+                                </a>
+                                @endif
+                                <div class="nav-dropdown-divider"></div>
+                            @endif
+
+                            {{-- ADMIN ITEMS --}}
+                            @if(auth()->user()->isAdmin())
+                                @if(Route::has('admin.dashboard'))
+                                <a href="{{ route('admin.dashboard') }}" class="nav-dropdown-item nav-dropdown-highlight" @click="userOpen = false">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                    <span>{{ __('general.admin_panel') }}</span>
+                                </a>
+                                @endif
+                                <div class="nav-dropdown-divider"></div>
+                            @endif
+
+                            {{-- COMMON ITEMS --}}
+                            <a href="{{ route('orders.index') }}" class="nav-dropdown-item" @click="userOpen = false">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                                <span>{{ __('general.my_orders') }}</span>
                             </a>
 
-                            {{-- My Messages --}}
-                            <a href="{{ route('profile.messages') }}" @click="userOpen = false"
-                               style="display:flex;align-items:center;gap:0.6rem;
-                                      padding:0.65rem 1rem;font-size:0.85rem;
-                                      font-weight:500;color:var(--gray-700);
-                                      text-decoration:none;transition:background 0.12s,color 0.12s;"
-                               onmouseover="this.style.background='var(--orange-light)';this.style.color='var(--orange)'"
-                               onmouseout="this.style.background='';this.style.color='var(--gray-700)'">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none"
-                                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                          d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
-                                </svg>
-                                {{ __('general.my_messages') }}
+                            <a href="{{ route('wishlist.index') }}" class="nav-dropdown-item" @click="userOpen = false">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z"/></svg>
+                                <span>{{ __('general.my_wishlist') }}</span>
                             </a>
 
-                            {{-- Profile / Settings --}}
-                            <a href="/profile" @click="userOpen = false"
-                               style="display:flex;align-items:center;gap:0.6rem;
-                                      padding:0.65rem 1rem;font-size:0.85rem;
-                                      font-weight:500;color:var(--gray-700);
-                                      text-decoration:none;transition:background 0.12s,color 0.12s;"
-                               onmouseover="this.style.background='var(--orange-light)';this.style.color='var(--orange)'"
-                               onmouseout="this.style.background='';this.style.color='var(--gray-700)'">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none"
-                                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                </svg>
-                                {{ __('general.settings') }}
+                            <a href="{{ route('profile.edit') }}" class="nav-dropdown-item" @click="userOpen = false">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                <span>{{ __('general.settings') }}</span>
                             </a>
 
-                            {{-- Divider + Logout --}}
-                            <div style="border-top:1px solid var(--gray-100);">
-                                <form method="POST" action="/logout" style="margin:0;">
-                                    @csrf
-                                    <button type="submit"
-                                            data-dusk="logout-button"
-                                            style="display:flex;align-items:center;gap:0.6rem;
-                                                   width:100%;padding:0.65rem 1rem;
-                                                   font-size:0.85rem;font-weight:500;
-                                                   color:#ef4444;background:none;border:none;
-                                                   cursor:pointer;text-align:left;
-                                                   font-family:'DM Sans',sans-serif;
-                                                   transition:background 0.12s;"
-                                            onmouseover="this.style.background='#fef2f2'"
-                                            onmouseout="this.style.background=''">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none"
-                                             viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                                        </svg>
-                                        {{ __('general.sign_out') }}
-                                    </button>
-                                </form>
-                            </div>
+                            <div class="nav-dropdown-divider"></div>
+
+                            {{-- LOGOUT --}}
+                            <form method="POST" action="{{ route('logout') }}" style="margin:0;">
+                                @csrf
+                                <button type="submit" data-dusk="logout-button" class="nav-dropdown-item nav-dropdown-logout">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                                    <span>{{ __('general.sign_out') }}</span>
+                                </button>
+                            </form>
+
                         </div>
                     </div>
                 @else
@@ -890,6 +1021,23 @@
             @endauth
             <a href="/cart">{{ __('general.cart') }} @if($cartCount > 0)({{ $cartCount }})@endif</a>
             @auth
+            @if(auth()->user()->isStoreOwner() || (auth()->user()->store && in_array(auth()->user()->store->status, ['pending', 'approved'])))
+            <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;
+                        letter-spacing:0.08em;color:#E8621A;padding:0.5rem 0 0.25rem;
+                        border-bottom:1px solid #F0EBE4;margin-bottom:0.25rem;">
+                {{ __('general.my_store') }}
+            </div>
+            @if(Route::has('store.dashboard'))
+            <a href="{{ route('store.dashboard') }}" onclick="toggleMenu()">{{ __('general.store_dashboard') }}</a>
+            @endif
+            @if(Route::has('store.editor'))
+            <a href="{{ route('store.editor') }}" onclick="toggleMenu()">{{ __('general.edit_store') }}</a>
+            @endif
+            @if(Route::has('store.messages.index'))
+            <a href="{{ route('store.messages.index') }}" onclick="toggleMenu()">{{ __('general.my_messages') }}</a>
+            @endif
+            <div style="border-top:1px solid #F0EBE4;margin:0.25rem 0;"></div>
+            @endif
             <a href="/orders">{{ __('general.my_orders') }}</a>
             <a href="{{ route('profile.messages') }}">{{ __('general.my_messages') }}</a>
             <a href="/profile">{{ __('general.settings') }}</a>
@@ -984,7 +1132,7 @@
     @endif
 
     {{-- Page Content --}}
-    <main {{ isset($mainClass) ? "class=$mainClass" : '' }}>
+    <main {{ isset($mainClass) ? "class=$mainClass" : '' }} {{ isset($mainStyle) ? "style=$mainStyle" : '' }}>
         {{ $slot }}
     </main>
 
@@ -1084,11 +1232,12 @@
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js" defer></script>
     <script>
         const navbar = document.getElementById('navbar');
+        const navTransparent = {{ $navTransparent ? 'true' : 'false' }};
         window.addEventListener('scroll', () => {
             if (window.scrollY > 50) {
                 navbar.classList.remove('nav-top');
                 navbar.classList.add('nav-scrolled');
-            } else {
+            } else if (navTransparent) {
                 navbar.classList.remove('nav-scrolled');
                 navbar.classList.add('nav-top');
             }

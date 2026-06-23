@@ -8,12 +8,29 @@
     gap:14px;
     margin-bottom:2rem;
 }
+.overview-grid-4{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+    margin-bottom:2rem;
+}
 .ov-card{
     background:#fff;
     border:1px solid var(--border);
     border-radius:10px;
     padding:18px 20px;
 }
+.ov-card-link{
+    display:block;
+    text-decoration:none;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:18px 20px;
+    transition:box-shadow .15s;
+    cursor:pointer;
+}
+.ov-card-link:hover{box-shadow:0 2px 8px rgba(0,0,0,0.08);}
 .ov-icon{font-size:1.75rem;margin-bottom:10px;}
 .ov-label{
     font-size:10.5px;font-weight:700;letter-spacing:.07em;
@@ -24,12 +41,13 @@
 .ov-value.blue   {color:#4f46e5;}
 .ov-value.green  {color:var(--green);}
 .ov-value.red    {color:var(--red);}
+.ov-value.amber  {color:var(--amber);}
 .ov-sub{font-size:12px;color:var(--muted);}
 
 /* ── Today's cards ──────────────────────────────────── */
 .today-grid{
     display:grid;
-    grid-template-columns:repeat(3,1fr);
+    grid-template-columns:repeat(4,1fr);
     gap:14px;
     margin-bottom:2rem;
 }
@@ -41,6 +59,7 @@
 .td-card.orange {background:var(--orange);}
 .td-card.dark   {background:#1a1a2e;}
 .td-card.green  {background:#16a34a;}
+.td-card.blue   {background:#2563eb;}
 .td-label{
     font-size:10.5px;font-weight:700;letter-spacing:.07em;
     text-transform:uppercase;opacity:.85;margin-bottom:10px;
@@ -59,7 +78,41 @@
 }
 </style>
 
-{{-- ═══════════════ OVERALL DETAILS ═══════════════ --}}
+{{-- ═══════════════ PLATFORM OVERVIEW ═══════════════ --}}
+<p class="section-heading">Platform Overview</p>
+<div class="overview-grid-4">
+
+    <div class="ov-card">
+        <div class="ov-icon"><i class="ti ti-building-store" style="color:var(--orange);"></i></div>
+        <div class="ov-label">Total Stores</div>
+        <div class="ov-value orange">{{ number_format($totalStores) }}</div>
+        <div class="ov-sub">{{ $activeStores }} active</div>
+    </div>
+
+    <a class="ov-card-link" href="/admin/stores?tab=pending" onclick="adminNavigate('/admin/stores?tab=pending');return false;">
+        <div class="ov-icon"><i class="ti ti-clock" style="color:var(--amber);"></i></div>
+        <div class="ov-label">Pending Approvals</div>
+        <div class="ov-value amber">{{ number_format($pendingStores) }}</div>
+        <div class="ov-sub">Stores awaiting review</div>
+    </a>
+
+    <div class="ov-card">
+        <div class="ov-icon"><i class="ti ti-coin" style="color:var(--green);"></i></div>
+        <div class="ov-label">Commission Earned</div>
+        <div class="ov-value green">{{ config('shop.currency_symbol', '₪') }}{{ number_format($totalCommission, 2) }}</div>
+        <div class="ov-sub">From all store sales</div>
+    </div>
+
+    <a class="ov-card-link" href="/admin/stores?tab=expiring" onclick="adminNavigate('/admin/stores?tab=expiring');return false;">
+        <div class="ov-icon"><i class="ti ti-alert-triangle" style="color:var(--red);"></i></div>
+        <div class="ov-label">Expiring Soon</div>
+        <div class="ov-value red">{{ number_format($expiringStores) }}</div>
+        <div class="ov-sub">Subscriptions within 7 days</div>
+    </a>
+
+</div>
+
+{{-- ═══════════════ SALES OVERVIEW ═══════════════ --}}
 <p class="section-heading">{{ __('admin.overall_details') }}</p>
 <div class="overview-grid">
 
@@ -119,6 +172,11 @@
         <div class="td-value">{{ $todayCustomers }}</div>
     </div>
 
+    <div class="td-card blue">
+        <div class="td-label">New Applications</div>
+        <div class="td-value">{{ $todayApplications }}</div>
+    </div>
+
 </div>
 
 {{-- ═══════════════ TABLES ══════════════════════════ --}}
@@ -134,6 +192,7 @@
                 <thead>
                     <tr>
                         <th>{{ __('admin.product_col') }}</th>
+                        <th>Store</th>
                         <th style="text-align:right;">{{ __('admin.sales_col') }}</th>
                         <th style="text-align:right;">{{ __('admin.revenue_col') }}</th>
                     </tr>
@@ -146,6 +205,17 @@
                                style="color:var(--orange);text-decoration:none;font-weight:500;">
                                 {{ $p->name }}
                             </a>
+                        </td>
+                        <td>
+                            @if($p->store_name)
+                                <a href="/admin/stores/{{ $p->store_slug }}"
+                                   onclick="adminNavigate('/admin/stores/{{ $p->store_slug }}');return false;"
+                                   style="color:var(--orange);text-decoration:none;font-size:12px;">
+                                    {{ $p->store_name }}
+                                </a>
+                            @else
+                                <span style="color:var(--muted);font-size:12px;">—</span>
+                            @endif
                         </td>
                         <td style="text-align:right;color:var(--dark);">{{ number_format($p->total_sold) }}</td>
                         <td style="text-align:right;color:var(--dark);">₪{{ number_format($p->revenue) }}</td>
@@ -166,6 +236,7 @@
                 <thead>
                     <tr>
                         <th>{{ __('admin.customer_col') }}</th>
+                        <th>Top Store</th>
                         <th style="text-align:right;">{{ __('admin.orders_col') }}</th>
                         <th style="text-align:right;">{{ __('admin.total_spent_col') }}</th>
                     </tr>
@@ -174,6 +245,7 @@
                     @foreach($topCustomers as $c)
                     <tr>
                         <td style="font-weight:500;">{{ $c->name }}</td>
+                        <td style="font-size:12px;color:var(--muted);">{{ $c->top_store ?? '—' }}</td>
                         <td style="text-align:right;color:var(--dark);">{{ $c->order_count }}</td>
                         <td style="text-align:right;color:var(--dark);">₪{{ number_format($c->total_spent) }}</td>
                     </tr>

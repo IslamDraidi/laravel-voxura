@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Category;
 use App\Models\CmsPage;
 use App\Models\Product;
+use App\Models\Store;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -16,6 +17,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(PaymentEmailTemplateSeeder::class);
+        $this->call(StoreSeeder::class);
 
         // CMS Pages
         CmsPage::firstOrCreate(

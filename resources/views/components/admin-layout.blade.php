@@ -526,6 +526,18 @@
         <a href="/admin/coupons"   class="nav-item {{ $section === 'marketing' ? 'active' : '' }}"><span class="nav-icon">🏷️</span> Marketing</a>
         <a href="/admin/reports"   class="nav-item {{ $section === 'reporting' ? 'active' : '' }}"><span class="nav-icon">📈</span> Reporting</a>
         <a href="/admin/shipping"  class="nav-item {{ $section === 'configure' ? 'active' : '' }}"><span class="nav-icon">⚙️</span> Configure</a>
+        <a href="/admin/stores" class="nav-item {{ $section === 'stores' ? 'active' : '' }}">
+            <span class="nav-icon">🏪</span> Stores
+            @if(isset($pendingStoresCount) && $pendingStoresCount > 0)
+            <span style="margin-left:auto;background:var(--orange);color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;">{{ $pendingStoresCount }}</span>
+            @endif
+        </a>
+        <a href="/admin/messages"  class="nav-item {{ $section === 'messages' ? 'active' : '' }}">
+            <span class="nav-icon">💬</span> Messages
+            @if(isset($pendingCount) && $pendingCount > 0)
+            <span style="margin-left:auto;background:var(--orange);color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;">{{ $pendingCount }}</span>
+            @endif
+        </a>
     </nav>
 
     <div class="sidebar-footer">Voxura v2.0</div>
@@ -752,7 +764,7 @@
 
     // ── PREVIEW MODAL ──
     window.previewProduct = function (slug) {
-        document.getElementById('preview-iframe').src = '/product/' + slug;
+        document.getElementById('preview-iframe').src = '/products/' + slug;
         var m = document.getElementById('preview-modal');
         m.style.display = 'flex';
     };

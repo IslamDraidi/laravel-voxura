@@ -374,11 +374,12 @@
         $availableColors = $availableColors ?? collect();
         $productCounts   = $productCounts   ?? collect();
 
-        $filterCount = count($sizes) + count($colors) + count($categoryIds) + ($priceRange !== '' ? 1 : 0);
+        $storeSlug   = $storeSlug ?? '';
+        $filterCount = count($sizes) + count($colors) + count($categoryIds) + ($priceRange !== '' ? 1 : 0) + ($storeSlug !== '' ? 1 : 0);
         $hasActive   = $filterCount > 0;
 
         $currParams = array_filter(
-            request()->only(['sort','size','color','price_range','category']),
+            request()->only(['sort','size','color','price_range','category','store']),
             fn($v) => $v !== '' && $v !== [] && $v !== null
         );
 
@@ -485,6 +486,13 @@
                         <span class="fd-active-tag-x">&times;</span>
                     </a>
                 @endforeach
+                @if($storeSlug !== '')
+                    @php $activeStoreName = $stores->firstWhere('slug', $storeSlug)?->name ?? $storeSlug; @endphp
+                    <a href="{{ $rmFilter('store') }}" class="fd-active-tag" data-dusk="filter-chip">
+                        {{ __('general.store') }}: {{ $activeStoreName }}
+                        <span class="fd-active-tag-x" data-dusk="filter-chip-remove">&times;</span>
+                    </a>
+                @endif
                 <a href="{{ route('products.index') . $sortSuffix }}" class="fd-active-tag fd-active-tag--clear">
                     {{ __('general.clear_all') }}
                 </a>
@@ -621,6 +629,30 @@
                         </div>
                     </div>
 
+                    {{-- § Store --}}
+                    @if(!empty($stores) && $stores->isNotEmpty())
+                    <div class="fd-section">
+                        <div class="fd-section-label">{{ __('general.store') }}</div>
+                        <div class="fd-price-options">
+                            <label class="fd-radio-label">
+                                <input type="radio" name="store" value="" class="fd-radio"
+                                    {{ $storeSlug === '' ? 'checked' : '' }}>
+                                <span class="fd-radio-custom"></span>
+                                {{ __('general.all_stores') }}
+                            </label>
+                            @foreach($stores as $store)
+                            <label class="fd-radio-label">
+                                <input type="radio" name="store" value="{{ $store->slug }}"
+                                    class="fd-radio"
+                                    {{ $storeSlug === $store->slug ? 'checked' : '' }}>
+                                <span class="fd-radio-custom"></span>
+                                {{ $store->name }}
+                            </label>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+
                 </div>{{-- /.fd-body --}}
 
                 {{-- Sticky Footer --}}
@@ -686,6 +718,11 @@
                     @endif
                     <p class="card-name">{{ $product->name }}</p>
                     <p class="card-price">₪{{ number_format($product->price, 2) }}</p>
+                    @if($product->store)
+                        <p class="card-store" style="font-size:0.72rem;color:var(--gray-400);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                            {{ __('general.sold_by', ['store' => $product->store->name]) }}
+                        </p>
+                    @endif
                     <p class="card-stock {{ $product->stock < 1 ? 'out' : '' }}">
                         {{ $product->stock > 0 ? __('general.in_stock_count', ['count' => $product->stock]) : __('general.out_of_stock') }}
                     </p>

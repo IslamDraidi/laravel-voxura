@@ -30,6 +30,12 @@
         @endif
         <input type="text" name="search" placeholder="{{ __('admin.search_orders_ph') }}"
                value="{{ request('search') }}">
+        <select name="store" onchange="this.form.submit()">
+            <option value="">All Stores</option>
+            @foreach($stores as $store)
+                <option value="{{ $store->id }}" {{ request('store') == $store->id ? 'selected' : '' }}>{{ $store->name }}</option>
+            @endforeach
+        </select>
         <button type="submit" class="add-btn">{{ __('admin.search_btn') }}</button>
         <a href="/admin/orders{{ request('status') ? '?status='.request('status') : '' }}"
            style="font-size:0.85rem;color:var(--muted);text-decoration:none;align-self:center;">{{ __('admin.reset_btn') }}</a>
@@ -50,6 +56,7 @@
                     <tr>
                         <th>{{ __('admin.order_num_col') }}</th>
                         <th>{{ __('admin.customer_col_h') }}</th>
+                        <th>Store</th>
                         <th>{{ __('admin.date_col') }}</th>
                         <th>{{ __('admin.items_col') }}</th>
                         <th>{{ __('admin.total_col') }}</th>
@@ -77,6 +84,17 @@
                         <td>
                             <div style="font-weight:600;">{{ $order->user->name }}</div>
                             <div style="font-size:0.75rem;color:var(--muted);">{{ $order->user->email }}</div>
+                        </td>
+                        <td>
+                            @if($order->store)
+                                <a href="{{ route('admin.stores.show', $order->store) }}"
+                                   onclick="event.stopPropagation();adminNavigate('{{ route('admin.stores.show', $order->store) }}');return false;"
+                                   style="color:var(--orange);text-decoration:none;font-size:12px;font-weight:600;">
+                                    {{ $order->store->name }}
+                                </a>
+                            @else
+                                <span style="color:var(--muted);font-size:12px;">Direct</span>
+                            @endif
                         </td>
                         <td style="white-space:nowrap;">{{ $order->created_at->format('M d, Y · g:i A') }}</td>
                         <td>

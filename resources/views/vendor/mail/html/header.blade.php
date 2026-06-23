@@ -1,8 +1,10 @@
 @props(['url'])
 <tr>
-<td class="header" style="background-color:#111111;padding:30px 48px;">
+<td class="header">
 <a href="{{ $url }}" style="display:inline-block;text-decoration:none;">
-    <span style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:22px;font-weight:800;letter-spacing:0.08em;color:#ffffff;">VOXURA</span>
+<span style="font-size:24px;font-weight:900;letter-spacing:-0.5px;font-family:Arial,sans-serif;">
+    <span style="color:#ffffff;">VOX</span><span style="color:#E8621A;">URA</span>
+</span>
 </a>
 </td>
 </tr>

@@ -34,62 +34,83 @@ class AdminController extends Controller
 {
     public function index()
     {
-        $today = now()->toDateString();
+        // ── Platform store stats ─────────────────────────────────────────
+        $totalStores     = \App\Models\Store::count();
+        $activeStores    = \App\Models\Store::where('status', 'approved')->count();
+        $pendingStores   = \App\Models\Store::where('status', 'pending')->count();
+        $suspendedStores = \App\Models\Store::where('status', 'suspended')->count();
+        $expiringStores  = \App\Models\Store::where('status', 'approved')
+            ->where('subscription_active', true)
+            ->where('subscription_expires_at', '<=', now()->addDays(7))
+            ->count();
 
-        // ── Overall Details ──────────────────────────────────────────────
-        $totalSales = Order::whereNotIn('status', ['cancelled'])->sum('total_amount');
-        $totalOrders = Order::count();
-        $totalCustomers = User::where('is_admin', false)->count();
-        $avgOrderSale = Order::whereNotIn('status', ['cancelled'])->avg('total_amount') ?? 0;
+        // ── Platform revenue stats ───────────────────────────────────────
+        $totalRevenue = Order::whereIn('status', ['paid', 'completed', 'shipped', 'delivered'])
+            ->sum('grand_total');
+
+        $totalCommission = Order::join('stores', 'orders.store_id', '=', 'stores.id')
+            ->whereIn('orders.status', ['paid', 'completed', 'shipped', 'delivered'])
+            ->selectRaw('SUM(orders.grand_total * stores.commission_rate / 100) as commission')
+            ->value('commission') ?? 0;
+
+        // ── Existing stats ───────────────────────────────────────────────
+        $totalSales     = $totalRevenue;
+        $totalOrders    = Order::count();
+        $totalCustomers = User::where('is_admin', false)->whereDoesntHave('store')->count();
+        $avgOrderSale   = $totalOrders > 0 ? $totalRevenue / $totalOrders : 0;
         $unpaidInvoices = Order::where('status', 'pending')->count();
 
-        // ── Today's Details ───────────────────────────────────────────────
-        $todaySales = Order::whereDate('created_at', $today)
-            ->whereNotIn('status', ['cancelled'])->sum('total_amount');
-        $todayOrders = Order::whereDate('created_at', $today)->count();
-        $todayCustomers = User::where('is_admin', false)->whereDate('created_at', $today)->count();
+        // ── Today's stats ────────────────────────────────────────────────
+        $todaySales = Order::whereIn('status', ['paid', 'completed', 'shipped', 'delivered'])
+            ->whereDate('created_at', today())->sum('grand_total');
+        $todayOrders      = Order::whereDate('created_at', today())->count();
+        $todayCustomers   = User::whereDate('created_at', today())->count();
+        $todayApplications = \App\Models\Store::whereDate('created_at', today())->count();
 
-        // ── Top Selling Products (by units sold) ─────────────────────────
+        // ── Messages ─────────────────────────────────────────────────────
+        $pendingMessages = \App\Models\StoreMessage::needsReview()->count();
+
+        // ── Top selling products ─────────────────────────────────────────
         $topProducts = DB::table('order_items')
             ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->leftJoin('stores', 'products.store_id', '=', 'stores.id')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
-            ->whereNotIn('orders.status', ['cancelled'])
-            ->select(
-                'products.id',
-                'products.name',
-                DB::raw('SUM(order_items.quantity) as total_sold'),
-                DB::raw('SUM(order_items.quantity * order_items.price) as revenue')
-            )
-            ->groupBy('products.id', 'products.name')
-            ->orderByDesc('total_sold')
+            ->whereIn('orders.status', ['paid', 'completed', 'shipped', 'delivered'])
+            ->selectRaw('products.id, products.name, stores.name as store_name, stores.slug as store_slug,
+                SUM(order_items.quantity) as total_sold,
+                SUM(order_items.quantity * order_items.price) as revenue')
+            ->groupBy('products.id', 'products.name', 'stores.name', 'stores.slug')
+            ->orderByDesc('revenue')
             ->limit(5)
             ->get();
 
-        // ── Customers with Most Sales ─────────────────────────────────────
+        // ── Top customers ────────────────────────────────────────────────
         $topCustomers = DB::table('orders')
             ->join('users', 'orders.user_id', '=', 'users.id')
-            ->whereNotIn('orders.status', ['cancelled'])
-            ->select(
-                'users.id',
-                'users.name',
-                DB::raw('COUNT(orders.id) as order_count'),
-                DB::raw('SUM(orders.total_amount) as total_spent')
-            )
-            ->groupBy('users.id', 'users.name')
+            ->leftJoin('stores', 'orders.store_id', '=', 'stores.id')
+            ->whereIn('orders.status', ['paid', 'completed', 'shipped', 'delivered'])
+            ->whereNotNull('orders.user_id')
+            ->selectRaw('users.id, users.name, users.email,
+                COUNT(orders.id) as order_count,
+                SUM(orders.grand_total) as total_spent,
+                stores.name as top_store')
+            ->groupBy('users.id', 'users.name', 'users.email', 'stores.name')
             ->orderByDesc('total_spent')
             ->limit(5)
             ->get();
 
         return view('admin.dashboard', compact(
+            'totalStores', 'activeStores', 'pendingStores', 'suspendedStores',
+            'expiringStores', 'totalCommission', 'pendingMessages',
             'totalSales', 'totalOrders', 'totalCustomers', 'avgOrderSale', 'unpaidInvoices',
-            'todaySales', 'todayOrders', 'todayCustomers',
+            'todaySales', 'todayOrders', 'todayCustomers', 'todayApplications',
             'topProducts', 'topCustomers'
         ));
     }
 
     public function products(Request $request)
     {
-        $query = Product::with('category');
+        $query = Product::with(['category', 'store']);
 
         if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
@@ -107,10 +128,15 @@ class AdminController extends Controller
             }
         }
 
+        if ($request->filled('store')) {
+            $query->where('store_id', $request->store);
+        }
+
         $products   = $query->orderBy('name')->get();
         $categories = Category::orderBy('name')->get();
+        $stores     = \App\Models\Store::approved()->orderBy('name')->get(['id', 'name', 'slug']);
 
-        return view('admin.products.index', compact('products', 'categories'));
+        return view('admin.products.index', compact('products', 'categories', 'stores'));
     }
 
     public function create()
@@ -280,7 +306,7 @@ class AdminController extends Controller
 
     public function orders(Request $request)
     {
-        $query = Order::with('user', 'items.product')->latest();
+        $query = Order::with(['user', 'items.product', 'store'])->latest();
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -291,6 +317,10 @@ class AdminController extends Controller
                 $q->where('name', 'like', '%'.$request->search.'%')
                     ->orWhere('email', 'like', '%'.$request->search.'%');
             });
+        }
+
+        if ($request->filled('store')) {
+            $query->where('store_id', $request->store);
         }
 
         $orders = $query->get();
@@ -308,7 +338,9 @@ class AdminController extends Controller
             'partially_refunded' => Order::where('status', 'partially_refunded')->count(),
         ];
 
-        return view('admin.orders.index', compact('orders', 'statusCounts'));
+        $stores = \App\Models\Store::approved()->orderBy('name')->get(['id', 'name', 'slug']);
+
+        return view('admin.orders.index', compact('orders', 'statusCounts', 'stores'));
     }
 
     public function updateOrderStatus(Request $request, Order $order)
@@ -319,7 +351,7 @@ class AdminController extends Controller
 
         $order->update(['status' => $request->status]);
 
-        $this->sendOrderStatusEmail($order, $request->status);
+        $this->sendOrderStatusEmail($order, $request->status, $request->cancellation_reason ?? '');
 
         if ($request->ajax()) {
             return response()->json(['success' => true, 'message' => "Order #{$order->id} status updated.", 'status' => $request->status]);
@@ -328,7 +360,7 @@ class AdminController extends Controller
         return back()->with('success', "Order #{$order->id} status updated to ".ucfirst($request->status).'.');
     }
 
-    private function sendOrderStatusEmail(Order $order, string $status): void
+    private function sendOrderStatusEmail(Order $order, string $status, string $cancellationReason = ''): void
     {
         $mailableMap = [
             'shipped'   => OrderShippedMail::class,
@@ -339,7 +371,7 @@ class AdminController extends Controller
             return;
         }
 
-        $order->loadMissing(['user', 'items']);
+        $order->loadMissing(['user', 'store', 'items']);
         $recipientEmail = $order->recipientEmail();
         if (! $recipientEmail) {
             return;
@@ -350,6 +382,19 @@ class AdminController extends Controller
                 ->send(new $mailableMap[$status]($order));
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error("Order status email ({$status}) failed: " . $e->getMessage());
+        }
+
+        // Also fire notification to authenticated user for in-app + additional channels
+        try {
+            if ($order->user) {
+                match ($status) {
+                    'shipped'   => $order->user->notify(new \App\Notifications\OrderShippedNotification($order)),
+                    'cancelled' => $order->user->notify(new \App\Notifications\OrderCancelledNotification($order, $cancellationReason)),
+                    default     => null,
+                };
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Order status notification ({$status}) failed: " . $e->getMessage());
         }
     }
 

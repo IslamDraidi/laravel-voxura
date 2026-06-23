@@ -106,6 +106,37 @@
             </div>
         </div>
 
+        {{-- Fulfilled By --}}
+        <div class="detail-card">
+            <div class="detail-card-header">Fulfilled by</div>
+            <div class="detail-card-body">
+                @if($order->store)
+                    <div class="info-grid">
+                        <div>
+                            <p class="info-label">Store</p>
+                            <p class="info-value">
+                                <a href="{{ route('admin.stores.show', $order->store) }}"
+                                   onclick="event.preventDefault();adminNavigate('{{ route('admin.stores.show', $order->store) }}')"
+                                   style="color:var(--orange);text-decoration:none;">
+                                    {{ $order->store->name }}
+                                </a>
+                            </p>
+                        </div>
+                        <div>
+                            <p class="info-label">Plan</p>
+                            <p class="info-value">{{ ucfirst($order->store->plan_type) }}</p>
+                        </div>
+                        <div>
+                            <p class="info-label">Commission</p>
+                            <p class="info-value">{{ $order->store->commission_rate }}%</p>
+                        </div>
+                    </div>
+                @else
+                    <p class="info-value" style="color:var(--muted);">Direct (no store)</p>
+                @endif
+            </div>
+        </div>
+
         {{-- Items --}}
         <div class="detail-card">
             <div class="detail-card-header">{{ __('admin.items_card', ['count' => $order->items->count()]) }}</div>

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminRefundController;
+use App\Http\Controllers\Admin\AdminStoreController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminPreviewController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
@@ -22,6 +23,11 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TryOnController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\StoreController;
+use App\Http\Controllers\StoreMessageController;
+use App\Http\Controllers\Store\StoreApplicationController;
+use App\Http\Controllers\Store\StoreDashboardController;
+use App\Http\Controllers\Store\StoreEditorController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -30,8 +36,30 @@ Route::post('/language/switch', [LanguageController::class, 'switch'])->name('la
 Route::post('/contact', [ContactController::class, 'send'])->name('contact.send');
 
 Route::get('/', [UserController::class, 'index'])->name('home');
+
+// Stores
+Route::get('/stores', [StoreController::class, 'index'])->name('stores.index');
+Route::get('/stores/{store:slug}', [StoreController::class, 'show'])->name('stores.show');
+// ── Partner / Become-a-partner onboarding (auth required) ────────────────────
+Route::middleware(['auth'])
+    ->prefix('become-a-partner')
+    ->name('partner.')
+    ->group(function () {
+        Route::get('/',                  [StoreApplicationController::class, 'applicationForm'])->name('apply');
+        Route::post('/',                 [StoreApplicationController::class, 'submitApplication'])->name('apply.submit');
+        Route::get('/contact',           [StoreApplicationController::class, 'contactForm'])->name('contact');
+        Route::post('/contact',          [StoreApplicationController::class, 'submitContact'])->name('contact.submit');
+        Route::get('/plan',              [StoreApplicationController::class, 'planSelection'])->name('plan');
+        Route::post('/plan',             [StoreApplicationController::class, 'selectPlan'])->name('plan.submit');
+        Route::get('/payment',           [StoreApplicationController::class, 'paymentPage'])->name('payment');
+        Route::post('/payment/tap',      [StoreApplicationController::class, 'payWithTap'])->name('payment.tap');
+        Route::post('/payment/bank',     [StoreApplicationController::class, 'payWithBank'])->name('payment.bank');
+        Route::get('/payment/callback',  [StoreApplicationController::class, 'tapCallback'])->name('payment.callback');
+        Route::get('/success',           [StoreApplicationController::class, 'success'])->name('success');
+    });
+Route::post('/stores/{store:slug}/contact', [StoreMessageController::class, 'send'])->name('stores.contact.send');
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
-Route::get('/product/{product}', [ProductController::class, 'show'])->name('products.show');
+Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
 Route::get('/search', [ProductController::class, 'search'])->name('products.search');
 Route::get('/search/live', [ProductController::class, 'liveSearch'])->name('products.live-search');
 
@@ -48,7 +76,6 @@ Route::post('/reviews/{feedback}/helpful', [FeedbackController::class, 'markHelp
 Route::view('/register', 'auth.register')->middleware('guest')->name('register');
 Route::post('/register', [RegisterController::class, 'store'])->middleware('guest');
 Route::post('/logout', Logout::class)->middleware('auth')->name('logout');
-Route::get('/logout', Logout::class)->middleware('auth');
 Route::view('/login', 'auth.login')->middleware('guest')->name('login');
 Route::post('/login', [Login::class, 'store'])->middleware(['guest', 'throttle:5,1']);
 
@@ -106,6 +133,48 @@ Route::middleware('auth')->group(function () {
     // Reviews
     Route::post('/products/{product}/reviews', [FeedbackController::class, 'store'])->name('reviews.store');
     Route::delete('/reviews/{feedback}', [FeedbackController::class, 'destroy'])->name('reviews.destroy');
+});
+
+// Store publish
+Route::post('/store/publish', [StoreController::class, 'publish'])
+    ->name('store.publish')
+    ->middleware(['auth', 'store.owner']);
+
+// Store dashboard
+Route::middleware(['auth', 'store.owner'])->prefix('store')->name('store.')->group(function () {
+    Route::get('/dashboard',              [StoreDashboardController::class, 'overview'])->name('dashboard');
+    Route::get('/dashboard/orders',       [StoreDashboardController::class, 'orders'])->name('dashboard.orders');
+    Route::get('/dashboard/inventory',    [StoreDashboardController::class, 'inventory'])->name('dashboard.inventory');
+    Route::get('/dashboard/customers',    [StoreDashboardController::class, 'customers'])->name('dashboard.customers');
+    Route::get('/dashboard/traffic',      [StoreDashboardController::class, 'traffic'])->name('dashboard.traffic');
+    Route::get('/dashboard/print/{section}', [StoreDashboardController::class, 'printReport'])->name('dashboard.print');
+    Route::get('/dashboard/chart-data',   [StoreDashboardController::class, 'chartData'])->name('dashboard.chart-data');
+});
+
+// Store editor
+Route::middleware(['auth', 'store.owner'])->prefix('store')->name('store.')->group(function () {
+    Route::get('/editor', [StoreEditorController::class, 'index'])->name('editor');
+    Route::get('/editor/preview', [StoreEditorController::class, 'preview'])->name('editor.preview');
+    Route::post('/editor/save', [StoreEditorController::class, 'save'])->name('editor.save');
+    Route::get('/editor/products', [StoreEditorController::class, 'products'])->name('editor.products');
+    Route::post('/editor/products', [StoreEditorController::class, 'storeProduct'])->name('editor.products.store');
+    Route::get('/editor/products/{product}', [StoreEditorController::class, 'editProduct'])->name('editor.products.edit');
+    Route::post('/editor/products/{product}', [StoreEditorController::class, 'updateProduct'])->name('editor.products.update');
+    Route::delete('/editor/products/{product}', [StoreEditorController::class, 'deleteProduct'])->name('editor.products.delete');
+    Route::post('/editor/products/{product}/images', [StoreEditorController::class, 'uploadProductImage'])->name('editor.products.images');
+    Route::delete('/editor/products/{product}/images/{image}', [StoreEditorController::class, 'deleteProductImage'])->name('editor.products.images.delete');
+});
+
+// Store 3D generation
+Route::middleware(['auth', 'store.owner'])->prefix('store')->name('store.')->group(function () {
+    Route::post('/products/{product}/generate-3d', [\App\Http\Controllers\Store\StoreProductController::class, 'generate3D'])->name('products.generate3d');
+    Route::get('/products/{product}/3d-status',    [\App\Http\Controllers\Store\StoreProductController::class, 'check3DStatus'])->name('products.3d-status');
+});
+
+// Store owner messages
+Route::middleware(['auth', 'store.owner'])->prefix('store/messages')->name('store.messages.')->group(function () {
+    Route::get('/', [StoreMessageController::class, 'storeIndex'])->name('index');
+    Route::post('/{message}/reply', [StoreMessageController::class, 'reply'])->name('reply');
 });
 
 // Payment gateway webhooks (no auth, CSRF exempted in bootstrap/app.php)
@@ -217,6 +286,32 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     // Reporting — extra tabs
     Route::get('/reports/customers', [AdminController::class, 'customerReports'])->name('admin.reports.customers');
     Route::get('/reports/products', [AdminController::class, 'productReports'])->name('admin.reports.products');
+
+    // Messages
+    Route::get('/messages', [StoreMessageController::class, 'adminIndex'])->name('admin.messages.index');
+    Route::get('/messages/{message}', [StoreMessageController::class, 'adminShow'])->name('admin.messages.show');
+    Route::post('/messages/{message}/approve', [StoreMessageController::class, 'approve'])->name('admin.messages.approve');
+    Route::post('/messages/{message}/reject', [StoreMessageController::class, 'reject'])->name('admin.messages.reject');
+
+    // Stores management
+    Route::get('/stores/analytics/overview', [AdminStoreController::class, 'analytics'])->name('admin.stores.analytics');
+    Route::post('/stores/auto-feature', [AdminStoreController::class, 'autoFeature'])->name('admin.stores.auto-feature');
+    Route::get('/stores', [AdminStoreController::class, 'index'])->name('admin.stores.index');
+    Route::get('/stores/{store}', [AdminStoreController::class, 'show'])->name('admin.stores.show');
+    Route::get('/stores/{store}/edit', [AdminStoreController::class, 'edit'])->name('admin.stores.edit');
+    Route::patch('/stores/{store}', [AdminStoreController::class, 'update'])->name('admin.stores.update');
+    Route::post('/stores/{store}/approve', [AdminStoreController::class, 'approve'])->name('admin.stores.approve');
+    Route::post('/stores/{store}/reject', [AdminStoreController::class, 'reject'])->name('admin.stores.reject');
+    Route::post('/stores/{store}/suspend', [AdminStoreController::class, 'suspend'])->name('admin.stores.suspend');
+    Route::post('/stores/{store}/reactivate', [AdminStoreController::class, 'reactivate'])->name('admin.stores.reactivate');
+    Route::post('/stores/{store}/feature', [AdminStoreController::class, 'setFeatured'])->name('admin.stores.feature');
+    Route::patch('/stores/{store}/subscription', [AdminStoreController::class, 'updateSubscription'])->name('admin.stores.subscription.update');
+    Route::get('/stores/{store}/products', [AdminStoreController::class, 'storeProducts'])->name('admin.stores.products');
+    Route::post('/stores/{store}/products/{product}/approve', [AdminStoreController::class, 'approveProduct'])->name('admin.stores.products.approve');
+    Route::post('/stores/{store}/products/{product}/reject', [AdminStoreController::class, 'rejectProduct'])->name('admin.stores.products.reject');
+    Route::delete('/stores/{store}/products/{product}', [AdminStoreController::class, 'removeProduct'])->name('admin.stores.products.remove');
+    Route::post('/stores/{store}/credits/grant', [AdminStoreController::class, 'grantCredits'])->name('admin.stores.credits.grant');
+    Route::post('/stores/{store}/credits/reset', [AdminStoreController::class, 'resetCredits'])->name('admin.stores.credits.reset');
 
     // Admin Preview Mode
     Route::get('/preview/enable', [AdminPreviewController::class, 'enable'])->name('admin.preview.enable');

@@ -226,8 +226,11 @@ class OrderController extends Controller
 
         $isGuest = ! auth()->check();
 
+        $storeId = $cart->items->first()?->product?->store_id ?? null;
+
         $order = Order::create([
             'user_id'            => auth()->id(),
+            'store_id'           => $storeId,
             'guest_email'        => $isGuest ? $request->email : null,
             'guest_name'         => $isGuest ? $request->full_name : null,
             'coupon_id'          => $coupon?->id,
@@ -283,6 +286,20 @@ class OrderController extends Controller
             \Illuminate\Support\Facades\Log::error('Order confirmation email failed: ' . $e->getMessage());
         }
 
+        // Notify authenticated customer via notification channel
+        try {
+            $order->loadMissing(['user', 'store', 'items.product']);
+            if ($order->user) {
+                $order->user->notify(new \App\Notifications\OrderPlacedNotification($order));
+            }
+            // Notify store owner if order has a store
+            if ($order->store && $order->store->owner) {
+                $order->store->owner->notify(new \App\Notifications\NewOrderNotification($order));
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Order placed notification failed: ' . $e->getMessage());
+        }
+
         // Store order token in session so guest can view it
         if ($isGuest) {
             session(['guest_order_id' => $order->id]);
@@ -296,7 +313,7 @@ class OrderController extends Controller
     {
         $orders = auth()->user()
             ->orders()
-            ->with('items.product')
+            ->with(['items.product', 'store'])
             ->latest()
             ->get();
 
@@ -307,7 +324,7 @@ class OrderController extends Controller
     public function show(Order $order)
     {
         abort_unless($order->user_id === auth()->id(), 403);
-        $order->load('items.product.category', 'shippingMethod');
+        $order->load('items.product.category', 'shippingMethod', 'store');
 
         return view('orders.show', compact('order'));
     }

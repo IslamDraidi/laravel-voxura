@@ -5,7 +5,7 @@
         <div class="pc-image-wrap">
 
             {{-- الصورة نفسها --}}
-            <a href="/product/{{ $product->id }}">
+            <a href="/products/{{ $product->id }}">
                 <img src="{{ asset('images/' . $product->image) }}"
                      alt="{{ $product->name }}" />
             </a>
@@ -55,7 +55,7 @@
         <div class="pc-info">
             <p class="pc-category">{{ $product->category->name}}</p>
             <h3 class="pc-name">
-                <a href="/product/{{ $product->id }}">{{ $product->name }}</a>
+                <a href="/products/{{ $product->id }}">{{ $product->name }}</a>
             </h3>
             <p class="pc-description">{{ $product->description }}</p>
             @if($product->stock > 0 && $product->stock <= $product->stock_alert_threshold)
@@ -69,7 +69,7 @@
             @endif
             <div class="pc-footer">
                 <span class="pc-price">₪{{ number_format($product->price) }}</span>
-                <a href="/product/{{ $product->id }}" class="pc-learn">
+                <a href="/products/{{ $product->id }}" class="pc-learn">
                     {{ __('general.view_product') }}
                 </a>
             </div>

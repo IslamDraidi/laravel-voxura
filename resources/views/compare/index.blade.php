@@ -242,7 +242,7 @@
                                 <img src="{{ asset('images/' . $product->image) }}"
                                      alt="{{ $product->name }}"
                                      class="cmp-img">
-                                <a href="/product/{{ $product->id }}" class="cmp-prod-name" style="margin-top:0.75rem;">
+                                <a href="/products/{{ $product->id }}" class="cmp-prod-name" style="margin-top:0.75rem;">
                                     {{ $product->name }}
                                 </a>
                                 <form method="POST" action="/compare/{{ $product->id }}">

@@ -252,7 +252,7 @@
                     <div class="wish-card-img-wrap">
 
                         {{-- Product image --}}
-                        <a href="/product/{{ $product->id }}">
+                        <a href="/products/{{ $product->id }}">
                             <img src="{{ asset('images/' . $product->image) }}"
                                  alt="{{ $product->name }}">
                         </a>
@@ -291,11 +291,11 @@
                     <div class="wish-card-info">
                         <p class="wish-card-category">{{ $product->category->name }}</p>
                         <h3 class="wish-card-name">
-                            <a href="/product/{{ $product->id }}">{{ $product->name }}</a>
+                            <a href="/products/{{ $product->id }}">{{ $product->name }}</a>
                         </h3>
                         <div class="wish-card-footer">
                             <span class="wish-card-price">₪{{ number_format($product->price) }}</span>
-                            <a href="/product/{{ $product->id }}" class="wish-card-learn">{{ __('general.view_product') }}</a>
+                            <a href="/products/{{ $product->id }}" class="wish-card-learn">{{ __('general.view_product') }}</a>
                         </div>
                     </div>
 

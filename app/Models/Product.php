@@ -12,13 +12,15 @@ class Product extends Model
 
     protected $fillable = [
         'name', 'slug', 'description', 'name_ar', 'description_ar',
-        'price', 'stock', 'image', 'category_id',
+        'price', 'stock', 'image', 'category_id', 'store_id',
         'sale_badge', 'is_new', 'max_order_quantity', 'stock_alert_threshold',
         'delivery_estimate', 'material', 'fit', 'care_instructions', 'sku',
         'shipping_returns', 'color_swatches', 'has_colors', 'size_guide',
         'model3d_path', 'has_3d_model',
         'model3d_status', 'model3d_queued_at', 'model3d_generated_at',
         'model3d_error', 'model3d_selected_image', 'model3d_job_id',
+        'model3d_requested_by_store', 'model3d_requested_at',
+        'status', 'rejection_reason',
     ];
 
     protected function casts(): array
@@ -31,8 +33,9 @@ class Product extends Model
             'color_swatches' => 'array',
             'size_guide' => 'array',
             'has_3d_model' => 'boolean',
-            'model3d_queued_at' => 'datetime',
-            'model3d_generated_at' => 'datetime',
+            'model3d_queued_at'      => 'datetime',
+            'model3d_generated_at'   => 'datetime',
+            'model3d_requested_at'   => 'datetime',
         ];
     }
 
@@ -86,6 +89,11 @@ class Product extends Model
         }
 
         return asset('models/placeholder.glb');
+    }
+
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
     }
 
     public function category()

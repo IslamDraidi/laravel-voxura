@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Category;
+use App\Models\StoreMessage;
 use App\Services\AI\Contracts\TryOnBodyProvider;
 use App\Services\AI\Sam3DBodyFalService;
 use Illuminate\Support\Facades\View;
@@ -22,6 +23,12 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Share pending counts with admin layout
+        View::composer('components.admin-layout', function ($view) {
+            $view->with('pendingCount', StoreMessage::needsReview()->count());
+            $view->with('pendingStoresCount', \App\Models\Store::pending()->count());
+        });
+
         // Share nav categories with the main layout on every page
         View::composer('components.layout', function ($view) {
             $navCategories = Category::whereNull('parent_id')

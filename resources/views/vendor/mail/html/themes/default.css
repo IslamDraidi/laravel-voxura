@@ -10,8 +10,8 @@ body *:not(html):not(style):not(br):not(tr):not(code) {
 
 body {
     -webkit-text-size-adjust: none;
-    background-color: #ffffff;
-    color: #52525b;
+    background-color: #0f0f0f;
+    color: rgba(255, 255, 255, 0.7);
     height: 100%;
     line-height: 1.4;
     margin: 0;
@@ -28,7 +28,7 @@ blockquote {
 }
 
 a {
-    color: #18181b;
+    color: #E8621A;
 }
 
 a img {
@@ -38,7 +38,7 @@ a img {
 /* Typography */
 
 h1 {
-    color: #18181b;
+    color: #ffffff;
     font-size: 18px;
     font-weight: bold;
     margin-top: 0;
@@ -46,6 +46,7 @@ h1 {
 }
 
 h2 {
+    color: #ffffff;
     font-size: 16px;
     font-weight: bold;
     margin-top: 0;
@@ -53,6 +54,7 @@ h2 {
 }
 
 h3 {
+    color: #ffffff;
     font-size: 14px;
     font-weight: bold;
     margin-top: 0;
@@ -80,7 +82,7 @@ img {
     -premailer-cellpadding: 0;
     -premailer-cellspacing: 0;
     -premailer-width: 100%;
-    background-color: #fafafa;
+    background-color: #0f0f0f;
     margin: 0;
     padding: 0;
     width: 100%;
@@ -98,14 +100,16 @@ img {
 /* Header */
 
 .header {
-    padding: 25px 0;
+    padding: 32px 0 20px;
     text-align: center;
+    background-color: #0f0f0f;
 }
 
 .header a {
-    color: #18181b;
-    font-size: 19px;
-    font-weight: bold;
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
     text-decoration: none;
 }
 
@@ -125,9 +129,9 @@ img {
     -premailer-cellpadding: 0;
     -premailer-cellspacing: 0;
     -premailer-width: 100%;
-    background-color: #fafafa;
-    border-bottom: 1px solid #fafafa;
-    border-top: 1px solid #fafafa;
+    background-color: #0f0f0f;
+    border-bottom: 1px solid #1a1a1a;
+    border-top: 1px solid #1a1a1a;
     margin: 0;
     padding: 0;
     width: 100%;
@@ -137,11 +141,11 @@ img {
     -premailer-cellpadding: 0;
     -premailer-cellspacing: 0;
     -premailer-width: 570px;
-    background-color: #ffffff;
-    border-color: #e4e4e7;
-    border-radius: 4px;
+    background-color: #1a1a1a;
+    border-color: #2a2a2a;
+    border-radius: 8px;
     border-width: 1px;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
     margin: 0 auto;
     padding: 0;
     width: 570px;
@@ -154,7 +158,7 @@ img {
 /* Subcopy */
 
 .subcopy {
-    border-top: 1px solid #e4e4e7;
+    border-top: 1px solid #2a2a2a;
     margin-top: 25px;
     padding-top: 25px;
 }
@@ -176,13 +180,13 @@ img {
 }
 
 .footer p {
-    color: #a1a1aa;
+    color: rgba(255, 255, 255, 0.35);
     font-size: 12px;
     text-align: center;
 }
 
 .footer a {
-    color: #a1a1aa;
+    color: rgba(255, 255, 255, 0.35);
     text-decoration: underline;
 }
 
@@ -197,13 +201,14 @@ img {
 }
 
 .table th {
-    border-bottom: 1px solid #e4e4e7;
+    border-bottom: 1px solid #2a2a2a;
+    color: rgba(255, 255, 255, 0.5);
     margin: 0;
     padding-bottom: 8px;
 }
 
 .table td {
-    color: #52525b;
+    color: rgba(255, 255, 255, 0.7);
     font-size: 15px;
     line-height: 18px;
     margin: 0;
@@ -239,11 +244,11 @@ img {
 
 .button-blue,
 .button-primary {
-    background-color: #ea580c;
-    border-bottom: 8px solid #ea580c;
-    border-left: 18px solid #ea580c;
-    border-right: 18px solid #ea580c;
-    border-top: 8px solid #ea580c;
+    background-color: #E8621A;
+    border-bottom: 8px solid #E8621A;
+    border-left: 18px solid #E8621A;
+    border-right: 18px solid #E8621A;
+    border-top: 8px solid #E8621A;
 }
 
 .button-green,
@@ -267,18 +272,18 @@ img {
 /* Panels */
 
 .panel {
-    border-left: #18181b solid 4px;
+    border-left: #E8621A solid 4px;
     margin: 21px 0;
 }
 
 .panel-content {
-    background-color: #fafafa;
-    color: #52525b;
+    background-color: #242424;
+    color: rgba(255, 255, 255, 0.7);
     padding: 16px;
 }
 
 .panel-content p {
-    color: #52525b;
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .panel-item {

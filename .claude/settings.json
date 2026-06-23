@@ -38,7 +38,21 @@
       "Bash(grep -n '$cart\\\\.' /home/islamdriadi/voxura/resources/views/cart/index.blade.php)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://voxura.local/checkout)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://voxura.local/)",
-      "Bash(curl -s http://voxura.local/cart)"
+      "Bash(curl -s http://voxura.local/cart)",
+      "Bash(mkdir -p /home/islamdriadi/voxura/public/images/stores)",
+      "Bash(mkdir -p /home/islamdriadi/voxura/resources/views/stores)",
+      "Bash(curl -s http://localhost:8000/stores)",
+      "mcp__claude-flow__agent_execute",
+      "Skill(run)",
+      "Skill(run:*)"
+    ],
+    "additionalDirectories": [
+      "/home/islamdriadi/Desktop"
     ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "jq -r '\"[\\(.model.display_name)] \\(.context_window.used_percentage // 0)% context\"'",
+    "padding": 2
   }
 }

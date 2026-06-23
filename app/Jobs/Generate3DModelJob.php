@@ -3,7 +3,9 @@
 namespace App\Jobs;
 
 use App\Models\Product;
+use App\Models\Store;
 use App\Services\AI\Model3DPipeline;
+use App\Services\Store3DCreditService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -21,8 +23,10 @@ class Generate3DModelJob implements ShouldQueue
     public int $timeout = 600;
     public int $backoff = 30;
 
-    public function __construct(public Product $product)
-    {
+    public function __construct(
+        public Product $product,
+        public ?int $storeId = null,
+    ) {
     }
 
     public function handle(Model3DPipeline $pipeline): void
@@ -60,8 +64,16 @@ class Generate3DModelJob implements ShouldQueue
             return;
         }
 
+        if ($this->storeId) {
+            $store = Store::find($this->storeId);
+            if ($store) {
+                app(Store3DCreditService::class)->refundCredit($store);
+            }
+        }
+
         Log::error('3D generation job permanently failed', [
             'product_id' => $this->product->id,
+            'store_id'   => $this->storeId,
             'error'      => $exception->getMessage(),
         ]);
     }

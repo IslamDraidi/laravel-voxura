@@ -21,8 +21,14 @@
             <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>{{ __('admin.in_stock') }}</option>
             <option value="out"    {{ request('status') === 'out'    ? 'selected' : '' }}>{{ __('admin.out_of_stock') }}</option>
         </select>
+        <select name="store" onchange="this.form.submit()">
+            <option value="">All Stores</option>
+            @foreach($stores as $store)
+                <option value="{{ $store->id }}" {{ request('store') == $store->id ? 'selected' : '' }}>{{ $store->name }}</option>
+            @endforeach
+        </select>
         <button type="submit" class="add-btn">{{ __('admin.filter') }}</button>
-        @if(request()->hasAny(['search','category','status']))
+        @if(request()->hasAny(['search','category','status','store']))
             <a href="/admin/products" class="act-btn" style="text-decoration:none;">{{ __('admin.clear') }}</a>
         @endif
     </div>
@@ -57,6 +63,7 @@
             <thead>
                 <tr>
                     <th>{{ __('admin.product_col') }}</th>
+                    <th>Store</th>
                     <th>{{ __('admin.category_col') }}</th>
                     <th>{{ __('admin.price_col') }}</th>
                     <th>{{ __('admin.stock_col') }}</th>
@@ -83,6 +90,17 @@
                                 @endif
                             </div>
                         </div>
+                    </td>
+                    <td>
+                        @if($product->store)
+                            <a href="{{ route('admin.stores.show', $product->store) }}"
+                               onclick="event.stopPropagation();adminNavigate('{{ route('admin.stores.show', $product->store) }}');return false;"
+                               style="color:var(--orange);text-decoration:none;font-size:12px;font-weight:600;">
+                                {{ $product->store->name }}
+                            </a>
+                        @else
+                            <span style="color:var(--muted);font-size:12px;">Voxura</span>
+                        @endif
                     </td>
                     <td>
                         @if($product->category)

@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\Store;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -27,7 +28,15 @@ class ProductController extends Controller
             $categoryIds = $categoryId ? [$categoryId] : [];
         }
 
-        $query = Product::with(['category', 'variants'])->whereNull('deleted_at');
+        $storeSlug = $request->get('store', '');
+
+        $query = Product::with(['category', 'variants', 'images', 'store'])
+            ->whereNull('deleted_at')
+            ->where('status', 'approved')
+            ->where(function ($q) {
+                $q->whereNull('store_id')
+                  ->orWhereHas('store', fn ($sq) => $sq->where('status', 'approved'));
+            });
 
         if (!empty($sizes)) {
             $query->whereHas('variants', fn ($q) => $q->where('type', 'Size')->whereIn('value', $sizes));
@@ -56,6 +65,10 @@ class ProductController extends Controller
             $query->whereIn('category_id', $categoryIds);
         }
 
+        if ($storeSlug !== '') {
+            $query->whereHas('store', fn ($q) => $q->where('slug', $storeSlug));
+        }
+
         $query = match ($sort) {
             'price_asc'  => $query->orderBy('price'),
             'price_desc' => $query->orderByDesc('price'),
@@ -63,6 +76,7 @@ class ProductController extends Controller
             default      => $query->latest(),
         };
 
+        $stores   = Store::approved()->orderBy('name')->get(['id', 'name', 'slug']);
         $products = $query->get();
 
         $categories = Category::all();
@@ -88,13 +102,24 @@ class ProductController extends Controller
             'products', 'categories', 'q', 'sort', 'categoryId',
             'sizes', 'colors', 'priceRange', 'categoryIds',
             'availableSizes', 'availableColors', 'productCounts',
-            'isShopPage'
+            'isShopPage', 'stores', 'storeSlug'
         ));
     }
 
     public function show(Product $product)
     {
-        $product->load(['category', 'images', 'variants', 'feedbacks.user']);
+        $product->load(['category', 'images', 'variants', 'feedbacks.user', 'store']);
+
+        $moreFromStore = collect();
+        if ($product->store) {
+            $moreFromStore = Product::where('store_id', $product->store_id)
+                ->where('id', '!=', $product->id)
+                ->where('status', 'approved')
+                ->with('images')
+                ->latest()
+                ->take(4)
+                ->get();
+        }
 
         $viewed = session('recently_viewed', []);
         $viewed = array_filter($viewed, fn ($id) => $id !== $product->id);
@@ -133,6 +158,7 @@ class ProductController extends Controller
 
         return view('products.show', compact(
             'product',
+            'moreFromStore',
             'recentlyViewed',
             'relatedProducts',
             'reviews',

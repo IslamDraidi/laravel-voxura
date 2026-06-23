@@ -9,7 +9,7 @@ class Order extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'user_id', 'coupon_id', 'shipping_method_id', 'shipping_zone_id',
+        'user_id', 'store_id', 'coupon_id', 'shipping_method_id', 'shipping_zone_id',
         'total_amount', 'discount_amount', 'tax_amount', 'shipping_cost',
         'tax_breakdown', 'shipping_tax_amount', 'subtotal', 'grand_total',
         'currency', 'channel', 'coupon_code', 'status', 'shipping_address',
@@ -32,6 +32,11 @@ class Order extends Model
         'grand_total' => 'decimal:2',
         'shipping_tax_amount' => 'decimal:2',
     ];
+
+    public function store()
+    {
+        return $this->belongsTo(\App\Models\Store::class);
+    }
 
     public function user()
     {

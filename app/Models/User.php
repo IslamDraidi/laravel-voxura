@@ -37,6 +37,18 @@ class User extends Authenticatable implements CanResetPasswordContract
         return $this->role === 'admin';
     }
 
+    public function isStoreOwner(): bool
+    {
+        return $this->store()->exists()
+            && $this->store->status === 'approved';
+    }
+
+    public function hasActiveStore(): bool
+    {
+        return $this->store()->exists()
+            && in_array($this->store->status, ['approved']);
+    }
+
     public function isBlocked(): bool
     {
         return (bool) $this->is_blocked;
@@ -85,6 +97,11 @@ class User extends Authenticatable implements CanResetPasswordContract
     public function wishlistCount(): int
     {
         return $this->likes()->count();
+    }
+
+    public function store()
+    {
+        return $this->hasOne(Store::class, 'owner_id')->latestOfMany('id');
     }
 
     public function tryons()

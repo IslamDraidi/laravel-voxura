@@ -26,3 +26,6 @@ Homestead.yaml
 Thumbs.db
 .claude/settings.local.json
 vendor/laravel/dusk/bin/
+/public/images/stores/temp/*
+!/public/images/stores/temp/.gitkeep
+!/public/images/stores/temp/.gitkeep

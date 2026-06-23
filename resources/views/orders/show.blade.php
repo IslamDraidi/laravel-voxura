@@ -257,6 +257,16 @@
         <div class="order-sidebar-card">
             <p class="sidebar-title">{{ __('general.order_summary') }}</p>
 
+            @if($order->store)
+            <div class="sidebar-row" style="margin-bottom:0.85rem;padding-bottom:0.85rem;border-bottom:1px solid var(--gray-100);">
+                <span>{{ __('general.sold_by_label') }}</span>
+                <a href="{{ route('stores.show', $order->store) }}"
+                   style="color:var(--orange);font-weight:600;text-decoration:none;font-size:0.88rem;">
+                    {{ $order->store->name }}
+                </a>
+            </div>
+            @endif
+
             <div class="sidebar-row">
                 <span>{{ __('general.subtotal') }}</span>
                 <span>₪{{ number_format($order->subtotal ?: $order->total_amount, 2) }}</span>

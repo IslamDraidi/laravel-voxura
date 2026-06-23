@@ -53,7 +53,7 @@
                     <tr>
                         <td style="font-weight:600;">{{ $review->user->name }}</td>
                         <td>
-                            <a href="/product/{{ $review->product->slug }}" target="_blank"
+                            <a href="/products/{{ $review->product->slug }}" target="_blank"
                                style="color:var(--orange);text-decoration:none;font-size:13px;">
                                 {{ $review->product->name }}
                             </a>
