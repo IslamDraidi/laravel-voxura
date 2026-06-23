@@ -25,6 +25,10 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 .claude/settings.local.json
+.claude-flow/
+.swarm/
+.github/skills/
+ruvector.db
 vendor/laravel/dusk/bin/
 /public/images/stores/temp/*
 !/public/images/stores/temp/.gitkeep
